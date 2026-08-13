@@ -11,6 +11,8 @@
 
 > 원래 계획은 Prisma였으나, 이 실행 환경에서 Prisma의 엔진 바이너리 CDN(binaries.prisma.sh)이 네트워크 차단되어 있어 순수 JS 드라이버 기반의 Drizzle + better-sqlite3로 전환했습니다. 기능/스키마는 동일합니다.
 
+#안녕하세요. 반갑습니다.
+
 ## 실행 방법
 
 ```bash
