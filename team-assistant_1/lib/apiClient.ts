@@ -1,0 +1,145 @@
+"use client";
+
+import type {
+  EvidenceDTO,
+  MemberContribution,
+  RecentChangeDTO,
+  TaskDTO,
+  TaskStatus,
+} from "@/lib/types";
+
+export interface Project {
+  id: string;
+  name: string;
+  createdAt: number | string;
+  updatedAt: number | string;
+}
+
+export interface Member {
+  id: string;
+  projectId: string;
+  name: string;
+  createdAt: number | string;
+}
+
+export interface RecordItem {
+  id: string;
+  projectId: string;
+  type: "KAKAO_TEXT" | "MANUAL_TEXT";
+  rawContent: string;
+  analysisStatus: "PENDING" | "ANALYZING" | "COMPLETED" | "FAILED";
+  analysisError: string | null;
+  analyzedAt: number | string | null;
+  createdAt: number | string;
+}
+
+class ApiError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
+async function request<T>(url: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(url, {
+    ...init,
+    headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
+  });
+  let body: unknown = null;
+  try {
+    body = await res.json();
+  } catch {
+    // no body
+  }
+  if (!res.ok) {
+    const message =
+      body && typeof body === "object" && "error" in body
+        ? String((body as { error: unknown }).error)
+        : "요청 처리 중 오류가 발생했습니다.";
+    throw new ApiError(message);
+  }
+  return body as T;
+}
+
+// Projects
+export const listProjects = () => request<{ projects: Project[] }>("/api/projects");
+export const createProject = (name: string) =>
+  request<{ project: Project }>("/api/projects", {
+    method: "POST",
+    body: JSON.stringify({ name }),
+  });
+export const getProject = (projectId: string) =>
+  request<{ project: Project; members: Member[] }>(`/api/projects/${projectId}`);
+
+// Members
+export const listMembers = (projectId: string) =>
+  request<{ members: Member[] }>(`/api/projects/${projectId}/members`);
+export const addMember = (projectId: string, name: string) =>
+  request<{ member: Member }>(`/api/projects/${projectId}/members`, {
+    method: "POST",
+    body: JSON.stringify({ name }),
+  });
+export const deleteMember = (projectId: string, memberId: string) =>
+  request<{ ok: true }>(`/api/projects/${projectId}/members/${memberId}`, {
+    method: "DELETE",
+  });
+
+// Records
+export const listRecords = (projectId: string) =>
+  request<{ records: RecordItem[] }>(`/api/projects/${projectId}/records`);
+export const createRecord = (
+  projectId: string,
+  type: "KAKAO_TEXT" | "MANUAL_TEXT",
+  rawContent: string
+) =>
+  request<{ record: RecordItem }>(`/api/projects/${projectId}/records`, {
+    method: "POST",
+    body: JSON.stringify({ type, rawContent }),
+  });
+export const analyzeRecord = (
+  projectId: string,
+  recordId: string,
+  force = false
+) =>
+  request<{
+    changes: RecentChangeDTO[];
+    contribution: MemberContribution[];
+    usedFallback: boolean;
+    eventCount: number;
+  }>(`/api/projects/${projectId}/records/${recordId}/analyze`, {
+    method: "POST",
+    body: JSON.stringify({ force }),
+  });
+
+// Tasks
+export const listTasks = (projectId: string) =>
+  request<{ tasks: TaskDTO[] }>(`/api/projects/${projectId}/tasks`);
+export const getTask = (projectId: string, taskId: string) =>
+  request<{ task: TaskDTO; evidence: EvidenceDTO[]; members: Member[] }>(
+    `/api/projects/${projectId}/tasks/${taskId}`
+  );
+export const updateTask = (
+  projectId: string,
+  taskId: string,
+  updates: Partial<{ title: string; status: TaskStatus; assigneeId: string | null }>
+) =>
+  request<{ task: TaskDTO }>(`/api/projects/${projectId}/tasks/${taskId}`, {
+    method: "PATCH",
+    body: JSON.stringify(updates),
+  });
+export const deleteTask = (projectId: string, taskId: string) =>
+  request<{ ok: true }>(`/api/projects/${projectId}/tasks/${taskId}`, {
+    method: "DELETE",
+  });
+
+// Contribution / recent changes
+export const getContribution = (projectId: string) =>
+  request<{ contribution: MemberContribution[]; lastSnapshotAt: number | null }>(
+    `/api/projects/${projectId}/contribution`
+  );
+export const getRecentChanges = (projectId: string) =>
+  request<{ recordId: string | null; analyzedAt: number | null; changes: RecentChangeDTO[] }>(
+    `/api/projects/${projectId}/recent-changes`
+  );
+
+export { ApiError };
