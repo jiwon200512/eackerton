@@ -43,8 +43,8 @@ export default function LoginForm() {
 
   return (
     <AuthCard
-      title="Team Project Assistant"
-      description="아이디와 비밀번호로 로그인하세요."
+      title="다시 만나서 반가워요"
+      description="Effortly에서 팀의 진행 상황을 이어서 확인하세요."
     >
       <form onSubmit={handleSubmit} className="grid gap-4">
         <Field label="아이디" htmlFor="username">
@@ -81,7 +81,7 @@ export default function LoginForm() {
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+          className="btn-primary mt-1 rounded-xl px-4 py-3 text-sm font-semibold disabled:opacity-50"
         >
           {submitting ? "로그인 중..." : "로그인"}
         </button>
@@ -102,7 +102,7 @@ export default function LoginForm() {
 }
 
 export const inputClassName =
-  "mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500";
+  "glass-input mt-1.5 w-full rounded-xl px-3.5 py-2.5 text-sm";
 
 export function Field({
   label,
@@ -114,7 +114,7 @@ export function Field({
   children: React.ReactNode;
 }) {
   return (
-    <label htmlFor={htmlFor} className="block text-sm font-medium text-slate-700">
+    <label htmlFor={htmlFor} className="block text-sm font-semibold text-slate-700">
       {label}
       {children}
     </label>
@@ -131,10 +131,11 @@ export function AuthCard({
   children: React.ReactNode;
 }) {
   return (
-    <main className="mx-auto flex w-full max-w-md flex-1 items-center px-6 py-12">
-      <section className="w-full rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <main className="flex min-h-screen w-full items-center justify-center px-5 py-10">
+      <section className="glass-card-strong w-full max-w-[440px] rounded-3xl p-6 sm:p-8">
         <div className="mb-6 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight text-slate-900">{title}</h1>
+          <div className="mx-auto mb-5 flex w-fit items-center gap-2.5"><span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 text-lg font-bold text-white shadow-lg shadow-indigo-500/25">E</span><span className="text-xl font-bold tracking-tight text-slate-900">Effortly</span></div>
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">{title}</h1>
           <p className="mt-2 text-sm text-slate-500">{description}</p>
         </div>
         {children}

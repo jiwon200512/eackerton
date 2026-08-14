@@ -76,8 +76,8 @@ export default function SignupForm() {
 
   return (
     <AuthCard
-      title="Team Project Assistant"
-      description="새 계정을 만들고 프로젝트를 시작하세요."
+      title="Effortly 시작하기"
+      description="계정을 만들고 팀의 노력을 더 선명하게 관리하세요."
     >
       <form onSubmit={handleSubmit} className="grid gap-4">
         <Field label="이름" htmlFor="name">
@@ -139,21 +139,21 @@ export default function SignupForm() {
 
         <fieldset>
           <legend className="text-sm font-medium text-slate-700">이메일</legend>
-          <div className="mt-1.5 flex items-center gap-2">
+          <div className="mt-1.5 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1.15fr)] items-center gap-2">
             <input
               aria-label="이메일 아이디"
               value={emailLocal}
               onChange={(event) => setEmailLocal(event.target.value)}
               autoComplete="email"
               required
-              className="min-w-0 flex-1 rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              className="glass-input min-w-0 rounded-xl px-3 py-2.5 text-sm"
             />
             <span className="text-sm text-slate-500">@</span>
             <select
               aria-label="이메일 도메인"
               value={domainOption}
               onChange={(event) => setDomainOption(event.target.value)}
-              className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              className="glass-input min-w-0 rounded-xl px-3 py-2.5 text-sm"
             >
               {DOMAIN_OPTIONS.map((domain) => (
                 <option key={domain} value={domain}>
@@ -184,7 +184,7 @@ export default function SignupForm() {
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+          className="btn-primary mt-1 rounded-xl px-4 py-3 text-sm font-semibold disabled:opacity-50"
         >
           {submitting ? "가입 중..." : "회원가입"}
         </button>

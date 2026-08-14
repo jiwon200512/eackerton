@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import AuthHeader from "@/components/auth/AuthHeader";
+import ProtectedShell from "@/components/layout/ProtectedShell";
 import { getCurrentUser } from "@/lib/auth/session";
 
 export default async function ProtectedLayout({
@@ -10,10 +10,5 @@ export default async function ProtectedLayout({
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  return (
-    <>
-      <AuthHeader name={user.name} username={user.username} />
-      {children}
-    </>
-  );
+  return <ProtectedShell user={{ name: user.name, username: user.username }}>{children}</ProtectedShell>;
 }

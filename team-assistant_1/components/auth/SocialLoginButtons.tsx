@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 
-const PROVIDERS = ["Google", "카카오", "Apple", "네이버"] as const;
+const PROVIDERS = [
+  { name: "Google", mark: "G", color: "text-blue-600" },
+  { name: "카카오", mark: "K", color: "text-amber-700" },
+  { name: "Apple", mark: "A", color: "text-slate-900" },
+  { name: "네이버", mark: "N", color: "text-emerald-600" },
+] as const;
 
 export default function SocialLoginButtons() {
   const [message, setMessage] = useState<string | null>(null);
@@ -18,12 +23,12 @@ export default function SocialLoginButtons() {
       <div className="mt-4 grid gap-2">
         {PROVIDERS.map((provider) => (
           <button
-            key={provider}
+            key={provider.name}
             type="button"
-            onClick={() => setMessage(`${provider} 로그인은 준비 중인 기능입니다.`)}
-            className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            onClick={() => setMessage(`${provider.name} 로그인은 준비 중인 기능입니다.`)}
+            className="btn-secondary relative w-full rounded-xl px-4 py-2.5 text-sm font-semibold"
           >
-            {provider}로 계속하기
+            <span className={`absolute left-4 font-bold ${provider.color}`}>{provider.mark}</span>{provider.name}로 계속하기
           </button>
         ))}
       </div>

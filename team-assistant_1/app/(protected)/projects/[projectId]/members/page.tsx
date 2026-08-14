@@ -82,20 +82,16 @@ export default function MembersPage({
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 px-6 py-16">
+    <div className="page-container max-w-4xl">
       <div>
-        <button onClick={() => router.push("/")} className="text-sm text-slate-500 hover:text-slate-700">
-          ← 프로젝트 목록
-        </button>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
-          {project?.name} · 팀원 등록
-        </h1>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-500">Team Members</p>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{project?.name} 팀원 관리</h1>
         <p className="mt-1 text-sm text-slate-500">
           대화 속 화자를 실제 팀원과 연결하기 위해 팀원 이름을 등록해주세요.
         </p>
       </div>
 
-      <form onSubmit={handleAdd} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <form onSubmit={handleAdd} className="glass-card mt-7 rounded-2xl p-5 sm:p-6">
         <label className="block text-sm font-medium text-slate-700" htmlFor="member-name">
           팀원 추가
         </label>
@@ -105,12 +101,12 @@ export default function MembersPage({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="예: 김지원"
-            className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+            className="glass-input min-w-0 flex-1 rounded-xl px-4 py-2.5 text-sm"
           />
           <button
             type="submit"
             disabled={busy || !name.trim()}
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+            className="btn-primary rounded-xl px-5 py-2.5 text-sm font-semibold disabled:opacity-50"
           >
             추가
           </button>
@@ -118,16 +114,15 @@ export default function MembersPage({
         {error && <p className="mt-2 text-sm text-rose-600">{error}</p>}
       </form>
 
-      <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
-        <ul className="divide-y divide-slate-100">
+      <div className="glass-card mt-6 overflow-hidden rounded-2xl">
+        <ul className="divide-y divide-white/70">
           {members.length === 0 && (
             <li className="px-5 py-6 text-center text-sm text-slate-500">
               아직 등록된 팀원이 없습니다.
             </li>
           )}
           {members.map((m) => (
-            <li key={m.id} className="flex items-center justify-between px-5 py-3">
-              <span className="text-sm font-medium text-slate-800">{m.name}</span>
+            <li key={m.id} className="flex items-center justify-between px-5 py-4"><div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-violet-600 text-sm font-bold text-white">{m.name.charAt(0)}</span><div><span className="text-sm font-semibold text-slate-800">{m.name}</span><p className="text-[11px] text-slate-400">등록 팀원</p></div></div>
               <button
                 onClick={() => handleDelete(m.id)}
                 disabled={busy}
@@ -143,7 +138,7 @@ export default function MembersPage({
       <button
         onClick={() => router.push(`/projects/${projectId}`)}
         disabled={members.length === 0}
-        className="self-end rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-40"
+        className="btn-primary mt-6 ml-auto block rounded-xl px-5 py-2.5 text-sm font-semibold disabled:opacity-40"
       >
         Dashboard로 이동 →
       </button>

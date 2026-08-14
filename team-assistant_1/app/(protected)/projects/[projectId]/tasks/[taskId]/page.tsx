@@ -104,30 +104,26 @@ export default function TaskDetailPage({
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-6 px-6 py-10">
-      <button
-        onClick={() => router.push(`/projects/${projectId}`)}
-        className="self-start text-sm text-slate-500 hover:text-slate-700"
-      >
-        ← Dashboard
-      </button>
+    <div className="page-container max-w-5xl">
+      <div className="mb-7"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-500">Task Detail</p><h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900">업무 상세</h1><p className="mt-1 text-sm text-slate-500">Task 정보와 AI 평가, 분석 근거를 확인하고 수정하세요.</p></div>
 
       {error && <p className="text-sm text-rose-600">{error}</p>}
 
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,.65fr)]">
+      <div className="glass-card rounded-2xl p-5 sm:p-6">
         <div className="flex items-start justify-between gap-3">
           {editingTitle ? (
             <div className="flex flex-1 gap-2">
               <input
                 value={titleDraft}
                 onChange={(e) => setTitleDraft(e.target.value)}
-                className="flex-1 rounded-lg border border-slate-300 px-3 py-1.5 text-lg font-semibold outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                className="glass-input min-w-0 flex-1 rounded-xl px-3 py-2 text-lg font-semibold"
                 autoFocus
               />
               <button
                 onClick={() => titleDraft.trim() && saveUpdate({ title: titleDraft.trim() })}
                 disabled={saving || !titleDraft.trim()}
-                className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+                className="btn-primary rounded-xl px-3 py-2 text-sm font-semibold disabled:opacity-50"
               >
                 저장
               </button>
@@ -160,7 +156,7 @@ export default function TaskDetailPage({
               value={task.assigneeId ?? ""}
               onChange={(e) => saveUpdate({ assigneeId: e.target.value || null })}
               disabled={saving}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              className="glass-input mt-1 w-full rounded-xl px-3 py-2.5 text-sm"
             >
               <option value="">미배정</option>
               {members.map((m) => (
@@ -176,7 +172,7 @@ export default function TaskDetailPage({
               value={task.status}
               onChange={(e) => saveUpdate({ status: e.target.value as TaskStatus })}
               disabled={saving}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              className="glass-input mt-1 w-full rounded-xl px-3 py-2.5 text-sm"
             >
               {TASK_STATUSES.map((s) => (
                 <option key={s} value={s}>
@@ -187,14 +183,14 @@ export default function TaskDetailPage({
           </div>
         </div>
 
-        <div className="mt-5 grid grid-cols-3 gap-3 text-center">
+        <div className="mt-6"><p className="mb-3 text-xs font-bold uppercase tracking-[0.12em] text-slate-400">AI 업무 평가</p><div className="grid grid-cols-3 gap-3 text-center">
           <ScoreBox label="중요도" value={task.importance} />
           <ScoreBox label="난이도" value={task.difficulty} />
           <ScoreBox label="작업량" value={task.workload} />
-        </div>
+        </div></div>
 
         {task.lastReason && (
-          <p className="mt-4 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500">
+          <p className="mt-4 rounded-xl border border-indigo-100/60 bg-indigo-50/35 px-3 py-3 text-xs leading-5 text-slate-500">
             AI 판단 근거: {task.lastReason}
           </p>
         )}
@@ -208,14 +204,14 @@ export default function TaskDetailPage({
         </button>
       </div>
 
-      <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-3 text-sm font-semibold text-slate-700">Evidence ({evidence.length})</h2>
+      <div className="glass-card rounded-2xl p-5 sm:p-6">
+        <div className="mb-4"><p className="text-xs font-semibold uppercase tracking-[0.12em] text-indigo-500">Evidence</p><h2 className="mt-1 text-base font-bold text-slate-800">분석 근거 <span className="text-indigo-500">{evidence.length}</span></h2></div>
         {evidence.length === 0 ? (
           <p className="text-sm text-slate-500">아직 근거가 없습니다.</p>
         ) : (
-          <ul className="flex flex-col gap-2">
+          <ul className="relative flex flex-col gap-3 before:absolute before:bottom-4 before:left-[7px] before:top-4 before:w-px before:bg-indigo-200">
             {evidence.map((ev) => (
-              <li key={ev.id} className="rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700">
+              <li key={ev.id} className="relative ml-5 rounded-xl border border-white/70 bg-white/50 px-3 py-3 text-sm text-slate-700 before:absolute before:-left-[21px] before:top-4 before:h-3 before:w-3 before:rounded-full before:border-2 before:border-white before:bg-indigo-500 before:shadow-sm">
                 <span className="font-medium text-slate-800">{ev.speaker}</span>
                 {ev.timestamp && <span className="ml-1.5 text-xs text-slate-400">{ev.timestamp}</span>}
                 <p className="mt-0.5 text-slate-600">{ev.text}</p>
@@ -223,16 +219,16 @@ export default function TaskDetailPage({
             ))}
           </ul>
         )}
-      </div>
+      </div></div>
     </div>
   );
 }
 
 function ScoreBox({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-lg bg-slate-50 py-3">
+    <div className="rounded-xl border border-white/70 bg-white/48 py-3">
       <p className="text-xs text-slate-500">{label}</p>
-      <p className="mt-0.5 text-lg font-semibold text-slate-800">{value}</p>
+      <p className="mt-0.5 text-lg font-bold text-indigo-600">{value}<span className="text-xs font-medium text-slate-400">/5</span></p>
     </div>
   );
 }
