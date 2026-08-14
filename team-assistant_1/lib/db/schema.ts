@@ -12,6 +12,32 @@ const id = () =>
     .primaryKey()
     .$defaultFn(() => randomUUID());
 
+export const users = sqliteTable("users", {
+  id: id(),
+  username: text("username").notNull().unique(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  passwordHash: text("password_hash").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .notNull()
+    .default(sql`(strftime('%s','now') * 1000)`),
+  updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+    .notNull()
+    .default(sql`(strftime('%s','now') * 1000)`),
+});
+
+export const sessions = sqliteTable("sessions", {
+  id: id(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  tokenHash: text("token_hash").notNull().unique(),
+  expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .notNull()
+    .default(sql`(strftime('%s','now') * 1000)`),
+});
+
 export const projects = sqliteTable("projects", {
   id: id(),
   name: text("name").notNull(),

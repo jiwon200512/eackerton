@@ -1,24 +1,24 @@
-import { GoogleGenAI } from "@google/genai";
+import OpenAI from "openai";
 import { Errors } from "@/lib/errors";
 import { SYSTEM_PROMPT } from "./systemPrompt";
 import { AI_JSON_SCHEMA } from "./schema";
 import type { AIContext } from "./buildContext";
 
-let client: GoogleGenAI | null = null;
+let client: OpenAI | null = null;
 
-function getClient(): GoogleGenAI {
-  const apiKey = process.env.GEMINI_API_KEY;
+function getClient(): OpenAI {
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     throw Errors.aiUnavailable();
   }
   if (!client) {
-    client = new GoogleGenAI({ apiKey });
+    client = new OpenAI({ apiKey });
   }
   return client;
 }
 
 /**
- * Calls the LLM (Google Gemini) with the current project state + new
+ * Calls the OpenAI Responses API with the current project state + new
  * messages and returns the raw parsed JSON. Callers must run the result
  * through services/ai/validate.ts (validateAIResult) before touching the
  * database - this function only guarantees "valid JSON was returned", not
@@ -26,38 +26,26 @@ function getClient(): GoogleGenAI {
  */
 export async function analyzeWithAI(context: AIContext): Promise<unknown> {
   const ai = getClient();
-  const model = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+  const model = process.env.OPENAI_MODEL || "gpt-5.4-mini";
 
   let text: string | undefined;
   try {
-    const response = await ai.models.generateContent({
+    const response = await ai.responses.create({
       model,
-      contents: [
-        {
-          role: "user",
-          parts: [
-            {
-              text:
-                "다음은 현재 프로젝트 상태와 새로 입력된 기록이다. 이 JSON을 분석하여 지정된 스키마에 맞는 결과를 반환하라.\n\n" +
-                JSON.stringify(context, null, 2),
-            },
-          ],
+      instructions: SYSTEM_PROMPT,
+      input:
+        "다음은 현재 프로젝트 상태와 새로 입력된 기록이다. 이 JSON을 분석하여 지정된 스키마에 맞는 결과를 반환하라.\n\n" +
+        JSON.stringify(context, null, 2),
+      text: {
+        format: {
+          type: "json_schema",
+          ...AI_JSON_SCHEMA,
         },
-      ],
-      config: {
-        systemInstruction: SYSTEM_PROMPT,
-        temperature: 0.2,
-        responseMimeType: "application/json",
-        // Gemini accepts a standard JSON Schema via responseJsonSchema
-        // (as opposed to its own restricted OpenAPI-subset `responseSchema`
-        // type), so we can reuse a single shared schema definition instead
-        // of maintaining a separate OpenAPI-subset schema dialect.
-        responseJsonSchema: AI_JSON_SCHEMA.schema,
       },
     });
-    text = response.text;
+    text = response.output_text;
   } catch (err) {
-    console.error("Gemini API call failed:", err);
+    console.error("OpenAI API call failed:", err);
     throw Errors.aiUnavailable();
   }
 

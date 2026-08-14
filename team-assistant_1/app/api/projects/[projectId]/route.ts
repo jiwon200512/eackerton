@@ -3,11 +3,13 @@ import { db } from "@/lib/db/client";
 import { projects, members } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { Errors, toErrorResponse } from "@/lib/errors";
+import { requireUser } from "@/lib/auth/session";
 
 type Params = { params: Promise<{ projectId: string }> };
 
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
+    await requireUser();
     const { projectId } = await params;
     const [project] = await db
       .select()

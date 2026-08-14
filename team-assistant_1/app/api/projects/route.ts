@@ -3,9 +3,11 @@ import { db } from "@/lib/db/client";
 import { projects } from "@/lib/db/schema";
 import { desc } from "drizzle-orm";
 import { AppError, toErrorResponse } from "@/lib/errors";
+import { requireUser } from "@/lib/auth/session";
 
 export async function GET() {
   try {
+    await requireUser();
     const all = await db
       .select()
       .from(projects)
@@ -19,6 +21,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
+    await requireUser();
     const body = await req.json().catch(() => ({}));
     const name = typeof body.name === "string" ? body.name.trim() : "";
     if (!name) {

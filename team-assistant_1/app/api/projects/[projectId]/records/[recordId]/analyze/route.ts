@@ -17,11 +17,13 @@ import { validateAIResult } from "@/services/ai/validate";
 import { applyTaskEvents, type ExistingTaskRow } from "@/services/tasks/applyEvents";
 import { calculateContribution } from "@/services/contribution/calculate";
 import type { ParsedMessage, TaskStatus } from "@/lib/types";
+import { requireUser } from "@/lib/auth/session";
 
 type Params = { params: Promise<{ projectId: string; recordId: string }> };
 
 export async function POST(req: NextRequest, { params }: Params) {
   try {
+    await requireUser();
     const { projectId, recordId } = await params;
     const body = await req.json().catch(() => ({}));
     const force = body?.force === true;

@@ -1,0 +1,13 @@
+# Dependencies and Next.js output
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+
+# Local database files
+data/
+
+# Environment files may contain secrets
+.env*
+!.env.example

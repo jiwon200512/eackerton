@@ -3,7 +3,7 @@ import { EVENT_TYPES, TASK_STATUSES } from "@/lib/types";
 
 // --------------------------------------------------------------------------
 // Structured shape of what the AI must return. Kept deliberately close to
-// the JSON schema sent to the Gemini API (see analyzeRecord.ts) so the
+// the JSON schema sent to the OpenAI API (see analyzeRecord.ts) so the
 // contract between prompt / API / validation stays obvious.
 // --------------------------------------------------------------------------
 
@@ -41,9 +41,8 @@ export type AIEvaluation = z.infer<typeof AIEvaluationSchema>;
 export type AIEventRaw = z.infer<typeof AIEventSchema>;
 export type AIAnalysisResultRaw = z.infer<typeof AIAnalysisResultSchema>;
 
-// The JSON Schema handed to the LLM's structured-output API (Gemini's
-// `responseJsonSchema`, see analyzeRecord.ts - only the `schema` field below
-// is used). Every field is "required" and optionality is instead expressed
+// The JSON Schema handed to the LLM's structured-output API (OpenAI's
+// `text.format`, see analyzeRecord.ts). Every field is "required" and optionality is instead expressed
 // with a nullable type, which keeps the contract unambiguous regardless of
 // which provider's structured-output dialect ends up consuming it.
 export const AI_JSON_SCHEMA = {

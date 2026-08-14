@@ -5,11 +5,13 @@ import { and, eq } from "drizzle-orm";
 import { toErrorResponse } from "@/lib/errors";
 import { toTaskDTO } from "@/lib/taskDto";
 import type { TaskDTO, TaskStatus } from "@/lib/types";
+import { requireUser } from "@/lib/auth/session";
 
 type Params = { params: Promise<{ projectId: string }> };
 
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
+    await requireUser();
     const { projectId } = await params;
     const [taskRows, memberRows] = await Promise.all([
       db

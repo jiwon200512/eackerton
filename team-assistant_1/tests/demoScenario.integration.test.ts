@@ -134,6 +134,15 @@ vi.mock("@/services/ai/analyzeRecord", () => ({
   }),
 }));
 
+vi.mock("@/lib/auth/session", () => ({
+  requireUser: vi.fn(async () => ({
+    id: "test-user",
+    username: "testuser",
+    name: "테스트 사용자",
+    email: "test@example.com",
+  })),
+}));
+
 beforeAll(async () => {
   cleanupDbFiles();
   process.env.DATABASE_PATH = TEST_DB;
@@ -142,7 +151,9 @@ beforeAll(async () => {
   migrate(db, { migrationsFolder: path.join(process.cwd(), "drizzle") });
 });
 
-afterAll(() => {
+afterAll(async () => {
+  const { sqlite } = await import("@/lib/db/client");
+  sqlite.close();
   cleanupDbFiles();
 });
 

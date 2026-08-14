@@ -4,11 +4,13 @@ import { recordChanges, records } from "@/lib/db/schema";
 import { and, desc, eq } from "drizzle-orm";
 import { toErrorResponse } from "@/lib/errors";
 import type { RecentChangeDTO } from "@/lib/types";
+import { requireUser } from "@/lib/auth/session";
 
 type Params = { params: Promise<{ projectId: string }> };
 
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
+    await requireUser();
     const { projectId } = await params;
 
     const [lastRecord] = await db

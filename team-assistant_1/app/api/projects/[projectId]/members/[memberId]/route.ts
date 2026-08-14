@@ -3,11 +3,13 @@ import { db } from "@/lib/db/client";
 import { members } from "@/lib/db/schema";
 import { and, eq } from "drizzle-orm";
 import { Errors, toErrorResponse } from "@/lib/errors";
+import { requireUser } from "@/lib/auth/session";
 
 type Params = { params: Promise<{ projectId: string; memberId: string }> };
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
   try {
+    await requireUser();
     const { projectId, memberId } = await params;
     const [existing] = await db
       .select()

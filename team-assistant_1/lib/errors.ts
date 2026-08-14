@@ -13,6 +13,8 @@ export class AppError extends Error {
 }
 
 export const Errors = {
+  unauthorized: () =>
+    new AppError("UNAUTHORIZED", "로그인이 필요합니다.", 401),
   emptyInput: () =>
     new AppError("EMPTY_INPUT", "입력 내용이 비어 있습니다.", 400),
   noMembers: () =>
