@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -134,7 +135,7 @@ export function AuthCard({
     <main className="flex min-h-screen w-full items-center justify-center px-5 py-10">
       <section className="glass-card-strong w-full max-w-[440px] rounded-3xl p-6 sm:p-8">
         <div className="mb-6 text-center">
-          <div className="mx-auto mb-5 flex w-fit items-center gap-2.5"><span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 text-lg font-bold text-white shadow-lg shadow-indigo-500/25">E</span><span className="text-xl font-bold tracking-tight text-slate-900">Effortly</span></div>
+          <div className="mx-auto mb-5 flex w-fit items-center gap-2.5"><Image src="/logo.png" alt="" width={44} height={44} className="h-11 w-11 rounded-2xl" priority /><span className="text-xl font-bold tracking-tight text-slate-900">Effortly</span></div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">{title}</h1>
           <p className="mt-2 text-sm text-slate-500">{description}</p>
         </div>
