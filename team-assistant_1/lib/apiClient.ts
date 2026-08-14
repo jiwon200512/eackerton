@@ -21,6 +21,8 @@ export interface Member {
   name: string;
   claimed: boolean;
   claimedByMe: boolean;
+  isLeader: boolean;
+  role: "OWNER" | "MEMBER" | null;
   createdAt: number | string;
 }
 
@@ -71,7 +73,11 @@ export const createProject = (name: string) =>
     body: JSON.stringify({ name }),
   });
 export const getProject = (projectId: string) =>
-  request<{ project: Project; members: Member[] }>(`/api/projects/${projectId}`);
+  request<{
+    project: Project;
+    members: Member[];
+    currentUserRole: "OWNER" | "MEMBER";
+  }>(`/api/projects/${projectId}`);
 export const joinProjectByCode = (code: string) =>
   request<{ projectId: string }>("/api/projects/join", {
     method: "POST",
@@ -98,15 +104,10 @@ export const deleteMember = (projectId: string, memberId: string) =>
   request<{ ok: true }>(`/api/projects/${projectId}/members/${memberId}`, {
     method: "DELETE",
   });
-export const claimMember = (projectId: string, memberId: string) =>
-  request<{ member: Member }>(`/api/projects/${projectId}/members/${memberId}`, {
-    method: "PATCH",
-    body: JSON.stringify({ claim: true }),
-  });
-export const unclaimMember = (projectId: string, memberId: string) =>
-  request<{ member: Member }>(`/api/projects/${projectId}/members/${memberId}`, {
-    method: "PATCH",
-    body: JSON.stringify({ claim: false }),
+export const transferProjectOwner = (projectId: string, memberId: string) =>
+  request<{ ok: true }>(`/api/projects/${projectId}/transfer-owner`, {
+    method: "POST",
+    body: JSON.stringify({ memberId }),
   });
 
 // Records

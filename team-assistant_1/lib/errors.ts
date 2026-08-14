@@ -61,6 +61,50 @@ export const Errors = {
       "유효하지 않은 초대 코드입니다.",
       404
     ),
+  ownerRequired: () =>
+    new AppError(
+      "OWNER_REQUIRED",
+      "팀장만 사용할 수 있는 기능입니다.",
+      403
+    ),
+  memberNotRegistered: () =>
+    new AppError(
+      "MEMBER_NOT_REGISTERED",
+      "팀장이 등록한 팀원 이름과 회원가입 실명이 일치하지 않습니다. 팀원 등록 이름을 확인해주세요.",
+      409
+    ),
+  memberAlreadyClaimed: () =>
+    new AppError(
+      "MEMBER_ALREADY_CLAIMED",
+      "같은 이름의 팀원이 이미 다른 계정과 연결되어 있습니다.",
+      409
+    ),
+  ambiguousMemberName: () =>
+    new AppError(
+      "AMBIGUOUS_MEMBER_NAME",
+      "같은 이름의 팀원이 여러 명 있어 자동으로 연결할 수 없습니다. 팀장에게 팀원 목록 확인을 요청해주세요.",
+      409
+    ),
+  cannotDeleteOwner: () =>
+    new AppError(
+      "CANNOT_DELETE_OWNER",
+      "팀장은 삭제할 수 없습니다. 먼저 다른 팀원에게 팀장을 양도해주세요.",
+      409
+    ),
+  invalidTransferTarget: (message = "팀장 권한을 양도할 수 없는 팀원입니다.") =>
+    new AppError("INVALID_TRANSFER_TARGET", message, 400),
+  recordTooLarge: () =>
+    new AppError(
+      "RECORD_TOO_LARGE",
+      "기록이 너무 깁니다. 50,000자 이하로 입력해주세요.",
+      413
+    ),
+  aiTimeout: () =>
+    new AppError(
+      "AI_TIMEOUT",
+      "AI 분석 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.",
+      504
+    ),
 };
 
 export function toErrorResponse(err: unknown): { status: number; body: { error: string; code: string } } {

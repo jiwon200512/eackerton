@@ -55,8 +55,12 @@ export interface MemberDTO {
   // exposed to the client.
   claimed: boolean;
   claimedByMe: boolean;
+  isLeader: boolean;
+  role: ProjectRole | null;
   createdAt: number | string;
 }
+
+export type ProjectRole = "OWNER" | "MEMBER";
 
 export interface EvidenceDTO {
   id: string;

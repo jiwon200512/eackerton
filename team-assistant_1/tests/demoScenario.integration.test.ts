@@ -166,7 +166,8 @@ beforeAll(async () => {
 afterAll(async () => {
   const { client } = await import("@/lib/db/client");
   client.close();
-  cleanupDbFiles();
+  // Windows can keep the native libSQL handle alive briefly after close().
+  // The next test run removes these files before opening the database.
 });
 
 describe("demo scenario: two-round record analysis updates existing project state", () => {
@@ -318,5 +319,10 @@ describe("demo scenario: two-round record analysis updates existing project stat
     );
     expect(byMember["박민수"].percentage).toBeGreaterThan(0);
     expect(byMember["박민수"].deltaPercentage).not.toBeNull();
+    const deltas = contribBody.contribution
+      .map((item: { deltaPercentage: number | null }) => item.deltaPercentage)
+      .filter((delta: number | null): delta is number => delta !== null);
+    expect(deltas.some((delta: number) => delta > 0)).toBe(true);
+    expect(deltas.some((delta: number) => delta < 0)).toBe(true);
   });
 });

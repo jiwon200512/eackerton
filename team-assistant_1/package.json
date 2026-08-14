@@ -11,7 +11,8 @@
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "backfill:owner-members": "tsx scripts/backfillOwnerMembers.ts"
   },
   "dependencies": {
     "@libsql/client": "^0.15.0",

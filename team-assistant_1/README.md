@@ -1,115 +1,118 @@
-# Team Project Assistant
+# Effortly
 
-카카오톡 대화·회의 기록을 지속적으로 입력받아 기존 프로젝트 상태(Task/담당자/상태/Evidence)와 비교하며 누적 업데이트하고, 팀원별 기여도를 계산하는 해커톤 MVP입니다.
+팀 대화 기록을 AI로 분석해 Task, Evidence, 기여도와 최근 변경사항을 관리하는 프로젝트 협업 서비스입니다.
 
 ## 기술 스택
 
-- Next.js (App Router) + TypeScript + Tailwind CSS
-- Drizzle ORM + Turso (libSQL) — 로컬 개발 시 파일 DB, 배포 시 Turso 호스팅 DB
-- OpenAI API (`openai`, Responses API의 Structured Outputs) — AI 분석
-- Vitest — 단위/통합 테스트
+- Next.js 16 App Router, React 19, TypeScript, Tailwind CSS
+- Drizzle ORM, Turso/libSQL
+- OpenAI Responses API와 Structured Outputs
+- Vitest
 
-> 원래 계획은 Prisma였으나, 이 실행 환경에서 Prisma의 엔진 바이너리 CDN(binaries.prisma.sh)이 네트워크 차단되어 있어 순수 JS 드라이버 기반의 Drizzle로 전환했습니다. 기능/스키마는 동일합니다.
-
-## 실행 방법22
+## 로컬 실행
 
 ```bash
 npm install
-cp .env.example .env.local   # OPENAI_API_KEY 입력 (https://platform.openai.com/api-keys 에서 발급)
-npm run db:migrate           # DB 마이그레이션 적용 (최초 1회, 이미 적용됨)
-npm run seed                 # 데모 프로젝트("Team Project Assistant Demo") + 팀원 3명 생성
-npm run dev                  # http://localhost:3000
+cp .env.example .env.local
+npm run db:migrate
+npm run dev
 ```
 
-테스트/빌드:
+Windows PowerShell에서 `npm` 실행 정책 오류가 발생하면 `npm.cmd`를 사용합니다.
+
+```powershell
+npm.cmd run dev
+```
+
+앱은 `http://localhost:3000`에서 열립니다. 로컬 DB를 사용할 때는 `TURSO_DATABASE_URL`과 `TURSO_AUTH_TOKEN`을 비워 두면 `data/app.db`가 사용됩니다.
+
+## 환경 변수
+
+| 변수 | 설명 |
+| --- | --- |
+| `OPENAI_API_KEY` | OpenAI API 키. 없으면 기록 저장은 가능하지만 AI 분석은 실패합니다. |
+| `OPENAI_MODEL` | Structured Outputs를 지원하는 모델. 기본값은 `gpt-5.4-mini`입니다. |
+| `TURSO_DATABASE_URL` | 원격 Turso의 `libsql://...` URL. 개발 환경에서 비우면 로컬 파일 DB를 사용합니다. |
+| `TURSO_AUTH_TOKEN` | 원격 Turso 인증 토큰입니다. |
+
+실제 비밀값은 `.env.local`에만 저장하고 커밋하지 마세요. 운영 환경에서는 `TURSO_DATABASE_URL`이 필수이며, 원격 `libsql://` URL에는 `TURSO_AUTH_TOKEN`도 반드시 필요합니다.
+
+## DB 준비와 기존 프로젝트 보정
 
 ```bash
-npm run test       # vitest (기여도 계산 unit test + 전체 파이프라인 integration test)
-npm run typecheck  # 또는 npx tsc --noEmit
+npm run db:migrate
+npm run backfill:owner-members
+```
+
+`backfill:owner-members`는 기존 프로젝트의 OWNER 계정을 기여도 계산용 팀원 행과 연결합니다. 이미 연결된 행은 건너뛰므로 여러 번 실행해도 안전합니다. 앱 시작 시 자동 실행하지 않습니다.
+
+현재 DB 구조의 `project_users.role`(`OWNER`/`MEMBER`)과 `members.user_id`를 그대로 사용합니다. 별도의 LEADER 역할이나 역할 테이블은 추가하지 않습니다. UI에서는 OWNER를 “팀장”으로 표시합니다.
+
+## 인증과 프로젝트 참여
+
+- 회원가입은 실명, 아이디, 비밀번호, 이메일을 입력합니다.
+- 로그인은 이메일이 아닌 아이디와 비밀번호를 사용합니다.
+- 세션은 HttpOnly/SameSite 쿠키와 DB 세션으로 유지됩니다.
+- 프로젝트를 만든 사용자는 OWNER가 되고 같은 트랜잭션에서 연결된 팀원 행도 생성됩니다.
+- 초대 코드로 참여하려면 가입한 실명과 팀장이 미리 등록한 팀원 이름이 일치해야 합니다.
+- 이름 비교는 앞뒤 공백, 연속 공백, 유니코드 전각/반각, 영문 대소문자 차이를 정규화합니다.
+- 이름이 없거나 중복으로 모호하거나 이미 다른 계정에 연결됐으면 접근 권한을 새로 부여하지 않습니다.
+- 과거 버전에서 이미 `project_users` 접근 권한만 가진 사용자의 권한은 제거하지 않습니다.
+
+## 팀장 권한
+
+OWNER만 다음 작업을 할 수 있습니다.
+
+- 팀원 추가 및 삭제
+- 초대 코드 조회, 생성, 재발급
+- 참여가 완료된 MEMBER에게 팀장 권한 양도
+
+일반 MEMBER는 팀원 목록과 참여 상태만 조회할 수 있습니다. 팀장 본인은 삭제할 수 없고, 연결된 일반 팀원을 삭제하면 프로젝트 접근 권한도 함께 제거되며 해당 팀원의 Task 담당자는 미지정 상태가 됩니다. 팀장 양도 후에는 이전 팀장이 MEMBER로 바뀌며 프로젝트에는 OWNER가 정확히 한 명만 남습니다.
+
+## 기록 분석 흐름
+
+```text
+기록 저장 → 대화 파싱 → 현재 Task 컨텍스트 구성 → OpenAI 분석
+→ Zod 및 서버 규칙 검증 → Task/Evidence 반영 → 기여도 스냅샷 저장
+```
+
+안정성을 위해 다음 규칙을 적용합니다.
+
+- 기록 원문은 최대 50,000자입니다.
+- OpenAI 호출은 40초 후 중단합니다.
+- 파서 fallback이 발생하거나 메시지가 0개면 원문 전체를 `UNKNOWN` 메시지로 전달합니다.
+- AI 결과는 Zod 검증 후 이벤트 수와 Evidence 수를 제한합니다.
+- CREATE가 아닌 이벤트의 Task ID가 현재 프로젝트에 없으면 버립니다.
+- Evidence 문구가 원문에 실제로 존재하지 않거나 speaker가 허용되지 않으면 저장하지 않습니다.
+- 중대한 변경에 유효한 Evidence가 없으면 이벤트를 적용하지 않습니다.
+- 동일 기록의 같은 Evidence는 중복 저장하지 않습니다.
+- 분석 상태를 원자적으로 선점해 동시 분석과 `ANALYZING` 고착을 방지합니다.
+- Task, Evidence, 변경 로그, 기여도 스냅샷과 분석 완료 처리는 하나의 트랜잭션으로 반영됩니다.
+
+기여도 변화량은 가장 최근 스냅샷과 바로 이전 스냅샷의 퍼센트 차이입니다. 리포트 화면은 실제 퍼센트 내림차순으로 표시합니다.
+
+## 주요 API
+
+- `GET/POST /api/projects`: 프로젝트 목록 및 생성
+- `POST /api/projects/join`: 초대 코드와 실명으로 프로젝트 참여
+- `GET /api/projects/[projectId]`: 프로젝트 상세, 현재 사용자 역할과 팀원 조회
+- `GET/POST /api/projects/[projectId]/members`: 팀원 조회 및 OWNER 전용 추가
+- `DELETE /api/projects/[projectId]/members/[memberId]`: OWNER 전용 팀원 삭제
+- `GET/POST /api/projects/[projectId]/invite-code`: OWNER 전용 초대 코드 조회/재발급
+- `POST /api/projects/[projectId]/transfer-owner`: OWNER 권한 양도
+- `POST /api/projects/[projectId]/records`: 기록 저장
+- `POST /api/projects/[projectId]/records/[recordId]/analyze`: 기록 AI 분석
+- `GET /api/projects/[projectId]/contribution`: 기여도와 직전 대비 변화량 조회
+
+모든 프로젝트 API는 로그인 사용자와 프로젝트 접근 권한을 서버에서 확인합니다. 관리자 작업은 추가로 OWNER 역할을 검사합니다.
+
+## 검증 명령
+
+```bash
+npm run typecheck
+npm run lint
+npm test
 npm run build
 ```
 
-## 환경 변수 (`.env.example` 참고)
-
-| 변수 | 설명 |
-|---|---|
-| `OPENAI_API_KEY` | AI 분석에 사용하는 OpenAI API 키. 없으면 분석 시 "AI 분석 서비스에 연결할 수 없습니다" 오류를 안전하게 반환합니다. |
-| `OPENAI_MODEL` | 사용할 모델 (기본 `gpt-5.4-mini`, Structured Outputs 지원 모델 필요) |
-| `TURSO_DATABASE_URL` | Turso(libSQL) DB URL. 비워두면 로컬 파일(`./data/app.db`) 사용 |
-| `TURSO_AUTH_TOKEN` | `TURSO_DATABASE_URL`이 `libsql://...`(원격 Turso DB)일 때 필요한 인증 토큰 |
-
-## 인증
-
-- `/signup`: 이름, 아이디(username), 비밀번호, 이메일로 가입하며 가입 후 자동 로그인합니다.
-- `/login`: 이메일이 아닌 아이디와 비밀번호로 로그인합니다.
-- 비밀번호는 scrypt로 해시되며, 로그인 세션은 HttpOnly/SameSite 쿠키와 DB 세션으로 유지됩니다.
-- 로그인하지 않은 사용자는 프로젝트 화면과 `/api/projects/**`를 사용할 수 없습니다.
-- 소셜 로그인 버튼은 UI placeholder이며 OAuth는 아직 연결하지 않았습니다.
-
-## 핵심 데모 시나리오
-
-1. 프로젝트 생성 → 팀원(김지원/박민수/이철수) 등록
-2. 1차 기록 입력 ("로그인 페이지 내가 만들게" 등) → AI 분석 → Task 3개 생성
-3. 2차 기록 입력 ("로그인 페이지 거의 다 만들었어" 등) → 기존 Task와 비교하여
-   - 로그인 페이지: TODO → IN_PROGRESS
-   - DB 연결: TODO → DONE
-   - API 연동: 신규 Task 생성
-   - 발표자료 제작: 변화 없음 (그대로 유지)
-   - Evidence 누적, 기여도 재계산, Recent Changes 갱신
-
-`npm run seed`로 프로젝트/팀원을 만든 뒤 위 대화를 "기록 추가" 화면에 붙여넣어 확인할 수 있습니다. `tests/demoScenario.integration.test.ts`가 이 시나리오 전체를 AI 호출만 mocking한 채 실제 API 라우트로 검증합니다.
-
-## 코드 구조
-
-```
-app/
-  page.tsx                              프로젝트 생성/선택 (화면 1)
-  projects/[projectId]/
-    members/page.tsx                    팀원 등록 (화면 2)
-    page.tsx                            Dashboard (화면 3)
-    tasks/[taskId]/page.tsx             Task 상세 (화면 4)
-    records/new/page.tsx                기록 추가 (화면 5)
-  api/projects/...                      Project/Member/Record/Task/Contribution API
-
-services/
-  parser/kakaoParser.ts                 카카오톡 txt / 수동 텍스트 파서 (정규식, fallback 지원)
-  ai/
-    systemPrompt.ts                     AI 시스템 프롬프트 (hallucination 방지 규칙 포함)
-    buildContext.ts                     현재 프로젝트 상태 컨텍스트 생성
-    analyzeRecord.ts                    OpenAI Responses API 호출 (openai)
-    validate.ts                         AI 응답 런타임 검증/보정
-    schema.ts                           zod 스키마 + Structured Outputs용 JSON Schema
-  tasks/applyEvents.ts                  검증된 이벤트를 DB 트랜잭션으로 반영
-  contribution/calculate.ts             결정론적 기여도 계산 (LLM이 퍼센트를 정하지 않음)
-
-lib/
-  db/schema.ts, db/client.ts            Drizzle 스키마/커넥션
-  types.ts, errors.ts, taskDto.ts, apiClient.ts
-
-tests/
-  contribution.test.ts                  기여도 계산 unit test
-  demoScenario.integration.test.ts      핵심 데모 시나리오 end-to-end 통합 테스트
-```
-
-## DB 구조
-
-Project 1—N Member, Project 1—N Record, Project 1—N Task 1—N Evidence, Project 1—N ContributionSnapshot, Record별 변경 로그(RecordChange, "최근 변경사항" 표시용). 상세 컬럼은 `lib/db/schema.ts` 참고.
-
-## AI 분석 흐름
-
-```
-parseInput() → buildAIContext() → analyzeWithAI() → validateAIResult()
-→ applyTaskEvents() (DB transaction) → calculateContribution() → saveSnapshot()
-```
-
-- AI는 이벤트(JSON)만 반환하고, 기여도 퍼센트는 코드가 결정합니다.
-- 모든 AI 응답은 zod + 수동 검증을 거쳐 범위를 벗어난 값(잘못된 status enum, importance=99 등)을 정상 범위로 보정하거나 해당 이벤트를 폐기합니다.
-- 확신도(confidence)가 낮은 상태/담당자 변경은 적용하지 않고 기존 값을 유지합니다.
-- Task/Evidence/ContributionSnapshot/RecordChange는 하나의 SQLite 트랜잭션으로 함께 반영되어, 중간 실패 시 부분 반영을 방지합니다.
-
-## 알려진 제한사항
-
-- 공동 작업 기여도 분배 미지원 (spec대로 대표 담당자 1명 기준)
-- 음성 STT, PDF 리포트, 실시간 연동(Slack/Github/Email) 등은 범위 밖
-- 카카오톡 내보내기 포맷은 대표적인 몇 가지 패턴만 정규식으로 인식하며, 인식 실패 시 raw text를 그대로 AI에 전달하는 fallback으로 동작합니다.
-- `OPENAI_API_KEY`가 없으면 분석 자체는 실행되지 않으며 사용자 친화적 오류만 반환합니다. 통합 테스트에서는 AI 호출부만 mocking하고 나머지 파이프라인 전체(파싱→검증→DB반영→기여도계산→스냅샷)를 검증합니다.
+테스트에는 기여도 계산, AI 응답 검증과 fallback, 프로젝트 생성/실명 참여/팀장 양도/권한 차단/팀원 삭제, 전체 2회 기록 분석 시나리오가 포함됩니다.

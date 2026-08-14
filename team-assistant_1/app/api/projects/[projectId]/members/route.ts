@@ -4,8 +4,13 @@ import { members } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { AppError, toErrorResponse } from "@/lib/errors";
 import { requireUser } from "@/lib/auth/session";
-import { requireProjectAccess } from "@/lib/projects/access";
+import {
+  getProjectOwnerUserId,
+  requireProjectAccess,
+  requireProjectOwner,
+} from "@/lib/projects/access";
 import { toMemberDTO } from "@/lib/memberDto";
+import { normalizePersonName } from "@/lib/personName";
 
 type Params = { params: Promise<{ projectId: string }> };
 
@@ -14,11 +19,13 @@ export async function GET(_req: NextRequest, { params }: Params) {
     const user = await requireUser();
     const { projectId } = await params;
     await requireProjectAccess(projectId, user.id);
-    const list = await db
-      .select()
-      .from(members)
-      .where(eq(members.projectId, projectId));
-    return NextResponse.json({ members: list.map((m) => toMemberDTO(m, user.id)) });
+    const [list, ownerUserId] = await Promise.all([
+      db.select().from(members).where(eq(members.projectId, projectId)),
+      getProjectOwnerUserId(projectId),
+    ]);
+    return NextResponse.json({
+      members: list.map((m) => toMemberDTO(m, user.id, ownerUserId)),
+    });
   } catch (err) {
     const { status, body } = toErrorResponse(err);
     return NextResponse.json(body, { status });
@@ -29,7 +36,7 @@ export async function POST(req: NextRequest, { params }: Params) {
   try {
     const user = await requireUser();
     const { projectId } = await params;
-    await requireProjectAccess(projectId, user.id);
+    await requireProjectOwner(projectId, user.id);
 
     const body = await req.json().catch(() => ({}));
     const name = typeof body.name === "string" ? body.name.trim() : "";
@@ -41,7 +48,8 @@ export async function POST(req: NextRequest, { params }: Params) {
       .select()
       .from(members)
       .where(eq(members.projectId, projectId));
-    if (existing.some((m) => m.name === name)) {
+    const normalizedName = normalizePersonName(name);
+    if (existing.some((m) => normalizePersonName(m.name) === normalizedName)) {
       throw new AppError(
         "DUPLICATE_MEMBER",
         "이미 등록된 이름입니다.",

@@ -14,15 +14,18 @@ import { parseConversation } from "@/services/parser/kakaoParser";
 import { buildAIContext, type ContextTask } from "@/services/ai/buildContext";
 import { analyzeWithAI } from "@/services/ai/analyzeRecord";
 import { validateAIResult } from "@/services/ai/validate";
+import { AIAnalysisResultSchema } from "@/services/ai/schema";
 import { applyTaskEvents, type ExistingTaskRow } from "@/services/tasks/applyEvents";
 import { calculateContribution } from "@/services/contribution/calculate";
 import type { ParsedMessage, TaskStatus } from "@/lib/types";
 import { requireUser } from "@/lib/auth/session";
 import { requireProjectAccess } from "@/lib/projects/access";
+import { selectRecordMessages } from "@/services/ai/selectRecordMessages";
 
 type Params = { params: Promise<{ projectId: string; recordId: string }> };
 
 export async function POST(req: NextRequest, { params }: Params) {
+  let claimedRecordId: string | null = null;
   try {
     const user = await requireUser();
     const { projectId, recordId } = await params;
@@ -59,14 +62,9 @@ export async function POST(req: NextRequest, { params }: Params) {
 
     // 1. parseInput()
     const parsed = parseConversation(record.rawContent, record.type as "KAKAO_TEXT" | "MANUAL_TEXT");
-    let newMessages: ParsedMessage[] = parsed.messages;
-    if (newMessages.length === 0) {
-      // Full fallback: hand the raw text to the AI as a single unattributed
-      // message rather than failing the whole request (spec #3).
-      newMessages = [
-        { timestamp: null, speaker: "UNKNOWN", message: record.rawContent.trim() },
-      ];
-    }
+    const selectedMessages = selectRecordMessages(record.rawContent, parsed);
+    const usedFallback = selectedMessages.usedFallback;
+    const newMessages: ParsedMessage[] = selectedMessages.messages;
 
     // 2. buildAIContext(): current authoritative project state
     const activeTasks = await db
@@ -122,11 +120,23 @@ export async function POST(req: NextRequest, { params }: Params) {
       newMessages
     );
 
-    // Mark as analyzing (best-effort guard against double submission).
-    await db
+    // Atomically claim exactly the state read above. A concurrent request
+    // that already moved the row will update zero rows and be rejected.
+    const claimed = await db
       .update(records)
-      .set({ analysisStatus: "ANALYZING" })
-      .where(eq(records.id, recordId));
+      .set({ analysisStatus: "ANALYZING", analysisError: null })
+      .where(
+        and(
+          eq(records.id, recordId),
+          eq(records.projectId, projectId),
+          eq(records.analysisStatus, record.analysisStatus)
+        )
+      )
+      .returning({ id: records.id });
+    if (claimed.length === 0) {
+      throw new AppError("ALREADY_ANALYZING", "이미 분석이 진행 중입니다.", 409);
+    }
+    claimedRecordId = recordId;
 
     // 3. analyzeWithAI()
     let rawResult: unknown;
@@ -146,9 +156,13 @@ export async function POST(req: NextRequest, { params }: Params) {
     // 4. validateAIResult()
     let events;
     try {
-      events = validateAIResult(rawResult, {
+      const schemaResult = AIAnalysisResultSchema.safeParse(rawResult);
+      if (!schemaResult.success) throw Errors.aiParsingFailed();
+      events = validateAIResult(schemaResult.data, {
         memberNames: projectMembers.map((m) => m.name),
         validTaskIds: new Set(existingTasksById.keys()),
+        sourceText: record.rawContent,
+        allowUnknownSpeaker: usedFallback,
       });
     } catch (err) {
       await db
@@ -234,10 +248,31 @@ export async function POST(req: NextRequest, { params }: Params) {
     return NextResponse.json({
       changes: result.changes,
       contribution: result.contribution,
-      usedFallback: parsed.usedFallback,
+      usedFallback,
       eventCount: events.length,
     });
   } catch (err) {
+    if (claimedRecordId) {
+      try {
+        await db
+          .update(records)
+          .set({
+            analysisStatus: "FAILED",
+            analysisError:
+              err instanceof AppError
+                ? err.message
+                : "분석 처리 중 오류가 발생했습니다.",
+          })
+          .where(
+            and(
+              eq(records.id, claimedRecordId),
+              eq(records.analysisStatus, "ANALYZING")
+            )
+          );
+      } catch {
+        // Best effort only: never hide the original analysis error.
+      }
+    }
     const { status, body } = toErrorResponse(err);
     return NextResponse.json(body, { status });
   }

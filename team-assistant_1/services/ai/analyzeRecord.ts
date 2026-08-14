@@ -5,6 +5,7 @@ import { AI_JSON_SCHEMA } from "./schema";
 import type { AIContext } from "./buildContext";
 
 let client: OpenAI | null = null;
+const AI_TIMEOUT_MS = 40_000;
 
 function getClient(): OpenAI {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -29,6 +30,8 @@ export async function analyzeWithAI(context: AIContext): Promise<unknown> {
   const model = process.env.OPENAI_MODEL || "gpt-5.4-mini";
 
   let text: string | undefined;
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
   try {
     const response = await ai.responses.create({
       model,
@@ -42,11 +45,14 @@ export async function analyzeWithAI(context: AIContext): Promise<unknown> {
           ...AI_JSON_SCHEMA,
         },
       },
-    });
+    }, { signal: controller.signal });
     text = response.output_text;
   } catch (err) {
-    console.error("OpenAI API call failed:", err);
+    if (controller.signal.aborted) throw Errors.aiTimeout();
+    console.error("OpenAI API call failed:", err instanceof Error ? err.name : "unknown error");
     throw Errors.aiUnavailable();
+  } finally {
+    clearTimeout(timeout);
   }
 
   if (!text) {
@@ -56,7 +62,7 @@ export async function analyzeWithAI(context: AIContext): Promise<unknown> {
   try {
     return JSON.parse(text);
   } catch (err) {
-    console.error("Failed to parse AI JSON response:", err, text);
+    console.error("Failed to parse AI JSON response:", err instanceof Error ? err.name : "unknown error");
     throw Errors.aiParsingFailed();
   }
 }

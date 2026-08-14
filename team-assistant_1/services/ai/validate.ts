@@ -17,6 +17,12 @@ export interface ValidatedEvent {
 }
 
 const MIN_CONFIDENCE_TO_APPLY = 0.5;
+const MAX_EVENTS = 50;
+const MAX_EVIDENCE_PER_EVENT = 10;
+
+function normalizeEvidenceText(value: string): string {
+  return value.normalize("NFKC").trim().replace(/\s+/g, " ");
+}
 
 function clampInt(n: unknown, min: number, max: number, fallback: number): number {
   const num = typeof n === "number" && Number.isFinite(n) ? Math.round(n) : fallback;
@@ -36,14 +42,20 @@ function clampConfidence(n: unknown): number {
  */
 export function validateAIResult(
   raw: unknown,
-  ctx: { memberNames: string[]; validTaskIds: Set<string> }
+  ctx: {
+    memberNames: string[];
+    validTaskIds: Set<string>;
+    sourceText: string;
+    allowUnknownSpeaker: boolean;
+  }
 ): ValidatedEvent[] {
   if (!raw || typeof raw !== "object" || !Array.isArray((raw as { events?: unknown }).events)) {
     throw Errors.aiParsingFailed();
   }
 
-  const events = (raw as { events: unknown[] }).events;
+  const events = (raw as { events: unknown[] }).events.slice(0, MAX_EVENTS);
   const memberSet = new Set(ctx.memberNames);
+  const normalizedSource = normalizeEvidenceText(ctx.sourceText);
   const out: ValidatedEvent[] = [];
 
   for (const item of events) {
@@ -60,17 +72,12 @@ export function validateAIResult(
       typeof e.existingTaskId === "string" && e.existingTaskId.trim()
         ? e.existingTaskId.trim()
         : null;
-    // Rule #2 style safety: if the model references a task id that doesn't
-    // exist in the current project, don't let it silently mutate nothing -
-    // fall back to treating it as a new-task candidate.
-    let type = e.type as EventType;
-    if (existingTaskId && !ctx.validTaskIds.has(existingTaskId)) {
+    const type = e.type as EventType;
+    if (type === "TASK_CREATE") {
       existingTaskId = null;
-      if (type !== "TASK_CREATE") type = "TASK_CREATE";
-    }
-    if (type !== "TASK_CREATE" && !existingTaskId) {
+    } else if (!existingTaskId || !ctx.validTaskIds.has(existingTaskId)) {
       // status/assignee change/update/evidence without a valid target task
-      // is meaningless - skip it instead of guessing which task it means.
+      // is dropped. Never turn a bad reference into a duplicate CREATE.
       continue;
     }
 
@@ -113,6 +120,16 @@ export function validateAIResult(
               (ev as AIEvidenceItem).text.trim().length > 0
           )
           .map((ev) => ({ speaker: ev.speaker.trim(), text: ev.text.trim() }))
+          .filter((ev) => {
+            const speakerAllowed =
+              memberSet.has(ev.speaker) ||
+              (ctx.allowUnknownSpeaker && ev.speaker === "UNKNOWN");
+            return (
+              speakerAllowed &&
+              normalizedSource.includes(normalizeEvidenceText(ev.text))
+            );
+          })
+          .slice(0, MAX_EVIDENCE_PER_EVENT)
       : [];
 
     // Rule #6: major changes require evidence. Without it, we don't apply

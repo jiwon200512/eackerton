@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
-import { projects, projectUsers } from "@/lib/db/schema";
+import { members, projects, projectUsers } from "@/lib/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { AppError, toErrorResponse } from "@/lib/errors";
 import { requireUser } from "@/lib/auth/session";
@@ -38,6 +38,11 @@ export async function POST(req: NextRequest) {
       await tx
         .insert(projectUsers)
         .values({ projectId: project.id, userId: user.id, role: "OWNER" });
+      await tx.insert(members).values({
+        projectId: project.id,
+        userId: user.id,
+        name: user.name,
+      });
       return project;
     });
     return NextResponse.json({ project: created }, { status: 201 });

@@ -4,6 +4,7 @@ import { useState, use, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { ApiError, analyzeRecord, createRecord } from "@/lib/apiClient";
 import Spinner from "@/components/Spinner";
+import { MAX_RECORD_CHARS } from "@/lib/records/constants";
 
 type InputMode = "MANUAL_TEXT" | "KAKAO_TEXT";
 
@@ -29,6 +30,10 @@ export default function NewRecordPage({
     }
     setError(null);
     const content = await file.text();
+    if (content.length > MAX_RECORD_CHARS) {
+      setError(`기록이 너무 깁니다. ${MAX_RECORD_CHARS.toLocaleString()}자 이하로 입력해주세요.`);
+      return;
+    }
     setText(content);
     setFileName(file.name);
   }
@@ -36,6 +41,10 @@ export default function NewRecordPage({
   async function handleSubmit() {
     if (!text.trim()) {
       setError("입력 내용이 비어 있습니다.");
+      return;
+    }
+    if (text.length > MAX_RECORD_CHARS) {
+      setError(`기록이 너무 깁니다. ${MAX_RECORD_CHARS.toLocaleString()}자 이하로 입력해주세요.`);
       return;
     }
     setAnalyzing(true);
@@ -58,6 +67,7 @@ export default function NewRecordPage({
         <p className="mt-1 text-sm text-slate-500">
           카카오톡 대화나 회의 내용을 입력하면 AI가 기존 프로젝트 상태와 비교하여 Task를 업데이트합니다.
         </p>
+        <p className="mt-1 text-xs text-slate-400">최대 {MAX_RECORD_CHARS.toLocaleString()}자까지 분석할 수 있습니다.</p>
       </div>
 
       <div className="mt-7 flex w-fit rounded-xl border border-white/70 bg-white/45 p-1 shadow-sm backdrop-blur-xl">
@@ -96,9 +106,12 @@ export default function NewRecordPage({
               : "위에서 파일을 선택하면 내용이 여기에 표시됩니다. 직접 붙여넣어도 됩니다."
           }
           rows={12}
+          maxLength={MAX_RECORD_CHARS}
           className="glass-input w-full resize-none rounded-xl px-4 py-3 text-sm leading-6"
         />
       </div>
+
+      <p className="mt-2 text-right text-xs text-slate-400">{text.length.toLocaleString()} / {MAX_RECORD_CHARS.toLocaleString()}자</p>
 
       {error && <p className="text-sm text-rose-600">{error}</p>}
 

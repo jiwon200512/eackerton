@@ -53,9 +53,7 @@ export default function HomePage() {
     setJoinError(null);
     try {
       const { projectId } = await joinProjectByCode(inviteCode.trim());
-      // Members page first, not the dashboard - a fresh joiner usually
-      // wants to claim their existing name tag right away.
-      router.push(`/projects/${projectId}/members`);
+      router.push(`/projects/${projectId}`);
     } catch (err) {
       setJoinError(err instanceof ApiError ? err.message : "참가에 실패했습니다.");
       setJoining(false);
@@ -100,7 +98,7 @@ export default function HomePage() {
         <label className="block text-sm font-bold text-slate-800" htmlFor="invite-code">
           초대 코드로 참가하기
         </label>
-        <p className="mt-1 text-xs text-slate-500">팀원에게 받은 초대 코드를 입력하면 해당 프로젝트에 참가합니다.</p>
+        <p className="mt-1 text-xs text-slate-500">회원가입 실명이 팀장이 등록한 이름과 일치하면 자동으로 참가합니다.</p>
         <div className="mt-4 flex flex-col gap-2 sm:flex-row">
           <input
             id="invite-code"

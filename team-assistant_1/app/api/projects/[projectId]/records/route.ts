@@ -6,6 +6,7 @@ import { AppError, Errors, toErrorResponse } from "@/lib/errors";
 import { RECORD_TYPES } from "@/lib/types";
 import { requireUser } from "@/lib/auth/session";
 import { requireProjectAccess } from "@/lib/projects/access";
+import { MAX_RECORD_CHARS } from "@/lib/records/constants";
 
 type Params = { params: Promise<{ projectId: string }> };
 
@@ -42,6 +43,9 @@ export async function POST(req: NextRequest, { params }: Params) {
     }
     if (!rawContent.trim()) {
       throw Errors.emptyInput();
+    }
+    if (rawContent.length > MAX_RECORD_CHARS) {
+      throw Errors.recordTooLarge();
     }
 
     const [created] = await db

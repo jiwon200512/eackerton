@@ -41,9 +41,13 @@ async function insertEvidence(
   tx: DB,
   taskId: string,
   recordId: string,
-  items: { speaker: string; text: string }[]
+  items: { speaker: string; text: string }[],
+  seen: Set<string>
 ) {
   for (const ev of items) {
+    const key = [taskId, recordId, ev.speaker.trim(), ev.text.trim()].join("\u0000");
+    if (seen.has(key)) continue;
+    seen.add(key);
     // NOTE: drizzle query builders are lazy - `.run()` is required to
     // actually execute them (and, for the async libsql driver, must be
     // awaited) inside the db.transaction() callback.
@@ -74,6 +78,21 @@ export async function applyTaskEvents(
   existingTasksById: Map<string, ExistingTaskRow>
 ): Promise<AppliedChange[]> {
   const changes: AppliedChange[] = [];
+  const existingEvidence = await tx
+    .select({
+      taskId: evidence.taskId,
+      recordId: evidence.recordId,
+      speaker: evidence.speaker,
+      text: evidence.text,
+    })
+    .from(evidence)
+    .where(eq(evidence.recordId, recordId))
+    .all();
+  const seenEvidence = new Set(
+    existingEvidence.map((item) =>
+      [item.taskId, item.recordId, item.speaker.trim(), item.text.trim()].join("\u0000")
+    )
+  );
 
   for (const event of events) {
     const assigneeId = event.assigneeName
@@ -102,7 +121,7 @@ export async function applyTaskEvents(
         .returning()
         .get();
 
-      await insertEvidence(tx, created.id, recordId, event.evidence);
+      await insertEvidence(tx, created.id, recordId, event.evidence, seenEvidence);
 
       // Keep existingTasksById in sync in case a later event in the same
       // batch references this brand-new task by matching title semantics
@@ -151,7 +170,7 @@ export async function applyTaskEvents(
           confidence: event.confidence,
         });
       }
-      await insertEvidence(tx, existing.id, recordId, event.evidence);
+      await insertEvidence(tx, existing.id, recordId, event.evidence, seenEvidence);
       continue;
     }
 
@@ -173,7 +192,7 @@ export async function applyTaskEvents(
           confidence: event.confidence,
         });
       }
-      await insertEvidence(tx, existing.id, recordId, event.evidence);
+      await insertEvidence(tx, existing.id, recordId, event.evidence, seenEvidence);
       continue;
     }
 
@@ -222,13 +241,13 @@ export async function applyTaskEvents(
           confidence: event.confidence,
         });
       }
-      await insertEvidence(tx, existing.id, recordId, event.evidence);
+      await insertEvidence(tx, existing.id, recordId, event.evidence, seenEvidence);
       continue;
     }
 
     if (event.type === "EVIDENCE_ADD") {
       if (event.evidence.length === 0) continue;
-      await insertEvidence(tx, existing.id, recordId, event.evidence);
+      await insertEvidence(tx, existing.id, recordId, event.evidence, seenEvidence);
       changes.push({
         taskId: existing.id,
         taskTitle: existing.title,

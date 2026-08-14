@@ -10,8 +10,16 @@ declare global {
 // Defaults to a local libSQL file so `npm run dev` and tests work without a
 // Turso account. Point TURSO_DATABASE_URL at a libsql://... URL (with
 // TURSO_AUTH_TOKEN) to use a hosted Turso database instead.
-const url = process.env.TURSO_DATABASE_URL || "file:./data/app.db";
+const configuredUrl = process.env.TURSO_DATABASE_URL?.trim();
+if (process.env.NODE_ENV === "production" && !configuredUrl) {
+  throw new Error("TURSO_DATABASE_URL is required in production.");
+}
+const url = configuredUrl || "file:./data/app.db";
 const authToken = process.env.TURSO_AUTH_TOKEN;
+
+if (url.startsWith("libsql://") && !authToken) {
+  throw new Error("TURSO_AUTH_TOKEN is required for a remote Turso database.");
+}
 
 function createConnection() {
   if (url.startsWith("file:")) {

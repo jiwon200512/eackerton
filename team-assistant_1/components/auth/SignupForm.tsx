@@ -80,7 +80,7 @@ export default function SignupForm() {
       description="계정을 만들고 팀의 노력을 더 선명하게 관리하세요."
     >
       <form onSubmit={handleSubmit} className="grid gap-4">
-        <Field label="이름" htmlFor="name">
+        <Field label="이름(실명)" htmlFor="name">
           <input
             id="name"
             name="name"
@@ -90,6 +90,9 @@ export default function SignupForm() {
             required
             className={inputClassName}
           />
+          <span className="mt-1 block text-xs font-normal text-slate-400">
+            팀 프로젝트 초대 시 등록된 팀원과 자동으로 연결하는 데 사용됩니다.
+          </span>
         </Field>
 
         <Field label="아이디" htmlFor="username">

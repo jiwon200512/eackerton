@@ -4,20 +4,16 @@ import { inviteCodes } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { toErrorResponse } from "@/lib/errors";
 import { requireUser } from "@/lib/auth/session";
-import { requireProjectAccess } from "@/lib/projects/access";
+import { requireProjectOwner } from "@/lib/projects/access";
 import { generateInviteCode } from "@/lib/projects/inviteCode";
 
 type Params = { params: Promise<{ projectId: string }> };
-
-// Any current project member can view/create/regenerate the invite code -
-// there's no separate "admin" tier in this app, so whoever already has
-// access is trusted to invite more people.
 
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
     const user = await requireUser();
     const { projectId } = await params;
-    await requireProjectAccess(projectId, user.id);
+    await requireProjectOwner(projectId, user.id);
 
     const [existing] = await db
       .select()
@@ -44,7 +40,7 @@ export async function POST(_req: NextRequest, { params }: Params) {
   try {
     const user = await requireUser();
     const { projectId } = await params;
-    await requireProjectAccess(projectId, user.id);
+    await requireProjectOwner(projectId, user.id);
 
     const code = await createUniqueCode();
     const [existing] = await db

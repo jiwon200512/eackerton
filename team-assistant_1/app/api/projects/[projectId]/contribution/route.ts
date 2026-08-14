@@ -16,7 +16,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
     const { projectId } = await params;
     await requireProjectAccess(projectId, user.id);
 
-    const [memberRows, taskRows, lastSnapshot] = await Promise.all([
+    const [memberRows, taskRows, snapshots] = await Promise.all([
       db.select().from(members).where(eq(members.projectId, projectId)),
       db
         .select()
@@ -27,7 +27,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
         .from(contributionSnapshots)
         .where(eq(contributionSnapshots.projectId, projectId))
         .orderBy(desc(contributionSnapshots.createdAt))
-        .limit(1),
+        .limit(2),
     ]);
 
     const current = calculateContribution(
@@ -41,12 +41,16 @@ export async function GET(_req: NextRequest, { params }: Params) {
       }))
     );
 
+    let latestByMember: Map<string, number> | null = null;
     let previousByMember: Map<string, number> | null = null;
-    if (lastSnapshot[0]) {
+    if (snapshots.length >= 2) {
       try {
-        const parsed = JSON.parse(lastSnapshot[0].scores) as ContributionResult[];
-        previousByMember = new Map(parsed.map((p) => [p.memberId, p.percentage]));
+        const latest = JSON.parse(snapshots[0].scores) as ContributionResult[];
+        const previous = JSON.parse(snapshots[1].scores) as ContributionResult[];
+        latestByMember = new Map(latest.map((p) => [p.memberId, p.percentage]));
+        previousByMember = new Map(previous.map((p) => [p.memberId, p.percentage]));
       } catch {
+        latestByMember = null;
         previousByMember = null;
       }
     }
@@ -56,14 +60,17 @@ export async function GET(_req: NextRequest, { params }: Params) {
       name: c.name,
       rawScore: c.rawScore,
       percentage: c.percentage,
-      deltaPercentage: previousByMember?.has(c.memberId)
-        ? Math.round((c.percentage - previousByMember.get(c.memberId)!) * 10) / 10
+      deltaPercentage:
+        latestByMember?.has(c.memberId) && previousByMember?.has(c.memberId)
+        ? Math.round(
+            (latestByMember.get(c.memberId)! - previousByMember.get(c.memberId)!) * 10
+          ) / 10
         : null,
     }));
 
     return NextResponse.json({
       contribution: result,
-      lastSnapshotAt: lastSnapshot[0]?.createdAt.getTime() ?? null,
+      lastSnapshotAt: snapshots[0]?.createdAt.getTime() ?? null,
     });
   } catch (err) {
     const { status, body } = toErrorResponse(err);
