@@ -4,6 +4,7 @@ import {
   text,
   integer,
   real,
+  uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import { randomUUID } from "crypto";
 
@@ -45,6 +46,47 @@ export const projects = sqliteTable("projects", {
     .notNull()
     .default(sql`(strftime('%s','now') * 1000)`),
   updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+    .notNull()
+    .default(sql`(strftime('%s','now') * 1000)`),
+});
+
+// Which authenticated users can access a project. Distinct from `members`
+// below, which is just a name tag used for AI attribution/contribution and
+// has no login of its own.
+export const projectUsers = sqliteTable(
+  "project_users",
+  {
+    id: id(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    // OWNER | MEMBER
+    role: text("role").notNull().default("MEMBER"),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(strftime('%s','now') * 1000)`),
+  },
+  (table) => [
+    uniqueIndex("project_users_project_id_user_id_idx").on(
+      table.projectId,
+      table.userId
+    ),
+  ]
+);
+
+// One active invite code per project; regenerating overwrites `code` in
+// place rather than keeping old codes around.
+export const inviteCodes = sqliteTable("invite_codes", {
+  id: id(),
+  projectId: text("project_id")
+    .notNull()
+    .unique()
+    .references(() => projects.id, { onDelete: "cascade" }),
+  code: text("code").notNull().unique(),
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .default(sql`(strftime('%s','now') * 1000)`),
 });

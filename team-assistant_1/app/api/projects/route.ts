@@ -1,18 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
-import { projects } from "@/lib/db/schema";
-import { desc } from "drizzle-orm";
+import { projects, projectUsers } from "@/lib/db/schema";
+import { desc, eq } from "drizzle-orm";
 import { AppError, toErrorResponse } from "@/lib/errors";
 import { requireUser } from "@/lib/auth/session";
 
 export async function GET() {
   try {
-    await requireUser();
-    const all = await db
-      .select()
-      .from(projects)
+    const user = await requireUser();
+    const rows = await db
+      .select({ project: projects })
+      .from(projectUsers)
+      .innerJoin(projects, eq(projectUsers.projectId, projects.id))
+      .where(eq(projectUsers.userId, user.id))
       .orderBy(desc(projects.createdAt));
-    return NextResponse.json({ projects: all });
+    return NextResponse.json({ projects: rows.map((r) => r.project) });
   } catch (err) {
     const { status, body } = toErrorResponse(err);
     return NextResponse.json(body, { status });
@@ -21,7 +23,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    await requireUser();
+    const user = await requireUser();
     const body = await req.json().catch(() => ({}));
     const name = typeof body.name === "string" ? body.name.trim() : "";
     if (!name) {
@@ -31,10 +33,13 @@ export async function POST(req: NextRequest) {
         400
       );
     }
-    const [created] = await db
-      .insert(projects)
-      .values({ name })
-      .returning();
+    const created = await db.transaction(async (tx) => {
+      const [project] = await tx.insert(projects).values({ name }).returning();
+      await tx
+        .insert(projectUsers)
+        .values({ projectId: project.id, userId: user.id, role: "OWNER" });
+      return project;
+    });
     return NextResponse.json({ project: created }, { status: 201 });
   } catch (err) {
     const { status, body } = toErrorResponse(err);

@@ -6,6 +6,7 @@ import { AppError, Errors, toErrorResponse } from "@/lib/errors";
 import { TASK_STATUSES } from "@/lib/types";
 import { toTaskDTO } from "@/lib/taskDto";
 import { requireUser } from "@/lib/auth/session";
+import { requireProjectAccess } from "@/lib/projects/access";
 
 type Params = { params: Promise<{ projectId: string; taskId: string }> };
 
@@ -19,8 +20,9 @@ async function loadTask(projectId: string, taskId: string) {
 
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
-    await requireUser();
+    const user = await requireUser();
     const { projectId, taskId } = await params;
+    await requireProjectAccess(projectId, user.id);
     const task = await loadTask(projectId, taskId);
     if (!task) throw Errors.notFound("Task");
 
@@ -51,8 +53,9 @@ export async function GET(_req: NextRequest, { params }: Params) {
 // silently reverted by a later record analysis.
 export async function PATCH(req: NextRequest, { params }: Params) {
   try {
-    await requireUser();
+    const user = await requireUser();
     const { projectId, taskId } = await params;
+    await requireProjectAccess(projectId, user.id);
     const task = await loadTask(projectId, taskId);
     if (!task) throw Errors.notFound("Task");
 
@@ -124,8 +127,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
   try {
-    await requireUser();
+    const user = await requireUser();
     const { projectId, taskId } = await params;
+    await requireProjectAccess(projectId, user.id);
     const task = await loadTask(projectId, taskId);
     if (!task) throw Errors.notFound("Task");
 

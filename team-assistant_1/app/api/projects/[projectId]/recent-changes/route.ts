@@ -5,13 +5,15 @@ import { and, desc, eq } from "drizzle-orm";
 import { toErrorResponse } from "@/lib/errors";
 import type { RecentChangeDTO } from "@/lib/types";
 import { requireUser } from "@/lib/auth/session";
+import { requireProjectAccess } from "@/lib/projects/access";
 
 type Params = { params: Promise<{ projectId: string }> };
 
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
-    await requireUser();
+    const user = await requireUser();
     const { projectId } = await params;
+    await requireProjectAccess(projectId, user.id);
 
     const [lastRecord] = await db
       .select()

@@ -10,8 +10,9 @@
  * Usage: npm run seed
  */
 import { db } from "../lib/db/client";
-import { members, projects } from "../lib/db/schema";
+import { inviteCodes, members, projects } from "../lib/db/schema";
 import { eq } from "drizzle-orm";
+import { generateInviteCode } from "../lib/projects/inviteCode";
 
 const DEMO_PROJECT_NAME = "Team Project Assistant Demo";
 const DEMO_MEMBERS = ["김지원", "박민수", "이철수"];
@@ -50,9 +51,26 @@ async function main() {
     console.log(`  + added member: ${name}`);
   }
 
+  // Projects are only visible to users who've joined them (spec: invite
+  // code access control), so the seeded project starts with zero members -
+  // print an invite code here for whoever runs the demo to join with.
+  let invite = (
+    await db.select().from(inviteCodes).where(eq(inviteCodes.projectId, project.id))
+  )[0];
+  if (!invite) {
+    [invite] = await db
+      .insert(inviteCodes)
+      .values({ projectId: project.id, code: generateInviteCode() })
+      .returning();
+    console.log(`  + generated invite code: ${invite.code}`);
+  } else {
+    console.log(`  Invite code already exists: ${invite.code}`);
+  }
+
   console.log("\nDemo setup complete. Next steps for the live demo:");
-  console.log(`  1. Open the app and select "${DEMO_PROJECT_NAME}"`);
-  console.log("  2. Go to 기록 추가 and paste the 1st record:\n");
+  console.log(`  1. Log in, then use the invite code below to join "${DEMO_PROJECT_NAME}":\n`);
+  console.log(`     ${invite.code}`);
+  console.log("\n  2. Go to 기록 추가 and paste the 1st record:\n");
   console.log(DEMO_RECORD_1.split("\n").map((l) => "     " + l).join("\n"));
   console.log("\n  3. Click AI로 분석하기, review the dashboard, then add the 2nd record:\n");
   console.log(DEMO_RECORD_2.split("\n").map((l) => "     " + l).join("\n"));
