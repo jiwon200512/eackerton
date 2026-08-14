@@ -5,11 +5,11 @@
 ## 기술 스택
 
 - Next.js (App Router) + TypeScript + Tailwind CSS
-- Drizzle ORM + better-sqlite3 (SQLite, 로컬 파일 DB)
+- Drizzle ORM + Turso (libSQL) — 로컬 개발 시 파일 DB, 배포 시 Turso 호스팅 DB
 - OpenAI API (`openai`, Responses API의 Structured Outputs) — AI 분석
 - Vitest — 단위/통합 테스트
 
-> 원래 계획은 Prisma였으나, 이 실행 환경에서 Prisma의 엔진 바이너리 CDN(binaries.prisma.sh)이 네트워크 차단되어 있어 순수 JS 드라이버 기반의 Drizzle + better-sqlite3로 전환했습니다. 기능/스키마는 동일합니다.
+> 원래 계획은 Prisma였으나, 이 실행 환경에서 Prisma의 엔진 바이너리 CDN(binaries.prisma.sh)이 네트워크 차단되어 있어 순수 JS 드라이버 기반의 Drizzle로 전환했습니다. 기능/스키마는 동일합니다.
 
 ## 실행 방법22
 
@@ -35,7 +35,8 @@ npm run build
 |---|---|
 | `OPENAI_API_KEY` | AI 분석에 사용하는 OpenAI API 키. 없으면 분석 시 "AI 분석 서비스에 연결할 수 없습니다" 오류를 안전하게 반환합니다. |
 | `OPENAI_MODEL` | 사용할 모델 (기본 `gpt-5.4-mini`, Structured Outputs 지원 모델 필요) |
-| `DATABASE_PATH` | SQLite 파일 경로 (기본 `./data/app.db`) |
+| `TURSO_DATABASE_URL` | Turso(libSQL) DB URL. 비워두면 로컬 파일(`./data/app.db`) 사용 |
+| `TURSO_AUTH_TOKEN` | `TURSO_DATABASE_URL`이 `libsql://...`(원격 Turso DB)일 때 필요한 인증 토큰 |
 
 ## 인증
 

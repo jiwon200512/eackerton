@@ -1,30 +1,34 @@
-import Database from "better-sqlite3";
-import { drizzle } from "drizzle-orm/better-sqlite3";
-import path from "path";
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "./schema";
 
-// Keep a single sqlite connection across hot-reloads in dev.
+// Keep a single libsql connection across hot-reloads in dev.
 declare global {
-  var __sqlite: Database.Database | undefined;
+  var __turso: ReturnType<typeof createClient> | undefined;
 }
 
-const dbPath =
-  process.env.DATABASE_PATH || path.join(process.cwd(), "data", "app.db");
+// Defaults to a local libSQL file so `npm run dev` and tests work without a
+// Turso account. Point TURSO_DATABASE_URL at a libsql://... URL (with
+// TURSO_AUTH_TOKEN) to use a hosted Turso database instead.
+const url = process.env.TURSO_DATABASE_URL || "file:./data/app.db";
+const authToken = process.env.TURSO_AUTH_TOKEN;
 
 function createConnection() {
-  const dir = path.dirname(dbPath);
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  require("fs").mkdirSync(dir, { recursive: true });
-  const sqlite = new Database(dbPath);
-  sqlite.pragma("journal_mode = WAL");
-  sqlite.pragma("foreign_keys = ON");
-  return sqlite;
+  if (url.startsWith("file:")) {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require("fs").mkdirSync(require("path").dirname(url.slice("file:".length)), {
+      recursive: true,
+    });
+  }
+  const c = createClient({ url, authToken });
+  c.execute("PRAGMA foreign_keys = ON").catch(() => {});
+  return c;
 }
 
-const sqlite = global.__sqlite ?? createConnection();
+const client = global.__turso ?? createConnection();
 if (process.env.NODE_ENV !== "production") {
-  global.__sqlite = sqlite;
+  global.__turso = client;
 }
 
-export const db = drizzle(sqlite, { schema });
-export { sqlite };
+export const db = drizzle(client, { schema });
+export { client };

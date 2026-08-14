@@ -145,15 +145,15 @@ vi.mock("@/lib/auth/session", () => ({
 
 beforeAll(async () => {
   cleanupDbFiles();
-  process.env.DATABASE_PATH = TEST_DB;
+  process.env.TURSO_DATABASE_URL = `file:${TEST_DB}`;
   const { db } = await import("@/lib/db/client");
-  const { migrate } = await import("drizzle-orm/better-sqlite3/migrator");
-  migrate(db, { migrationsFolder: path.join(process.cwd(), "drizzle") });
+  const { migrate } = await import("drizzle-orm/libsql/migrator");
+  await migrate(db, { migrationsFolder: path.join(process.cwd(), "drizzle") });
 });
 
 afterAll(async () => {
-  const { sqlite } = await import("@/lib/db/client");
-  sqlite.close();
+  const { client } = await import("@/lib/db/client");
+  client.close();
   cleanupDbFiles();
 });
 

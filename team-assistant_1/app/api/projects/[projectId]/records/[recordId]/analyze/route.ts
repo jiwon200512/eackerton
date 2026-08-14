@@ -160,10 +160,12 @@ export async function POST(req: NextRequest, { params }: Params) {
     }
 
     // 5-8. applyTaskEvents() + calculateContribution() + saveSnapshot(),
-    // all inside one synchronous transaction so a mid-way failure never
-    // leaves tasks/evidence/snapshot partially written.
-    const result = db.transaction((tx) => {
-      const changes = applyTaskEvents(
+    // all inside one transaction so a mid-way failure never leaves
+    // tasks/evidence/snapshot partially written. Turso/libSQL transactions
+    // are async (network round trips), unlike better-sqlite3's synchronous
+    // ones, so every query inside must be awaited.
+    const result = await db.transaction(async (tx) => {
+      const changes = await applyTaskEvents(
         tx,
         projectId,
         recordId,
@@ -173,7 +175,8 @@ export async function POST(req: NextRequest, { params }: Params) {
       );
 
       for (const change of changes) {
-        tx.insert(recordChanges)
+        await tx
+          .insert(recordChanges)
           .values({
             projectId,
             recordId,
@@ -187,7 +190,7 @@ export async function POST(req: NextRequest, { params }: Params) {
           .run();
       }
 
-      const freshTasks = tx
+      const freshTasks = await tx
         .select()
         .from(tasks)
         .where(and(eq(tasks.projectId, projectId), eq(tasks.isDeleted, false)))
@@ -204,7 +207,8 @@ export async function POST(req: NextRequest, { params }: Params) {
         }))
       );
 
-      tx.insert(contributionSnapshots)
+      await tx
+        .insert(contributionSnapshots)
         .values({
           projectId,
           recordId,
@@ -212,7 +216,8 @@ export async function POST(req: NextRequest, { params }: Params) {
         })
         .run();
 
-      tx.update(records)
+      await tx
+        .update(records)
         .set({
           analysisStatus: "COMPLETED",
           analyzedAt: new Date(),

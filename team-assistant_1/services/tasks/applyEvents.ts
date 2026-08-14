@@ -1,14 +1,16 @@
 import { eq } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
-import type { RunResult } from "better-sqlite3";
+import type { ResultSet } from "@libsql/client";
 import { evidence, tasks } from "@/lib/db/schema";
 import type * as schema from "@/lib/db/schema";
 import type { EventType, TaskStatus } from "@/lib/types";
 import type { ValidatedEvent } from "@/services/ai/validate";
 
 // Shared base type of both the plain db handle and a transaction (tx)
-// handle, so applyTaskEvents can be called with either.
-type DB = BaseSQLiteDatabase<"sync", RunResult, typeof schema>;
+// handle, so applyTaskEvents can be called with either. Turso/libSQL
+// transactions are async (network round trips), unlike better-sqlite3's
+// synchronous ones.
+type DB = BaseSQLiteDatabase<"async", ResultSet, typeof schema>;
 
 export interface ExistingTaskRow {
   id: string;
@@ -35,7 +37,7 @@ const STATUS_LABEL: Record<TaskStatus, string> = {
   DONE: "완료",
 };
 
-function insertEvidence(
+async function insertEvidence(
   tx: DB,
   taskId: string,
   recordId: string,
@@ -43,8 +45,10 @@ function insertEvidence(
 ) {
   for (const ev of items) {
     // NOTE: drizzle query builders are lazy - `.run()` is required to
-    // actually execute them synchronously inside a sync db.transaction().
-    tx.insert(evidence)
+    // actually execute them (and, for the async libsql driver, must be
+    // awaited) inside the db.transaction() callback.
+    await tx
+      .insert(evidence)
       .values({
         taskId,
         recordId,
@@ -58,17 +62,17 @@ function insertEvidence(
 
 /**
  * Applies a batch of validated AI events to the database. Must be called
- * inside a db.transaction() callback so a partial failure (e.g. one bad
- * event) doesn't leave tasks/evidence half-updated.
+ * (and awaited) inside a db.transaction() callback so a partial failure
+ * (e.g. one bad event) doesn't leave tasks/evidence half-updated.
  */
-export function applyTaskEvents(
+export async function applyTaskEvents(
   tx: DB,
   projectId: string,
   recordId: string,
   events: ValidatedEvent[],
   memberByName: Map<string, string>,
   existingTasksById: Map<string, ExistingTaskRow>
-): AppliedChange[] {
+): Promise<AppliedChange[]> {
   const changes: AppliedChange[] = [];
 
   for (const event of events) {
@@ -83,7 +87,7 @@ export function applyTaskEvents(
         difficulty: 3,
         workload: 3,
       };
-      const created = tx
+      const created = await tx
         .insert(tasks)
         .values({
           projectId,
@@ -98,7 +102,7 @@ export function applyTaskEvents(
         .returning()
         .get();
 
-      insertEvidence(tx, created.id, recordId, event.evidence);
+      await insertEvidence(tx, created.id, recordId, event.evidence);
 
       // Keep existingTasksById in sync in case a later event in the same
       // batch references this brand-new task by matching title semantics
@@ -132,7 +136,8 @@ export function applyTaskEvents(
     if (event.type === "TASK_STATUS_CHANGE" && event.status) {
       const prevStatus = existing.status;
       if (prevStatus !== event.status) {
-        tx.update(tasks)
+        await tx
+          .update(tasks)
           .set({ status: event.status, lastReason: event.reason || null, updatedAt: new Date() })
           .where(eq(tasks.id, existing.id))
           .run();
@@ -146,14 +151,15 @@ export function applyTaskEvents(
           confidence: event.confidence,
         });
       }
-      insertEvidence(tx, existing.id, recordId, event.evidence);
+      await insertEvidence(tx, existing.id, recordId, event.evidence);
       continue;
     }
 
     if (event.type === "TASK_ASSIGNEE_CHANGE") {
       const prevAssigneeId = existing.assigneeId;
       if (assigneeId && assigneeId !== prevAssigneeId) {
-        tx.update(tasks)
+        await tx
+          .update(tasks)
           .set({ assigneeId, lastReason: event.reason || null, updatedAt: new Date() })
           .where(eq(tasks.id, existing.id))
           .run();
@@ -167,7 +173,7 @@ export function applyTaskEvents(
           confidence: event.confidence,
         });
       }
-      insertEvidence(tx, existing.id, recordId, event.evidence);
+      await insertEvidence(tx, existing.id, recordId, event.evidence);
       continue;
     }
 
@@ -201,7 +207,7 @@ export function applyTaskEvents(
       if (Object.keys(updates).length > 0) {
         updates.lastReason = event.reason || null;
         updates.updatedAt = new Date();
-        tx.update(tasks).set(updates).where(eq(tasks.id, existing.id)).run();
+        await tx.update(tasks).set(updates).where(eq(tasks.id, existing.id)).run();
         if (updates.importance !== undefined) existing.importance = updates.importance;
         if (updates.difficulty !== undefined) existing.difficulty = updates.difficulty;
         if (updates.workload !== undefined) existing.workload = updates.workload;
@@ -216,13 +222,13 @@ export function applyTaskEvents(
           confidence: event.confidence,
         });
       }
-      insertEvidence(tx, existing.id, recordId, event.evidence);
+      await insertEvidence(tx, existing.id, recordId, event.evidence);
       continue;
     }
 
     if (event.type === "EVIDENCE_ADD") {
       if (event.evidence.length === 0) continue;
-      insertEvidence(tx, existing.id, recordId, event.evidence);
+      await insertEvidence(tx, existing.id, recordId, event.evidence);
       changes.push({
         taskId: existing.id,
         taskTitle: existing.title,
