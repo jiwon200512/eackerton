@@ -1,11 +1,12 @@
 import type { MemberContribution } from "@/lib/types";
+import Avatar from "@/components/Avatar";
 
 export default function ContributionBar({ member }: { member: MemberContribution }) {
   const delta = member.deltaPercentage;
   return (
     <div>
-      <div className="flex items-baseline justify-between mb-1">
-        <span className="text-sm font-medium text-slate-800">{member.name}</span>
+      <div className="mb-1 flex items-center justify-between gap-3">
+        <span className="flex min-w-0 items-center gap-2 text-sm font-medium text-slate-800"><Avatar emoji={member.avatarEmoji} name={member.name} size="sm" /><span className="truncate">{member.name}</span></span>
         <span className="text-sm text-slate-600">
           {member.percentage.toFixed(1)}%
           {delta !== null && delta !== 0 && (

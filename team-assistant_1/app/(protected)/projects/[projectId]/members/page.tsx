@@ -14,6 +14,7 @@ import {
   type Project,
 } from "@/lib/apiClient";
 import Spinner from "@/components/Spinner";
+import Avatar from "@/components/Avatar";
 
 export default function MembersPage({ params }: { params: Promise<{ projectId: string }> }) {
   const { projectId } = use(params);
@@ -161,7 +162,7 @@ export default function MembersPage({ params }: { params: Promise<{ projectId: s
       <section className="glass-card mt-6 overflow-hidden rounded-2xl">
         <ul className="divide-y divide-white/70">
           {members.map((member) => <li key={member.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
-            <div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-violet-600 text-sm font-bold text-white">{member.name.charAt(0)}</span><div><div className="flex flex-wrap items-center gap-2"><span className="text-sm font-semibold text-slate-800">{member.name}</span>{member.isLeader && <Badge tone="indigo">팀장</Badge>}<Badge tone={member.claimed ? "green" : "slate"}>{member.claimed ? "참여 완료" : "초대 대기"}</Badge></div>{member.claimedByMe && <p className="mt-1 text-[11px] text-indigo-500">내 계정</p>}</div></div>
+            <div className="flex items-center gap-3"><Avatar emoji={member.avatarEmoji} name={member.name} size="md" /><div><div className="flex flex-wrap items-center gap-2"><span className="text-sm font-semibold text-slate-800">{member.name}</span>{member.isLeader && <Badge tone="indigo">팀장</Badge>}<Badge tone={member.claimed ? "green" : "slate"}>{member.claimed ? "참여 완료" : "초대 대기"}</Badge></div>{member.claimedByMe && <p className="mt-1 text-[11px] text-indigo-500">내 계정</p>}</div></div>
             {isOwner && !member.isLeader && <div className="flex items-center gap-3">{member.claimed && <button type="button" onClick={() => handleTransfer(member)} disabled={busy} className="text-xs font-semibold text-indigo-600 disabled:opacity-50">팀장 양도</button>}<button type="button" onClick={() => handleDelete(member)} disabled={busy} className="text-xs font-medium text-rose-500 disabled:opacity-50">삭제</button></div>}
           </li>)}
         </ul>

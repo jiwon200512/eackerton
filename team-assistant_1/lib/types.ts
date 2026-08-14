@@ -35,6 +35,7 @@ export interface TaskDTO {
   title: string;
   assigneeId: string | null;
   assigneeName: string | null;
+  assigneeAvatarEmoji: string;
   status: TaskStatus;
   importance: number;
   difficulty: number;
@@ -57,6 +58,7 @@ export interface MemberDTO {
   claimedByMe: boolean;
   isLeader: boolean;
   role: ProjectRole | null;
+  avatarEmoji: string;
   createdAt: number | string;
 }
 
@@ -78,6 +80,7 @@ export interface MemberContribution {
   rawScore: number;
   percentage: number;
   deltaPercentage: number | null;
+  avatarEmoji: string;
 }
 
 export interface RecentChangeDTO {

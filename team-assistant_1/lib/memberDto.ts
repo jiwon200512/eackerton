@@ -1,4 +1,5 @@
 import type { MemberDTO } from "@/lib/types";
+import { DEFAULT_AVATAR_EMOJI, normalizeAvatarEmoji } from "@/lib/avatar";
 
 interface MemberRow {
   id: string;
@@ -11,7 +12,8 @@ interface MemberRow {
 export function toMemberDTO(
   member: MemberRow,
   currentUserId: string,
-  ownerUserId: string | null = null
+  ownerUserId: string | null = null,
+  avatarEmoji: string = DEFAULT_AVATAR_EMOJI
 ): MemberDTO {
   const isLeader = member.userId !== null && member.userId === ownerUserId;
   return {
@@ -22,6 +24,7 @@ export function toMemberDTO(
     claimedByMe: member.userId === currentUserId,
     isLeader,
     role: member.userId === null ? null : isLeader ? "OWNER" : "MEMBER",
+    avatarEmoji: normalizeAvatarEmoji(avatarEmoji),
     createdAt: member.createdAt.getTime(),
   };
 }

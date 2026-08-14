@@ -4,9 +4,10 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import BrandMark from "@/components/BrandMark";
+import Avatar from "@/components/Avatar";
 import { getProject } from "@/lib/apiClient";
 
-type UserInfo = { name: string; username: string };
+type UserInfo = { name: string; username: string; avatarEmoji: string };
 const NAV_ITEMS = [
   { segment: "", label: "대시보드", icon: "▦" },
   { segment: "/records/new", label: "기록 추가", icon: "＋" },
@@ -51,7 +52,7 @@ function ProjectShell({ projectId, user, children }: { projectId: string; user: 
       </aside>
       <div className="min-w-0 flex-1 lg:pl-56">
         <header className="sticky top-0 z-20 border-b border-white/60 bg-white/50 px-4 py-3 backdrop-blur-2xl lg:hidden">
-          <div className="flex items-center justify-between gap-3"><BrandMark /><span className="max-w-36 truncate text-xs font-semibold text-slate-600">{projectName}</span></div>
+          <div className="flex items-center justify-between gap-3"><BrandMark /><span className="max-w-32 truncate text-xs font-semibold text-slate-600">{projectName}</span><Link href="/profile" aria-label="프로필 설정"><Avatar emoji={user.avatarEmoji} name={user.name} size="sm" /></Link></div>
           <nav className="mt-3 flex gap-1 overflow-x-auto pb-1" aria-label="프로젝트 모바일 메뉴">
             {nav.map((item) => {
               const active = item.segment === "" ? pathname === item.href : pathname.startsWith(item.href);
@@ -77,5 +78,18 @@ function UserPanel({ user, compact = false }: { user: UserInfo; compact?: boolea
     try { await fetch("/api/auth/logout", { method: "POST" }); }
     finally { router.replace("/login"); router.refresh(); }
   }
-  return <div className={`flex items-center ${compact ? "rounded-xl border border-white/70 bg-white/50 p-2" : "gap-3"}`}><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-400 to-indigo-600 text-sm font-bold text-white shadow-md">{user.name.trim().charAt(0) || user.username.charAt(0).toUpperCase()}</span><div className={`${compact ? "ml-2 min-w-0 flex-1" : "hidden sm:block"}`}><p className="truncate text-xs font-semibold text-slate-800">{user.name}</p><p className="truncate text-[11px] text-slate-400">@{user.username}</p></div><button type="button" onClick={logout} disabled={loggingOut} className={`${compact ? "ml-1 px-2" : "btn-secondary rounded-lg px-3"} py-1.5 text-xs font-semibold text-slate-500 disabled:opacity-50`}>{loggingOut ? "처리 중" : "로그아웃"}</button></div>;
+  return (
+    <div className={`flex items-center ${compact ? "rounded-xl border border-white/70 bg-white/50 p-2" : "gap-3"}`}>
+      <Link href="/profile" className="flex min-w-0 items-center gap-2" title="프로필 설정">
+        <Avatar emoji={user.avatarEmoji} name={user.name} size="sm" />
+        <div className={`${compact ? "min-w-0 flex-1" : "hidden sm:block"}`}>
+          <p className="truncate text-xs font-semibold text-slate-800">{user.name}</p>
+          <p className="truncate text-[11px] text-slate-400">프로필 설정</p>
+        </div>
+      </Link>
+      <button type="button" onClick={logout} disabled={loggingOut} className={`${compact ? "ml-auto px-2" : "btn-secondary rounded-lg px-3"} py-1.5 text-xs font-semibold text-slate-500 disabled:opacity-50`}>
+        {loggingOut ? "처리 중" : "로그아웃"}
+      </button>
+    </div>
+  );
 }

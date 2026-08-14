@@ -11,6 +11,7 @@ import {
 } from "@/lib/projects/access";
 import { toMemberDTO } from "@/lib/memberDto";
 import { normalizePersonName } from "@/lib/personName";
+import { loadProjectMembersWithAvatars } from "@/lib/members/query";
 
 type Params = { params: Promise<{ projectId: string }> };
 
@@ -20,11 +21,13 @@ export async function GET(_req: NextRequest, { params }: Params) {
     const { projectId } = await params;
     await requireProjectAccess(projectId, user.id);
     const [list, ownerUserId] = await Promise.all([
-      db.select().from(members).where(eq(members.projectId, projectId)),
+      loadProjectMembersWithAvatars(projectId),
       getProjectOwnerUserId(projectId),
     ]);
     return NextResponse.json({
-      members: list.map((m) => toMemberDTO(m, user.id, ownerUserId)),
+      members: list.map(({ member, avatarEmoji }) =>
+        toMemberDTO(member, user.id, ownerUserId, avatarEmoji)
+      ),
     });
   } catch (err) {
     const { status, body } = toErrorResponse(err);

@@ -6,6 +6,7 @@ import type { MemberContribution, TaskDTO } from "@/lib/types";
 import ContributionBar from "@/components/ContributionBar";
 import EmptyState from "@/components/EmptyState";
 import Spinner from "@/components/Spinner";
+import Avatar from "@/components/Avatar";
 
 export default function ContributionReportPage({ params }: { params: Promise<{ projectId: string }> }) {
   const { projectId } = use(params);
@@ -51,7 +52,7 @@ export default function ContributionReportPage({ params }: { params: Promise<{ p
     {!error && contribution.length === 0 ? <div className="mt-7"><EmptyState title="아직 계산된 기여도가 없습니다." description="기록을 분석하면 팀원별 기여도가 이곳에 표시됩니다." /></div> : <>
       <section className="mt-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {rankedContribution.map((member, index) => <article key={member.memberId} className="glass-card rounded-2xl p-5">
-          <div className="flex items-start justify-between"><span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-400 to-violet-600 font-bold text-white">{member.name.charAt(0)}</span><span className="text-xs font-semibold text-slate-400">#{index + 1}</span></div>
+          <div className="flex items-start justify-between"><Avatar emoji={member.avatarEmoji} name={member.name} size="md" /><span className="text-xs font-semibold text-slate-400">#{index + 1}</span></div>
           <h2 className="mt-4 text-sm font-bold text-slate-800">{member.name}</h2><p className="mt-1 text-3xl font-bold tracking-tight text-indigo-600">{member.percentage.toFixed(1)}%</p>
           <div className="mt-4 grid grid-cols-2 gap-2 text-center"><div className="rounded-xl bg-white/45 px-2 py-2"><p className="text-lg font-bold text-slate-800">{taskCounts[member.memberId] ?? 0}</p><p className="text-[10px] text-slate-400">담당 Task</p></div><div className="rounded-xl bg-white/45 px-2 py-2"><p className="text-lg font-bold text-slate-800">{evidenceByMember[member.memberId] ?? 0}</p><p className="text-[10px] text-slate-400">Evidence</p></div></div>
           {member.deltaPercentage !== null && <p className={`mt-3 text-xs font-semibold ${member.deltaPercentage >= 0 ? "text-emerald-600" : "text-rose-600"}`}>이전 분석 대비 {member.deltaPercentage > 0 ? "+" : ""}{member.deltaPercentage.toFixed(1)}%p</p>}

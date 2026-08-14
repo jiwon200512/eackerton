@@ -48,6 +48,8 @@ npm run backfill:owner-members
 
 현재 DB 구조의 `project_users.role`(`OWNER`/`MEMBER`)과 `members.user_id`를 그대로 사용합니다. 별도의 LEADER 역할이나 역할 테이블은 추가하지 않습니다. UI에서는 OWNER를 “팀장”으로 표시합니다.
 
+`0004_conscious_morlocks.sql` migration은 기존 `users` 행을 삭제하지 않고 `avatar_emoji` 컬럼만 `NOT NULL DEFAULT '🐶'`로 추가합니다. 기존 사용자와 신규 사용자 모두 기본 🐶 아바타를 사용합니다.
+
 ## 인증과 프로젝트 참여
 
 - 회원가입은 실명, 아이디, 비밀번호, 이메일을 입력합니다.
@@ -58,6 +60,15 @@ npm run backfill:owner-members
 - 이름 비교는 앞뒤 공백, 연속 공백, 유니코드 전각/반각, 영문 대소문자 차이를 정규화합니다.
 - 이름이 없거나 중복으로 모호하거나 이미 다른 계정에 연결됐으면 접근 권한을 새로 부여하지 않습니다.
 - 과거 버전에서 이미 `project_users` 접근 권한만 가진 사용자의 권한은 제거하지 않습니다.
+
+## 프로필
+
+- `/profile`에서 16개의 동물 이모지 중 프로필 아바타를 선택할 수 있습니다.
+- 서버는 공통 whitelist에 포함된 이모지만 저장합니다.
+- 연결된 프로젝트 팀원, Task 담당자와 기여도 화면에도 같은 아바타가 표시됩니다.
+- 이름, 아이디와 이메일은 조회만 가능하며 실명 기반 팀원 자동 연결을 보호하기 위해 수정하지 않습니다.
+- 현재 비밀번호를 확인한 뒤 새 비밀번호로 변경할 수 있습니다. 기존 scrypt hashing과 현재 session 구조를 그대로 사용하므로 변경 후에도 현재 로그인은 유지됩니다.
+- 이미지 업로드나 외부 이미지 저장소는 사용하지 않습니다.
 
 ## 팀장 권한
 
@@ -93,6 +104,9 @@ OWNER만 다음 작업을 할 수 있습니다.
 
 ## 주요 API
 
+- `GET /api/profile`: 로그인 사용자의 안전한 프로필 DTO 조회
+- `PATCH /api/profile/avatar`: whitelist 동물 아바타 변경
+- `POST /api/profile/password`: 현재 비밀번호 검증 후 비밀번호 변경
 - `GET/POST /api/projects`: 프로젝트 목록 및 생성
 - `POST /api/projects/join`: 초대 코드와 실명으로 프로젝트 참여
 - `GET /api/projects/[projectId]`: 프로젝트 상세, 현재 사용자 역할과 팀원 조회
@@ -115,4 +129,4 @@ npm test
 npm run build
 ```
 
-테스트에는 기여도 계산, AI 응답 검증과 fallback, 프로젝트 생성/실명 참여/팀장 양도/권한 차단/팀원 삭제, 전체 2회 기록 분석 시나리오가 포함됩니다.
+테스트에는 Profile 접근 제어, 아바타 whitelist와 팀원 DTO, 비밀번호 변경 후 로그인, 기여도 계산, AI 응답 검증과 fallback, 프로젝트 생성/실명 참여/팀장 양도/권한 차단/팀원 삭제, 전체 2회 기록 분석 시나리오가 포함됩니다.

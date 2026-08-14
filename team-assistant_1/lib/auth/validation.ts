@@ -1,7 +1,15 @@
 import { z } from "zod";
+import {
+  PASSWORD_MAX_LENGTH,
+  PASSWORD_MIN_LENGTH,
+} from "@/lib/auth/passwordPolicy";
 
 export const USERNAME_MIN_LENGTH = 3;
 export const USERNAME_MAX_LENGTH = 30;
+export const passwordSchema = z
+  .string()
+  .min(PASSWORD_MIN_LENGTH, "비밀번호는 8자 이상 입력해주세요.")
+  .max(PASSWORD_MAX_LENGTH, "비밀번호는 128자 이하로 입력해주세요.");
 
 export function normalizeUsername(username: string): string {
   return username.trim().toLowerCase();
@@ -29,10 +37,7 @@ export const signupSchema = z
       .min(2, "이름은 2자 이상 입력해주세요.")
       .max(50, "이름은 50자 이하로 입력해주세요."),
     username: usernameSchema,
-    password: z
-      .string()
-      .min(8, "비밀번호는 8자 이상 입력해주세요.")
-      .max(128, "비밀번호는 128자 이하로 입력해주세요."),
+    password: passwordSchema,
     passwordConfirm: z.string(),
     email: z
       .string()
@@ -50,6 +55,19 @@ export const loginSchema = z.object({
   username: usernameSchema,
   password: z.string().min(1, "비밀번호를 입력해주세요.").max(128),
 });
+
+export const passwordChangeSchema = z
+  .object({
+    currentPassword: z
+      .string()
+      .min(1, "현재 비밀번호를 입력해주세요.")
+      .max(PASSWORD_MAX_LENGTH),
+    newPassword: passwordSchema,
+  })
+  .refine((data) => data.currentPassword !== data.newPassword, {
+    message: "새 비밀번호는 현재 비밀번호와 다르게 입력해주세요.",
+    path: ["newPassword"],
+  });
 
 export function firstValidationError(error: z.ZodError): string {
   return error.issues[0]?.message ?? "입력값을 확인해주세요.";

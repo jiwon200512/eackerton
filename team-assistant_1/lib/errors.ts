@@ -105,6 +105,18 @@ export const Errors = {
       "AI 분석 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.",
       504
     ),
+  invalidAvatar: () =>
+    new AppError(
+      "INVALID_AVATAR",
+      "선택할 수 없는 프로필 아바타입니다.",
+      400
+    ),
+  invalidCurrentPassword: () =>
+    new AppError(
+      "INVALID_CURRENT_PASSWORD",
+      "현재 비밀번호가 올바르지 않습니다.",
+      400
+    ),
 };
 
 export function toErrorResponse(err: unknown): { status: number; body: { error: string; code: string } } {

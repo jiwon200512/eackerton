@@ -15,6 +15,7 @@ export type AuthUser = {
   username: string;
   name: string;
   email: string;
+  avatarEmoji: string;
 };
 
 function hashSessionToken(token: string): string {
@@ -52,6 +53,7 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
       username: users.username,
       name: users.name,
       email: users.email,
+      avatarEmoji: users.avatarEmoji,
     })
     .from(sessions)
     .innerJoin(users, eq(sessions.userId, users.id))

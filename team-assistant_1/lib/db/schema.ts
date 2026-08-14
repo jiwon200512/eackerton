@@ -7,6 +7,7 @@ import {
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import { randomUUID } from "crypto";
+import { DEFAULT_AVATAR_EMOJI } from "@/lib/avatar";
 
 const id = () =>
   text("id")
@@ -19,6 +20,9 @@ export const users = sqliteTable("users", {
   name: text("name").notNull(),
   email: text("email").notNull(),
   passwordHash: text("password_hash").notNull(),
+  avatarEmoji: text("avatar_emoji")
+    .notNull()
+    .default(DEFAULT_AVATAR_EMOJI),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .default(sql`(strftime('%s','now') * 1000)`),

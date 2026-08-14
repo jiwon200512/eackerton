@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
-import { contributionSnapshots, members, tasks } from "@/lib/db/schema";
+import { contributionSnapshots, tasks } from "@/lib/db/schema";
 import { and, desc, eq } from "drizzle-orm";
 import { toErrorResponse } from "@/lib/errors";
 import { calculateContribution, type ContributionResult } from "@/services/contribution/calculate";
 import type { MemberContribution, TaskStatus } from "@/lib/types";
 import { requireUser } from "@/lib/auth/session";
 import { requireProjectAccess } from "@/lib/projects/access";
+import { loadProjectMembersWithAvatars } from "@/lib/members/query";
+import { DEFAULT_AVATAR_EMOJI } from "@/lib/avatar";
 
 type Params = { params: Promise<{ projectId: string }> };
 
@@ -17,7 +19,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
     await requireProjectAccess(projectId, user.id);
 
     const [memberRows, taskRows, snapshots] = await Promise.all([
-      db.select().from(members).where(eq(members.projectId, projectId)),
+      loadProjectMembersWithAvatars(projectId),
       db
         .select()
         .from(tasks)
@@ -31,7 +33,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
     ]);
 
     const current = calculateContribution(
-      memberRows.map((m) => ({ id: m.id, name: m.name })),
+      memberRows.map(({ member }) => ({ id: member.id, name: member.name })),
       taskRows.map((t) => ({
         assigneeId: t.assigneeId,
         status: t.status as TaskStatus,
@@ -55,6 +57,9 @@ export async function GET(_req: NextRequest, { params }: Params) {
       }
     }
 
+    const avatarByMemberId = new Map(
+      memberRows.map(({ member, avatarEmoji }) => [member.id, avatarEmoji])
+    );
     const result: MemberContribution[] = current.map((c) => ({
       memberId: c.memberId,
       name: c.name,
@@ -66,6 +71,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
             (latestByMember.get(c.memberId)! - previousByMember.get(c.memberId)!) * 10
           ) / 10
         : null,
+      avatarEmoji: avatarByMemberId.get(c.memberId) ?? DEFAULT_AVATAR_EMOJI,
     }));
 
     return NextResponse.json({

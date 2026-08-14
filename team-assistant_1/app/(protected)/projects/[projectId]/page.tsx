@@ -16,6 +16,7 @@ import StatusBadge from "@/components/StatusBadge";
 import ContributionBar from "@/components/ContributionBar";
 import EmptyState from "@/components/EmptyState";
 import Spinner from "@/components/Spinner";
+import Avatar from "@/components/Avatar";
 
 const CHANGE_TYPE_LABEL: Record<string, string> = {
   TASK_CREATE: "신규 Task 생성",
@@ -149,7 +150,7 @@ export default function DashboardPage({
           <div className="py-10"><EmptyState title={tasks.length ? "이 상태의 Task가 없습니다." : "아직 분석된 업무가 없습니다."} description={tasks.length ? "다른 상태 필터를 선택해보세요." : "첫 번째 회의 기록을 추가해보세요."} action={!tasks.length ? <button onClick={() => router.push(`/projects/${projectId}/records/new`)} className="btn-primary rounded-xl px-4 py-2 text-sm font-semibold">기록 추가하기</button> : undefined} /></div>
         ) : (
           <ul className="mt-3 flex flex-col gap-2">
-            {visibleTasks.map((t) => <li key={t.id}><button onClick={() => router.push(`/projects/${projectId}/tasks/${t.id}`)} className="group w-full rounded-xl border border-white/70 bg-white/48 p-4 text-left hover:border-indigo-200 hover:bg-white/75"><div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="truncate text-sm font-semibold text-slate-800 group-hover:text-indigo-700">{t.title}</p><p className="mt-1 text-xs text-slate-500">{t.assigneeName ?? "미배정"}</p></div><StatusBadge status={t.status} /></div><div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-slate-400"><span>중요도 <b className="text-slate-600">{t.importance}</b></span><span>난이도 <b className="text-slate-600">{t.difficulty}</b></span><span>작업량 <b className="text-slate-600">{t.workload}</b></span></div></button></li>)}
+            {visibleTasks.map((t) => <li key={t.id}><button onClick={() => router.push(`/projects/${projectId}/tasks/${t.id}`)} className="group w-full rounded-xl border border-white/70 bg-white/48 p-4 text-left hover:border-indigo-200 hover:bg-white/75"><div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="truncate text-sm font-semibold text-slate-800 group-hover:text-indigo-700">{t.title}</p><p className="mt-1 flex items-center gap-1.5 text-xs text-slate-500"><Avatar emoji={t.assigneeAvatarEmoji} name={t.assigneeName} size="sm" />{t.assigneeName ?? "미배정"}</p></div><StatusBadge status={t.status} /></div><div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-slate-400"><span>중요도 <b className="text-slate-600">{t.importance}</b></span><span>난이도 <b className="text-slate-600">{t.difficulty}</b></span><span>작업량 <b className="text-slate-600">{t.workload}</b></span></div></button></li>)}
           </ul>
         )}
       </section>

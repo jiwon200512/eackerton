@@ -13,6 +13,7 @@ import type { EvidenceDTO, TaskDTO, TaskStatus } from "@/lib/types";
 import { TASK_STATUSES } from "@/lib/types";
 import StatusBadge from "@/components/StatusBadge";
 import Spinner from "@/components/Spinner";
+import Avatar from "@/components/Avatar";
 
 const STATUS_LABEL: Record<TaskStatus, string> = {
   TODO: "할 일",
@@ -152,6 +153,10 @@ export default function TaskDetailPage({
         <div className="mt-5 grid grid-cols-2 gap-4">
           <div>
             <label className="text-xs font-medium text-slate-500">담당자</label>
+            <div className="mt-1.5 flex items-center gap-2 text-sm font-medium text-slate-700">
+              <Avatar emoji={task.assigneeAvatarEmoji} name={task.assigneeName} size="sm" />
+              <span>{task.assigneeName ?? "미배정"}</span>
+            </div>
             <select
               value={task.assigneeId ?? ""}
               onChange={(e) => saveUpdate({ assigneeId: e.target.value || null })}

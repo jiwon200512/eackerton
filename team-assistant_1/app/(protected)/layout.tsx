@@ -10,5 +10,15 @@ export default async function ProtectedLayout({
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
-  return <ProtectedShell user={{ name: user.name, username: user.username }}>{children}</ProtectedShell>;
+  return (
+    <ProtectedShell
+      user={{
+        name: user.name,
+        username: user.username,
+        avatarEmoji: user.avatarEmoji,
+      }}
+    >
+      {children}
+    </ProtectedShell>
+  );
 }

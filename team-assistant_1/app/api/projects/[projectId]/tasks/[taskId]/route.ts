@@ -6,8 +6,12 @@ import { AppError, Errors, toErrorResponse } from "@/lib/errors";
 import { TASK_STATUSES } from "@/lib/types";
 import { toTaskDTO } from "@/lib/taskDto";
 import { requireUser } from "@/lib/auth/session";
-import { requireProjectAccess } from "@/lib/projects/access";
+import {
+  getProjectOwnerUserId,
+  requireProjectAccess,
+} from "@/lib/projects/access";
 import { toMemberDTO } from "@/lib/memberDto";
+import { loadProjectMembersWithAvatars } from "@/lib/members/query";
 
 type Params = { params: Promise<{ projectId: string; taskId: string }> };
 
@@ -27,20 +31,28 @@ export async function GET(_req: NextRequest, { params }: Params) {
     const task = await loadTask(projectId, taskId);
     if (!task) throw Errors.notFound("Task");
 
-    const [evidenceRows, memberRows] = await Promise.all([
+    const [evidenceRows, memberProfiles, ownerUserId] = await Promise.all([
       db
         .select()
         .from(evidence)
         .where(eq(evidence.taskId, taskId))
         .orderBy(desc(evidence.createdAt)),
-      db.select().from(members).where(eq(members.projectId, projectId)),
+      loadProjectMembersWithAvatars(projectId),
+      getProjectOwnerUserId(projectId),
     ]);
-    const memberById = new Map(memberRows.map((m) => [m.id, m.name]));
+    const memberById = new Map(
+      memberProfiles.map(({ member, avatarEmoji }) => [
+        member.id,
+        { name: member.name, avatarEmoji },
+      ])
+    );
 
     return NextResponse.json({
       task: toTaskDTO(task, task.assigneeId ? memberById.get(task.assigneeId) ?? null : null),
       evidence: evidenceRows,
-      members: memberRows.map((m) => toMemberDTO(m, user.id)),
+      members: memberProfiles.map(({ member, avatarEmoji }) =>
+        toMemberDTO(member, user.id, ownerUserId, avatarEmoji)
+      ),
     });
   } catch (err) {
     const { status, body } = toErrorResponse(err);
@@ -76,11 +88,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       updates.status = body.status;
     }
 
-    let assigneeName: string | null | undefined = undefined;
     if (body.assigneeId !== undefined) {
       if (body.assigneeId === null) {
         updates.assigneeId = null;
-        assigneeName = null;
       } else {
         const [assignee] = await db
           .select()
@@ -94,13 +104,17 @@ export async function PATCH(req: NextRequest, { params }: Params) {
           );
         }
         updates.assigneeId = assignee.id;
-        assigneeName = assignee.name;
       }
     }
 
     if (Object.keys(updates).length === 0) {
-      const memberRows = await db.select().from(members).where(eq(members.projectId, projectId));
-      const memberById = new Map(memberRows.map((m) => [m.id, m.name]));
+      const memberProfiles = await loadProjectMembersWithAvatars(projectId);
+      const memberById = new Map(
+        memberProfiles.map(({ member, avatarEmoji }) => [
+          member.id,
+          { name: member.name, avatarEmoji },
+        ])
+      );
       return NextResponse.json({
         task: toTaskDTO(task, task.assigneeId ? memberById.get(task.assigneeId) ?? null : null),
       });
@@ -113,13 +127,20 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       .where(eq(tasks.id, taskId))
       .returning();
 
-    if (assigneeName === undefined) {
-      const memberRows = await db.select().from(members).where(eq(members.projectId, projectId));
-      const memberById = new Map(memberRows.map((m) => [m.id, m.name]));
-      assigneeName = updated.assigneeId ? memberById.get(updated.assigneeId) ?? null : null;
-    }
+    const memberProfiles = await loadProjectMembersWithAvatars(projectId);
+    const memberById = new Map(
+      memberProfiles.map(({ member, avatarEmoji }) => [
+        member.id,
+        { name: member.name, avatarEmoji },
+      ])
+    );
 
-    return NextResponse.json({ task: toTaskDTO(updated, assigneeName) });
+    return NextResponse.json({
+      task: toTaskDTO(
+        updated,
+        updated.assigneeId ? memberById.get(updated.assigneeId) ?? null : null
+      ),
+    });
   } catch (err) {
     const { status, body } = toErrorResponse(err);
     return NextResponse.json(body, { status });

@@ -23,6 +23,7 @@ export interface Member {
   claimedByMe: boolean;
   isLeader: boolean;
   role: "OWNER" | "MEMBER" | null;
+  avatarEmoji: string;
   createdAt: number | string;
 }
 
@@ -35,6 +36,14 @@ export interface RecordItem {
   analysisError: string | null;
   analyzedAt: number | string | null;
   createdAt: number | string;
+}
+
+export interface ProfileUser {
+  id: string;
+  name: string;
+  username: string;
+  email: string;
+  avatarEmoji: string;
 }
 
 class ApiError extends Error {
@@ -108,6 +117,23 @@ export const transferProjectOwner = (projectId: string, memberId: string) =>
   request<{ ok: true }>(`/api/projects/${projectId}/transfer-owner`, {
     method: "POST",
     body: JSON.stringify({ memberId }),
+  });
+
+// Profile
+export const getProfile = () =>
+  request<{ user: ProfileUser }>("/api/profile");
+export const updateProfileAvatar = (avatarEmoji: string) =>
+  request<{ avatarEmoji: string }>("/api/profile/avatar", {
+    method: "PATCH",
+    body: JSON.stringify({ avatarEmoji }),
+  });
+export const changePassword = (
+  currentPassword: string,
+  newPassword: string
+) =>
+  request<{ ok: true; message: string }>("/api/profile/password", {
+    method: "POST",
+    body: JSON.stringify({ currentPassword, newPassword }),
   });
 
 // Records

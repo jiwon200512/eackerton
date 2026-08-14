@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
-import { members, tasks } from "@/lib/db/schema";
+import { tasks } from "@/lib/db/schema";
 import { and, eq } from "drizzle-orm";
 import { toErrorResponse } from "@/lib/errors";
 import { toTaskDTO } from "@/lib/taskDto";
 import type { TaskDTO, TaskStatus } from "@/lib/types";
 import { requireUser } from "@/lib/auth/session";
 import { requireProjectAccess } from "@/lib/projects/access";
+import { loadProjectMembersWithAvatars } from "@/lib/members/query";
 
 type Params = { params: Promise<{ projectId: string }> };
 
@@ -20,9 +21,14 @@ export async function GET(_req: NextRequest, { params }: Params) {
         .select()
         .from(tasks)
         .where(and(eq(tasks.projectId, projectId), eq(tasks.isDeleted, false))),
-      db.select().from(members).where(eq(members.projectId, projectId)),
+      loadProjectMembersWithAvatars(projectId),
     ]);
-    const memberById = new Map(memberRows.map((m) => [m.id, m.name]));
+    const memberById = new Map(
+      memberRows.map(({ member, avatarEmoji }) => [
+        member.id,
+        { name: member.name, avatarEmoji },
+      ])
+    );
 
     const dtos: TaskDTO[] = taskRows.map((t) =>
       toTaskDTO(t, t.assigneeId ? memberById.get(t.assigneeId) ?? null : null)

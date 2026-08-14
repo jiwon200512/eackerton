@@ -1,5 +1,6 @@
 import { computeCurrentTaskScore, computeTaskScore } from "@/services/contribution/calculate";
 import type { TaskStatus, TaskDTO } from "@/lib/types";
+import { DEFAULT_AVATAR_EMOJI, normalizeAvatarEmoji } from "@/lib/avatar";
 
 interface TaskRow {
   id: string;
@@ -17,7 +18,7 @@ interface TaskRow {
 
 export function toTaskDTO(
   task: TaskRow,
-  assigneeName: string | null
+  assignee: { name: string; avatarEmoji: string } | null
 ): TaskDTO {
   const status = task.status as TaskStatus;
   return {
@@ -25,7 +26,10 @@ export function toTaskDTO(
     projectId: task.projectId,
     title: task.title,
     assigneeId: task.assigneeId,
-    assigneeName,
+    assigneeName: assignee?.name ?? null,
+    assigneeAvatarEmoji: normalizeAvatarEmoji(
+      assignee?.avatarEmoji ?? DEFAULT_AVATAR_EMOJI
+    ),
     status,
     importance: task.importance,
     difficulty: task.difficulty,
