@@ -9,7 +9,7 @@
 - OpenAI Responses API와 Structured Outputs
 - Vitest
 
-## 로컬 실행
+## 로컬 실행3
 
 ```bash
 npm install
