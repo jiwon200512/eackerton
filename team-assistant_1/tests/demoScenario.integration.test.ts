@@ -149,6 +149,18 @@ beforeAll(async () => {
   const { db } = await import("@/lib/db/client");
   const { migrate } = await import("drizzle-orm/libsql/migrator");
   await migrate(db, { migrationsFolder: path.join(process.cwd(), "drizzle") });
+
+  // Project access checks now join against a real `users` row via
+  // project_users' foreign key, so the mocked requireUser() identity below
+  // ("test-user") needs a matching row for inserts to satisfy the FK.
+  const { users } = await import("@/lib/db/schema");
+  await db.insert(users).values({
+    id: "test-user",
+    username: "testuser",
+    name: "테스트 사용자",
+    email: "test@example.com",
+    passwordHash: "unused-in-tests",
+  });
 });
 
 afterAll(async () => {

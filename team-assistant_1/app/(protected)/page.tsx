@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ApiError, createProject, listProjects, listTasks, type Project } from "@/lib/apiClient";
+import { ApiError, createProject, joinProjectByCode, listProjects, listTasks, type Project } from "@/lib/apiClient";
 import EmptyState from "@/components/EmptyState";
 import Spinner from "@/components/Spinner";
 
@@ -13,6 +13,9 @@ export default function HomePage() {
   const [name, setName] = useState("");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [inviteCode, setInviteCode] = useState("");
+  const [joining, setJoining] = useState(false);
+  const [joinError, setJoinError] = useState<string | null>(null);
 
   useEffect(() => {
     listProjects()
@@ -40,6 +43,22 @@ export default function HomePage() {
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "프로젝트 생성에 실패했습니다.");
       setCreating(false);
+    }
+  }
+
+  async function handleJoin(e: React.FormEvent) {
+    e.preventDefault();
+    if (!inviteCode.trim()) return;
+    setJoining(true);
+    setJoinError(null);
+    try {
+      const { projectId } = await joinProjectByCode(inviteCode.trim());
+      // Members page first, not the dashboard - a fresh joiner usually
+      // wants to claim their existing name tag right away.
+      router.push(`/projects/${projectId}/members`);
+    } catch (err) {
+      setJoinError(err instanceof ApiError ? err.message : "참가에 실패했습니다.");
+      setJoining(false);
     }
   }
 
@@ -75,6 +94,30 @@ export default function HomePage() {
           </button>
         </div>
         {error && <p className="mt-2 text-sm text-rose-600">{error}</p>}
+      </form>
+
+      <form onSubmit={handleJoin} className="glass-card mx-auto mt-4 max-w-4xl rounded-2xl p-5 sm:p-6">
+        <label className="block text-sm font-bold text-slate-800" htmlFor="invite-code">
+          초대 코드로 참가하기
+        </label>
+        <p className="mt-1 text-xs text-slate-500">팀원에게 받은 초대 코드를 입력하면 해당 프로젝트에 참가합니다.</p>
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+          <input
+            id="invite-code"
+            value={inviteCode}
+            onChange={(e) => setInviteCode(e.target.value)}
+            placeholder="예: AB12CD34"
+            className="glass-input min-w-0 flex-1 rounded-xl px-4 py-3 text-sm uppercase"
+          />
+          <button
+            type="submit"
+            disabled={joining || !inviteCode.trim()}
+            className="rounded-xl border border-indigo-200 bg-white/70 px-5 py-3 text-sm font-semibold text-indigo-600 hover:bg-white disabled:opacity-50"
+          >
+            {joining ? "참가 중..." : "참가하기"}
+          </button>
+        </div>
+        {joinError && <p className="mt-2 text-sm text-rose-600">{joinError}</p>}
       </form>
 
       <section className="mx-auto mt-12 max-w-4xl">

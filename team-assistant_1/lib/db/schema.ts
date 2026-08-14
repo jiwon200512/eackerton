@@ -4,6 +4,7 @@ import {
   text,
   integer,
   real,
+  uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import { randomUUID } from "crypto";
 
@@ -49,16 +50,71 @@ export const projects = sqliteTable("projects", {
     .default(sql`(strftime('%s','now') * 1000)`),
 });
 
-export const members = sqliteTable("members", {
+// Which authenticated users can access a project. Distinct from `members`
+// below, which is just a name tag used for AI attribution/contribution and
+// has no login of its own.
+export const projectUsers = sqliteTable(
+  "project_users",
+  {
+    id: id(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    // OWNER | MEMBER
+    role: text("role").notNull().default("MEMBER"),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(strftime('%s','now') * 1000)`),
+  },
+  (table) => [
+    uniqueIndex("project_users_project_id_user_id_idx").on(
+      table.projectId,
+      table.userId
+    ),
+  ]
+);
+
+// One active invite code per project; regenerating overwrites `code` in
+// place rather than keeping old codes around.
+export const inviteCodes = sqliteTable("invite_codes", {
   id: id(),
   projectId: text("project_id")
     .notNull()
+    .unique()
     .references(() => projects.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
+  code: text("code").notNull().unique(),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .default(sql`(strftime('%s','now') * 1000)`),
 });
+
+export const members = sqliteTable(
+  "members",
+  {
+    id: id(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    // Set once a real account "claims" this name tag by joining via invite
+    // code and picking it - the member row's id (and every Task/Evidence
+    // that already references it) stays the same, it just gains a real
+    // owner. NULL means this is still just a placeholder name.
+    userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
+    name: text("name").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(strftime('%s','now') * 1000)`),
+  },
+  (table) => [
+    // SQLite treats each NULL as distinct, so this only blocks a user from
+    // claiming two member rows in the same project - unclaimed (NULL) rows
+    // are unaffected.
+    uniqueIndex("members_project_id_user_id_idx").on(table.projectId, table.userId),
+  ]
+);
 
 // KAKAO_TEXT | MANUAL_TEXT
 export const records = sqliteTable("records", {

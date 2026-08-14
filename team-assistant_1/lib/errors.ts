@@ -55,6 +55,12 @@ export const Errors = {
       "데이터를 저장하는 중 오류가 발생했습니다.",
       500
     ),
+  invalidInviteCode: () =>
+    new AppError(
+      "INVALID_INVITE_CODE",
+      "유효하지 않은 초대 코드입니다.",
+      404
+    ),
 };
 
 export function toErrorResponse(err: unknown): { status: number; body: { error: string; code: string } } {

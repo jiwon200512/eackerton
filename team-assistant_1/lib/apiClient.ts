@@ -19,6 +19,8 @@ export interface Member {
   id: string;
   projectId: string;
   name: string;
+  claimed: boolean;
+  claimedByMe: boolean;
   createdAt: number | string;
 }
 
@@ -70,6 +72,19 @@ export const createProject = (name: string) =>
   });
 export const getProject = (projectId: string) =>
   request<{ project: Project; members: Member[] }>(`/api/projects/${projectId}`);
+export const joinProjectByCode = (code: string) =>
+  request<{ projectId: string }>("/api/projects/join", {
+    method: "POST",
+    body: JSON.stringify({ code }),
+  });
+
+// Invite code
+export const getInviteCode = (projectId: string) =>
+  request<{ code: string }>(`/api/projects/${projectId}/invite-code`);
+export const regenerateInviteCode = (projectId: string) =>
+  request<{ code: string }>(`/api/projects/${projectId}/invite-code`, {
+    method: "POST",
+  });
 
 // Members
 export const listMembers = (projectId: string) =>
@@ -82,6 +97,16 @@ export const addMember = (projectId: string, name: string) =>
 export const deleteMember = (projectId: string, memberId: string) =>
   request<{ ok: true }>(`/api/projects/${projectId}/members/${memberId}`, {
     method: "DELETE",
+  });
+export const claimMember = (projectId: string, memberId: string) =>
+  request<{ member: Member }>(`/api/projects/${projectId}/members/${memberId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ claim: true }),
+  });
+export const unclaimMember = (projectId: string, memberId: string) =>
+  request<{ member: Member }>(`/api/projects/${projectId}/members/${memberId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ claim: false }),
   });
 
 // Records

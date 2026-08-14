@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx --yes playwright install chromium --with-deps)",
+      "Bash(curl -s -o /dev/null -w \"server: %{http_code}\\\\n\" http://localhost:3000)",
+      "Bash(curl -s -X POST http://localhost:3000/api/auth/signup -H 'Content-Type: application/json' -d '{\"username\":\"stalebugA\",\"password\":\"testpass123\",\"passwordConfirm\":\"testpass123\",\"name\":\"계정1\",\"email\":\"stalebugA@example.com\"}' -w '\\\\nSTATUS:%{http_code}\\\\n')",
+      "Bash(curl -s -X POST http://localhost:3000/api/auth/signup -H 'Content-Type: application/json' -d '{\"username\":\"stalebugB\",\"password\":\"testpass123\",\"passwordConfirm\":\"testpass123\",\"name\":\"계정2\",\"email\":\"stalebugB@example.com\"}' -w '\\\\nSTATUS:%{http_code}\\\\n')",
+      "Bash(curl -s -c /tmp/a.txt -X POST http://localhost:3000/api/auth/login -H \"Content-Type: application/json\" -d '{\"username\":\"stalebugA\",\"password\":\"testpass123\"}')",
+      "Bash(curl -s -b /tmp/a.txt -X POST http://localhost:3000/api/projects -H \"Content-Type: application/json\" -d '{\"name\":\"계정1전용프로젝트\"}')",
+      "Bash(npm ls *)",
+      "Bash(node /private/tmp/claude-501/-Users-gimjiwon-Effortly-eackerton/a47814da-c9ff-4502-aba6-f62a7462780a/scratchpad/repro.mjs)",
+      "Bash(npm init *)",
+      "Bash(node repro.mjs)",
+      "Bash(curl -s -c /tmp/b.txt -X POST http://localhost:3000/api/auth/login -H \"Content-Type: application/json\" -d '{\"username\":\"stalebugB\",\"password\":\"testpass123\"}')",
+      "Bash(curl -s -b /tmp/b.txt -X POST http://localhost:3000/api/projects -H \"Content-Type: application/json\" -d '{\"name\":\"계정2전용프로젝트\"}')"
+    ]
+  }
+}

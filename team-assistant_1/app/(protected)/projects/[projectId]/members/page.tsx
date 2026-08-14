@@ -5,8 +5,12 @@ import { useRouter } from "next/navigation";
 import {
   ApiError,
   addMember,
+  claimMember,
   deleteMember,
+  getInviteCode,
   getProject,
+  regenerateInviteCode,
+  unclaimMember,
   type Member,
   type Project,
 } from "@/lib/apiClient";
@@ -25,6 +29,9 @@ export default function MembersPage({
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [inviteCode, setInviteCode] = useState<string | null>(null);
+  const [inviteBusy, setInviteBusy] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   async function load() {
     try {
@@ -38,9 +45,44 @@ export default function MembersPage({
     }
   }
 
+  async function loadInviteCode() {
+    try {
+      const { code } = await getInviteCode(projectId);
+      setInviteCode(code);
+    } catch {
+      // Non-critical - the invite card just stays empty and the user can
+      // retry via "재발급".
+    }
+  }
+
+  async function handleRegenerateCode() {
+    setInviteBusy(true);
+    setCopied(false);
+    try {
+      const { code } = await regenerateInviteCode(projectId);
+      setInviteCode(code);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "초대 코드를 재발급하지 못했습니다.");
+    } finally {
+      setInviteBusy(false);
+    }
+  }
+
+  async function handleCopyCode() {
+    if (!inviteCode) return;
+    try {
+      await navigator.clipboard.writeText(inviteCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // Clipboard API unavailable - the code is still visible to copy manually.
+    }
+  }
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data fetch on mount
     load();
+    loadInviteCode();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectId]);
 
@@ -73,6 +115,32 @@ export default function MembersPage({
     }
   }
 
+  async function handleClaim(memberId: string) {
+    setBusy(true);
+    setError(null);
+    try {
+      await claimMember(projectId, memberId);
+      await load();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "팀원 연결에 실패했습니다.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleUnclaim(memberId: string) {
+    setBusy(true);
+    setError(null);
+    try {
+      await unclaimMember(projectId, memberId);
+      await load();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "연결 해제에 실패했습니다.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="mx-auto flex w-full max-w-2xl flex-1 items-center justify-center px-6 py-16">
@@ -87,11 +155,42 @@ export default function MembersPage({
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-500">Team Members</p>
         <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{project?.name} 팀원 관리</h1>
         <p className="mt-1 text-sm text-slate-500">
-          대화 속 화자를 실제 팀원과 연결하기 위해 팀원 이름을 등록해주세요.
+          대화 속 화자를 실제 팀원과 연결하기 위해 팀원 이름을 등록해주세요. 초대 코드로 들어온
+          팀원은 아래 목록에서 자신의 이름을 계정에 연결할 수 있어요.
         </p>
       </div>
 
-      <form onSubmit={handleAdd} className="glass-card mt-7 rounded-2xl p-5 sm:p-6">
+      <div className="glass-card mt-7 rounded-2xl p-5 sm:p-6">
+        <p className="text-sm font-bold text-slate-800">초대 코드</p>
+        <p className="mt-1 text-xs text-slate-500">
+          이 코드를 공유하면 계정이 있는 팀원이 로그인 후 프로젝트에 직접 참가할 수 있어요.
+        </p>
+        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+          <span className="min-w-0 flex-1 rounded-xl border border-indigo-200/60 bg-white/70 px-4 py-3 text-center font-mono text-lg font-bold tracking-[0.3em] text-indigo-700">
+            {inviteCode ?? "……"}
+          </span>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleCopyCode}
+              disabled={!inviteCode}
+              className="rounded-xl border border-indigo-200 bg-white/70 px-4 py-2.5 text-sm font-semibold text-indigo-600 hover:bg-white disabled:opacity-50"
+            >
+              {copied ? "복사됨!" : "복사"}
+            </button>
+            <button
+              type="button"
+              onClick={handleRegenerateCode}
+              disabled={inviteBusy}
+              className="rounded-xl border border-slate-200 bg-white/70 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-white disabled:opacity-50"
+            >
+              {inviteBusy ? "재발급 중..." : "재발급"}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <form onSubmit={handleAdd} className="glass-card mt-4 rounded-2xl p-5 sm:p-6">
         <label className="block text-sm font-medium text-slate-700" htmlFor="member-name">
           팀원 추가
         </label>
@@ -122,14 +221,42 @@ export default function MembersPage({
             </li>
           )}
           {members.map((m) => (
-            <li key={m.id} className="flex items-center justify-between px-5 py-4"><div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-violet-600 text-sm font-bold text-white">{m.name.charAt(0)}</span><div><span className="text-sm font-semibold text-slate-800">{m.name}</span><p className="text-[11px] text-slate-400">등록 팀원</p></div></div>
-              <button
-                onClick={() => handleDelete(m.id)}
-                disabled={busy}
-                className="text-xs font-medium text-rose-500 hover:text-rose-700 disabled:opacity-50"
-              >
-                삭제
-              </button>
+            <li key={m.id} className="flex items-center justify-between px-5 py-4">
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-violet-600 text-sm font-bold text-white">{m.name.charAt(0)}</span>
+                <div>
+                  <span className="text-sm font-semibold text-slate-800">{m.name}</span>
+                  <p className="text-[11px] text-slate-400">
+                    {m.claimedByMe ? "나와 연결됨" : m.claimed ? "계정과 연결됨" : "등록 팀원 (연결 안 됨)"}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                {m.claimedByMe ? (
+                  <button
+                    onClick={() => handleUnclaim(m.id)}
+                    disabled={busy}
+                    className="text-xs font-medium text-slate-500 hover:text-slate-700 disabled:opacity-50"
+                  >
+                    연결 해제
+                  </button>
+                ) : !m.claimed ? (
+                  <button
+                    onClick={() => handleClaim(m.id)}
+                    disabled={busy}
+                    className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 disabled:opacity-50"
+                  >
+                    내 계정으로 연결
+                  </button>
+                ) : null}
+                <button
+                  onClick={() => handleDelete(m.id)}
+                  disabled={busy}
+                  className="text-xs font-medium text-rose-500 hover:text-rose-700 disabled:opacity-50"
+                >
+                  삭제
+                </button>
+              </div>
             </li>
           ))}
         </ul>
