@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { toErrorResponse } from "@/lib/errors";
 import { requireUser } from "@/lib/auth/session";
 import { requireProjectAccess } from "@/lib/projects/access";
+import { toMemberDTO } from "@/lib/memberDto";
 
 type Params = { params: Promise<{ projectId: string }> };
 
@@ -17,7 +18,10 @@ export async function GET(_req: NextRequest, { params }: Params) {
       .select()
       .from(members)
       .where(eq(members.projectId, projectId));
-    return NextResponse.json({ project, members: projectMembers });
+    return NextResponse.json({
+      project,
+      members: projectMembers.map((m) => toMemberDTO(m, user.id)),
+    });
   } catch (err) {
     const { status, body } = toErrorResponse(err);
     return NextResponse.json(body, { status });

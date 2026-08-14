@@ -53,7 +53,9 @@ export default function HomePage() {
     setJoinError(null);
     try {
       const { projectId } = await joinProjectByCode(inviteCode.trim());
-      router.push(`/projects/${projectId}`);
+      // Members page first, not the dashboard - a fresh joiner usually
+      // wants to claim their existing name tag right away.
+      router.push(`/projects/${projectId}/members`);
     } catch (err) {
       setJoinError(err instanceof ApiError ? err.message : "참가에 실패했습니다.");
       setJoining(false);

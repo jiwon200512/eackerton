@@ -46,6 +46,18 @@ export interface TaskDTO {
   updatedAt: number;
 }
 
+export interface MemberDTO {
+  id: string;
+  projectId: string;
+  name: string;
+  // Whether some account has claimed this name tag, and whether it's the
+  // requesting user specifically - the actual userId is intentionally not
+  // exposed to the client.
+  claimed: boolean;
+  claimedByMe: boolean;
+  createdAt: number | string;
+}
+
 export interface EvidenceDTO {
   id: string;
   taskId: string;

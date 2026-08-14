@@ -7,6 +7,7 @@ import { TASK_STATUSES } from "@/lib/types";
 import { toTaskDTO } from "@/lib/taskDto";
 import { requireUser } from "@/lib/auth/session";
 import { requireProjectAccess } from "@/lib/projects/access";
+import { toMemberDTO } from "@/lib/memberDto";
 
 type Params = { params: Promise<{ projectId: string; taskId: string }> };
 
@@ -39,7 +40,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
     return NextResponse.json({
       task: toTaskDTO(task, task.assigneeId ? memberById.get(task.assigneeId) ?? null : null),
       evidence: evidenceRows,
-      members: memberRows,
+      members: memberRows.map((m) => toMemberDTO(m, user.id)),
     });
   } catch (err) {
     const { status, body } = toErrorResponse(err);

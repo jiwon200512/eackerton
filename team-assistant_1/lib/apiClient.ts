@@ -19,6 +19,8 @@ export interface Member {
   id: string;
   projectId: string;
   name: string;
+  claimed: boolean;
+  claimedByMe: boolean;
   createdAt: number | string;
 }
 
@@ -95,6 +97,16 @@ export const addMember = (projectId: string, name: string) =>
 export const deleteMember = (projectId: string, memberId: string) =>
   request<{ ok: true }>(`/api/projects/${projectId}/members/${memberId}`, {
     method: "DELETE",
+  });
+export const claimMember = (projectId: string, memberId: string) =>
+  request<{ member: Member }>(`/api/projects/${projectId}/members/${memberId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ claim: true }),
+  });
+export const unclaimMember = (projectId: string, memberId: string) =>
+  request<{ member: Member }>(`/api/projects/${projectId}/members/${memberId}`, {
+    method: "PATCH",
+    body: JSON.stringify({ claim: false }),
   });
 
 // Records
