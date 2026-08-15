@@ -134,9 +134,7 @@ export default function ProfilePage() {
   return (
     <div className="page-container max-w-4xl">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-500">
-          Profile
-        </p>
+        <p className="page-eyebrow">프로필</p>
         <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
           프로필 설정
         </h1>
@@ -171,7 +169,7 @@ export default function ProfilePage() {
                 <h2 className="truncate text-xl font-bold text-slate-900">
                   {profile.name}
                 </h2>
-                <p className="mt-1 text-sm font-medium text-indigo-600">
+                <p className="mt-1 text-sm font-medium text-[#6541f3]">
                   @{profile.username}
                 </p>
                 <p className="mt-0.5 truncate text-sm text-slate-500">
@@ -202,7 +200,7 @@ export default function ProfilePage() {
                 </p>
               </div>
               {avatarSaving && (
-                <span className="text-xs font-semibold text-indigo-500">
+                <span className="text-xs font-semibold text-[#6541f3]">
                   저장 중...
                 </span>
               )}
@@ -220,13 +218,13 @@ export default function ProfilePage() {
                     disabled={avatarSaving}
                     className={`relative flex aspect-square items-center justify-center rounded-full border text-2xl transition sm:text-3xl ${
                       selected
-                        ? "border-indigo-500 bg-indigo-50 ring-4 ring-indigo-100"
-                        : "border-white/80 bg-white/55 hover:border-indigo-200 hover:bg-white/85"
+                        ? "border-[#6541f3] bg-violet-50 ring-4 ring-violet-100"
+                        : "border-slate-200 bg-white hover:border-violet-300 hover:bg-slate-50"
                     } disabled:cursor-not-allowed disabled:opacity-60`}
                   >
                     {emoji}
                     {selected && (
-                      <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white">
+                      <span className="absolute -right-0.5 -top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#6541f3] text-[10px] font-bold text-white">
                         ✓
                       </span>
                     )}
@@ -290,7 +288,7 @@ export default function ProfilePage() {
 
 function ProfileField({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-white/70 bg-white/45 px-4 py-3">
+    <div className="border-l-2 border-slate-200 pl-4 py-1">
       <dt className="text-[11px] font-semibold text-slate-400">{label}</dt>
       <dd className="mt-1 truncate text-sm font-medium text-slate-700">
         {value}

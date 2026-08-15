@@ -108,41 +108,31 @@ function HomePage() {
     }
     const activeProjects = projects?.filter((project)=>project.status === "ACTIVE") ?? [];
     const completedProjects = projects?.filter((project)=>project.status === "COMPLETED") ?? [];
-    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "mx-auto w-full max-w-7xl px-5 py-12 sm:px-8 sm:py-16",
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
+        className: "mx-auto w-full max-w-6xl px-5 py-10 sm:px-8 sm:py-14",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
-                className: "mx-auto max-w-3xl text-center",
+                className: "max-w-2xl",
                 children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                        className: "inline-flex rounded-full border border-indigo-200/60 bg-white/55 px-3 py-1 text-xs font-semibold text-indigo-600 shadow-sm backdrop-blur-xl",
-                        children: "Effortly · AI Project Assistant"
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                        className: "page-eyebrow",
+                        children: "EFFORTLY"
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
                         lineNumber: 85,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
-                        className: "mt-5 text-4xl font-bold tracking-[-0.035em] text-slate-950 sm:text-5xl",
-                        children: [
-                            "팀의 협력을 ",
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                className: "bg-gradient-to-r from-indigo-600 to-violet-500 bg-clip-text text-transparent",
-                                children: "명확한 성과로"
-                            }, void 0, false, {
-                                fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                lineNumber: 86,
-                                columnNumber: 103
-                            }, this)
-                        ]
-                    }, void 0, true, {
+                        className: "mt-3 text-3xl font-bold tracking-[-0.03em] text-slate-950 sm:text-4xl",
+                        children: "팀의 진행 상황을 한눈에 확인하세요."
+                    }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
                         lineNumber: 86,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                        className: "mx-auto mt-4 max-w-2xl text-sm leading-7 text-slate-500 sm:text-base",
-                        children: "대화와 회의 기록을 AI가 분석해 업무 현황과 팀원별 기여도를 한곳에서 정리합니다."
+                        className: "mt-3 max-w-xl text-sm leading-7 text-slate-500 sm:text-base",
+                        children: "대화와 회의 기록을 바탕으로 업무 현황과 팀원별 기여도를 정리합니다."
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
                         lineNumber: 87,
@@ -155,281 +145,232 @@ function HomePage() {
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
-                className: "mx-auto mt-10 grid max-w-4xl gap-3 sm:grid-cols-3",
+                className: "mt-10 grid overflow-hidden rounded-2xl border border-slate-200 bg-white lg:grid-cols-2",
                 children: [
-                    [
-                        "AI",
-                        "AI 업무 분석",
-                        "기록에서 Task와 변경 사항을 추출해요."
-                    ],
-                    [
-                        "01",
-                        "한눈에 보는 현황",
-                        "진행 상태와 최근 변화를 모아봐요."
-                    ],
-                    [
-                        "%",
-                        "투명한 기여도",
-                        "실제 업무 근거로 기여도를 계산해요."
-                    ]
-                ].map(([icon, title, description])=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "glass-card rounded-2xl p-5 text-left",
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
+                        onSubmit: handleCreate,
+                        className: "p-5 sm:p-7 lg:border-r lg:border-slate-200",
                         children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                className: "flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-500/10 text-xs font-bold text-indigo-600",
-                                children: icon
-                            }, void 0, false, {
-                                fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                lineNumber: 92,
-                                columnNumber: 77
-                            }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                className: "mt-4 text-sm font-bold text-slate-800",
-                                children: title
+                                className: "section-title",
+                                children: "새 프로젝트"
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
                                 lineNumber: 92,
-                                columnNumber: 211
+                                columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                className: "mt-1.5 text-xs leading-5 text-slate-500",
-                                children: description
+                                className: "mt-1.5 text-sm text-slate-500",
+                                children: "프로젝트 이름을 입력하고 팀원 등록부터 시작하세요."
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                lineNumber: 92,
-                                columnNumber: 277
+                                lineNumber: 93,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "mt-5 flex flex-col gap-2 sm:flex-row",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        id: "project-name",
+                                        "aria-label": "프로젝트 이름",
+                                        value: name,
+                                        onChange: (event)=>setName(event.target.value),
+                                        placeholder: "예: 캠퍼스 디자인 프로젝트",
+                                        className: "glass-input min-w-0 flex-1 rounded-xl px-4 py-3 text-sm"
+                                    }, void 0, false, {
+                                        fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                                        lineNumber: 95,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        type: "submit",
+                                        disabled: creating || !name.trim(),
+                                        className: "btn-primary rounded-xl px-5 py-3 text-sm font-semibold disabled:opacity-50",
+                                        children: creating ? "생성 중..." : "만들기"
+                                    }, void 0, false, {
+                                        fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                                        lineNumber: 96,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                                lineNumber: 94,
+                                columnNumber: 11
+                            }, this),
+                            error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                role: "alert",
+                                className: "mt-2 text-sm text-rose-600",
+                                children: error
+                            }, void 0, false, {
+                                fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                                lineNumber: 98,
+                                columnNumber: 21
                             }, this)
                         ]
-                    }, title, true, {
+                    }, void 0, true, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 92,
-                        columnNumber: 11
-                    }, this))
-            }, void 0, false, {
+                        lineNumber: 91,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
+                        onSubmit: handleJoin,
+                        className: "border-t border-slate-200 p-5 sm:p-7 lg:border-t-0",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                className: "section-title",
+                                children: "초대 코드로 참가"
+                            }, void 0, false, {
+                                fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                                lineNumber: 102,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                className: "mt-1.5 text-sm text-slate-500",
+                                children: "팀장이 공유한 코드를 입력하세요."
+                            }, void 0, false, {
+                                fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                                lineNumber: 103,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "mt-5 flex flex-col gap-2 sm:flex-row",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        id: "invite-code",
+                                        "aria-label": "초대 코드",
+                                        value: inviteCode,
+                                        onChange: (event)=>setInviteCode(event.target.value),
+                                        placeholder: "예: AB12CD34",
+                                        className: "glass-input min-w-0 flex-1 rounded-xl px-4 py-3 text-sm uppercase"
+                                    }, void 0, false, {
+                                        fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                                        lineNumber: 105,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        type: "submit",
+                                        disabled: joining || !inviteCode.trim(),
+                                        className: "btn-secondary rounded-xl px-5 py-3 text-sm font-semibold text-[#6541f3] disabled:opacity-50",
+                                        children: joining ? "참가 중..." : "참가하기"
+                                    }, void 0, false, {
+                                        fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                                        lineNumber: 106,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                                lineNumber: 104,
+                                columnNumber: 11
+                            }, this),
+                            joinError && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                role: "alert",
+                                className: "mt-2 text-sm text-rose-600",
+                                children: joinError
+                            }, void 0, false, {
+                                fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                                lineNumber: 108,
+                                columnNumber: 25
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                        lineNumber: 101,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
                 lineNumber: 90,
                 columnNumber: 7
             }, this),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
-                onSubmit: handleCreate,
-                className: "glass-card-strong mx-auto mt-10 max-w-4xl rounded-2xl p-5 sm:p-6",
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                        className: "block text-sm font-bold text-slate-800",
-                        htmlFor: "project-name",
-                        children: "새 프로젝트 만들기"
-                    }, void 0, false, {
-                        fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 97,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                        className: "mt-1 text-xs text-slate-500",
-                        children: "프로젝트 이름을 입력하면 팀원 등록부터 시작합니다."
-                    }, void 0, false, {
-                        fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 98,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "mt-4 flex flex-col gap-2 sm:flex-row",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                id: "project-name",
-                                value: name,
-                                onChange: (event)=>setName(event.target.value),
-                                placeholder: "예: 캠퍼스 디자인 프로젝트",
-                                className: "glass-input min-w-0 flex-1 rounded-xl px-4 py-3 text-sm"
-                            }, void 0, false, {
-                                fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                lineNumber: 99,
-                                columnNumber: 63
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                type: "submit",
-                                disabled: creating || !name.trim(),
-                                className: "btn-primary rounded-xl px-5 py-3 text-sm font-semibold disabled:opacity-50",
-                                children: creating ? "생성 중..." : "만들기"
-                            }, void 0, false, {
-                                fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                lineNumber: 99,
-                                columnNumber: 251
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 99,
-                        columnNumber: 9
-                    }, this),
-                    error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                        role: "alert",
-                        className: "mt-2 text-sm text-rose-600",
-                        children: error
-                    }, void 0, false, {
-                        fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 100,
-                        columnNumber: 19
-                    }, this)
-                ]
-            }, void 0, true, {
-                fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                lineNumber: 96,
-                columnNumber: 7
-            }, this),
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
-                onSubmit: handleJoin,
-                className: "glass-card mx-auto mt-4 max-w-4xl rounded-2xl p-5 sm:p-6",
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                        className: "block text-sm font-bold text-slate-800",
-                        htmlFor: "invite-code",
-                        children: "초대 코드로 참가하기"
-                    }, void 0, false, {
-                        fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 104,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                        className: "mt-1 text-xs text-slate-500",
-                        children: "팀장이 공유한 초대 코드를 입력하세요."
-                    }, void 0, false, {
-                        fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 105,
-                        columnNumber: 9
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "mt-4 flex flex-col gap-2 sm:flex-row",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                id: "invite-code",
-                                value: inviteCode,
-                                onChange: (event)=>setInviteCode(event.target.value),
-                                placeholder: "예: AB12CD34",
-                                className: "glass-input min-w-0 flex-1 rounded-xl px-4 py-3 text-sm uppercase"
-                            }, void 0, false, {
-                                fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                lineNumber: 106,
-                                columnNumber: 63
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                type: "submit",
-                                disabled: joining || !inviteCode.trim(),
-                                className: "rounded-xl border border-indigo-200 bg-white/70 px-5 py-3 text-sm font-semibold text-indigo-600 hover:bg-white disabled:opacity-50",
-                                children: joining ? "참가 중..." : "참가하기"
-                            }, void 0, false, {
-                                fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                lineNumber: 106,
-                                columnNumber: 268
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 106,
-                        columnNumber: 9
-                    }, this),
-                    joinError && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                        role: "alert",
-                        className: "mt-2 text-sm text-rose-600",
-                        children: joinError
-                    }, void 0, false, {
-                        fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 107,
-                        columnNumber: 23
-                    }, this)
-                ]
-            }, void 0, true, {
-                fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                lineNumber: 103,
-                columnNumber: 7
-            }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
-                className: "mx-auto mt-12 max-w-4xl",
+                className: "mt-12",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SectionTitle, {
-                        eyebrow: "Workspace",
                         title: "진행 중인 프로젝트",
                         count: projects ? activeProjects.length : null
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 111,
+                        lineNumber: 113,
                         columnNumber: 9
                     }, this),
                     projects === null ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$components$2f$Spinner$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                        label: "진행 중인 프로젝트 불러오는 중..."
+                        label: "프로젝트를 불러오는 중..."
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 112,
+                        lineNumber: 114,
                         columnNumber: 30
                     }, this) : projectListError ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(LoadError, {
                         message: projectListError,
                         onRetry: loadProjects
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 112,
-                        columnNumber: 92
+                        lineNumber: 114,
+                        columnNumber: 87
                     }, this) : projects.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$components$2f$EmptyState$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                         title: "첫 프로젝트를 만들어보세요.",
                         description: "위에서 프로젝트 이름을 입력하고 시작할 수 있습니다."
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 112,
-                        columnNumber: 182
+                        lineNumber: 114,
+                        columnNumber: 177
                     }, this) : activeProjects.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$components$2f$EmptyState$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                         title: "진행 중인 프로젝트가 없습니다.",
                         description: "새 프로젝트를 만들거나 종료된 프로젝트를 다시 시작할 수 있습니다."
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 112,
-                        columnNumber: 297
-                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(ProjectGrid, {
+                        lineNumber: 114,
+                        columnNumber: 292
+                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(ProjectList, {
                         projects: activeProjects,
                         taskStats: taskStats,
                         onOpen: (project)=>router.push(`/projects/${project.id}`)
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 112,
-                        columnNumber: 392
+                        lineNumber: 114,
+                        columnNumber: 387
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                lineNumber: 110,
+                lineNumber: 112,
                 columnNumber: 7
             }, this),
             projects !== null && !projectListError && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
-                className: "mx-auto mt-10 max-w-4xl",
+                className: "mt-12",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SectionTitle, {
-                        eyebrow: "Archive",
                         title: "종료된 프로젝트",
                         count: completedProjects.length,
                         muted: true
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 116,
-                        columnNumber: 54
+                        lineNumber: 119,
+                        columnNumber: 11
                     }, this),
                     completedProjects.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$components$2f$EmptyState$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                         title: "아직 종료된 프로젝트가 없습니다.",
-                        description: "프로젝트를 종료하면 최종 결과를 이곳에서 다시 확인할 수 있습니다."
+                        description: "프로젝트를 종료하면 최종 결과를 이곳에서 확인할 수 있습니다."
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 116,
-                        columnNumber: 178
-                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(ProjectGrid, {
+                        lineNumber: 120,
+                        columnNumber: 45
+                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(ProjectList, {
                         projects: completedProjects,
                         taskStats: taskStats,
                         onOpen: (project)=>router.push(`/projects/${project.id}/result`),
                         completed: true
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 116,
-                        columnNumber: 274
+                        lineNumber: 120,
+                        columnNumber: 138
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                lineNumber: 116,
+                lineNumber: 118,
                 columnNumber: 9
             }, this)
         ]
@@ -447,15 +388,15 @@ _s(HomePage, "U53b1qrKccnQyogkf2zY5xJssNQ=", false, function() {
 _c = HomePage;
 function LoadError({ message, onRetry }) {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "glass-card rounded-2xl p-6 text-center",
+        className: "rounded-xl border border-rose-100 bg-rose-50 p-6 text-center",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                 className: "text-sm text-rose-600",
                 children: message
             }, void 0, false, {
                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                lineNumber: 123,
-                columnNumber: 66
+                lineNumber: 128,
+                columnNumber: 88
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                 type: "button",
@@ -464,44 +405,28 @@ function LoadError({ message, onRetry }) {
                 children: "다시 시도"
             }, void 0, false, {
                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                lineNumber: 123,
-                columnNumber: 116
+                lineNumber: 128,
+                columnNumber: 138
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-        lineNumber: 123,
+        lineNumber: 128,
         columnNumber: 10
     }, this);
 }
 _c1 = LoadError;
-function SectionTitle({ eyebrow, title, count, muted = false }) {
+function SectionTitle({ title, count, muted = false }) {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "mb-4 flex items-end justify-between",
+        className: "mb-4 flex items-end justify-between gap-4",
         children: [
-            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                children: [
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                        className: `text-xs font-semibold uppercase tracking-[0.14em] ${muted ? "text-slate-400" : "text-indigo-500"}`,
-                        children: eyebrow
-                    }, void 0, false, {
-                        fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 127,
-                        columnNumber: 68
-                    }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                        className: "mt-1 text-xl font-bold text-slate-900",
-                        children: title
-                    }, void 0, false, {
-                        fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 127,
-                        columnNumber: 196
-                    }, this)
-                ]
-            }, void 0, true, {
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                className: `text-xl font-bold tracking-tight ${muted ? "text-slate-600" : "text-slate-900"}`,
+                children: title
+            }, void 0, false, {
                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                lineNumber: 127,
-                columnNumber: 63
+                lineNumber: 132,
+                columnNumber: 69
             }, this),
             count !== null && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                 className: "text-xs text-slate-400",
@@ -512,20 +437,20 @@ function SectionTitle({ eyebrow, title, count, muted = false }) {
                 ]
             }, void 0, true, {
                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                lineNumber: 127,
-                columnNumber: 287
+                lineNumber: 132,
+                columnNumber: 198
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-        lineNumber: 127,
+        lineNumber: 132,
         columnNumber: 10
     }, this);
 }
 _c2 = SectionTitle;
-function ProjectGrid({ projects, taskStats, onOpen, completed = false }) {
+function ProjectList({ projects, taskStats, onOpen, completed = false }) {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
-        className: "grid gap-4 sm:grid-cols-2",
+        className: "overflow-hidden rounded-2xl border border-slate-200 bg-white divide-y divide-slate-200",
         children: projects.map((project)=>{
             const stats = taskStats[project.id] ?? {
                 total: 0,
@@ -536,128 +461,133 @@ function ProjectGrid({ projects, taskStats, onOpen, completed = false }) {
                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                     type: "button",
                     onClick: ()=>onOpen(project),
-                    className: `glass-card group w-full rounded-2xl p-5 text-left hover:-translate-y-0.5 ${completed ? "border-slate-200/70 opacity-90 hover:opacity-100" : "hover:border-indigo-200"}`,
+                    className: "group w-full p-5 text-left hover:bg-slate-50 sm:px-6",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "flex items-start justify-between gap-3",
+                            className: "flex items-start justify-between gap-4",
                             children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                    className: `flex h-10 w-10 items-center justify-center rounded-xl font-bold text-white ${completed ? "bg-slate-500" : "bg-gradient-to-br from-indigo-500 to-violet-500"}`,
-                                    children: project.name.charAt(0).toUpperCase()
-                                }, void 0, false, {
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "min-w-0",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            className: "flex items-center gap-2.5",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                                    className: "truncate text-sm font-bold text-slate-900 group-hover:text-[#6541f3]",
+                                                    children: project.name
+                                                }, void 0, false, {
+                                                    fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                                                    lineNumber: 146,
+                                                    columnNumber: 62
+                                                }, this),
+                                                completed && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    className: "rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-500",
+                                                    children: "종료됨"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                                                    lineNumber: 146,
+                                                    columnNumber: 180
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                                            lineNumber: 146,
+                                            columnNumber: 19
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                            className: "mt-1 text-xs text-slate-400",
+                                            children: completed && project.completedAt ? `종료 ${new Date(project.completedAt).toLocaleDateString("ko-KR")}` : `최근 업데이트 ${new Date(project.updatedAt).toLocaleDateString("ko-KR")}`
+                                        }, void 0, false, {
+                                            fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                                            lineNumber: 147,
+                                            columnNumber: 19
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
                                     fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                    lineNumber: 134,
-                                    columnNumber: 324
+                                    lineNumber: 145,
+                                    columnNumber: 17
                                 }, this),
-                                completed ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                    className: "rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-bold text-slate-600",
-                                    children: "종료됨"
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    className: "shrink-0 text-sm text-slate-400 group-hover:text-[#6541f3]",
+                                    children: "열기 →"
                                 }, void 0, false, {
                                     fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                    lineNumber: 134,
-                                    columnNumber: 559
-                                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                    className: "text-lg text-slate-300 group-hover:translate-x-1 group-hover:text-indigo-500",
-                                    children: "→"
-                                }, void 0, false, {
-                                    fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                    lineNumber: 134,
-                                    columnNumber: 665
+                                    lineNumber: 149,
+                                    columnNumber: 17
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                            lineNumber: 134,
-                            columnNumber: 268
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                            className: "mt-4 truncate text-sm font-bold text-slate-800",
-                            children: project.name
-                        }, void 0, false, {
-                            fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                            lineNumber: 134,
-                            columnNumber: 775
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                            className: "mt-1 text-xs text-slate-400",
-                            children: completed && project.completedAt ? `종료 ${new Date(project.completedAt).toLocaleDateString("ko-KR")}` : `최근 업데이트 ${new Date(project.updatedAt).toLocaleDateString("ko-KR")}`
-                        }, void 0, false, {
-                            fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                            lineNumber: 134,
-                            columnNumber: 855
+                            lineNumber: 144,
+                            columnNumber: 15
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "mt-4 flex items-center justify-between text-[11px] text-slate-500",
+                            className: "mt-4 flex items-center gap-4",
                             children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "h-1.5 flex-1 overflow-hidden rounded-full bg-slate-100",
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: `h-full rounded-full ${completed ? "bg-slate-400" : "bg-[#6541f3]"}`,
+                                        style: {
+                                            width: `${percentage}%`
+                                        }
+                                    }, void 0, false, {
+                                        fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                                        lineNumber: 152,
+                                        columnNumber: 89
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                                    lineNumber: 152,
+                                    columnNumber: 17
+                                }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    className: "shrink-0 text-xs text-slate-500",
                                     children: [
                                         "완료 ",
                                         stats.done,
-                                        " / ",
-                                        stats.total
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                    lineNumber: 134,
-                                    columnNumber: 1158
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                    children: [
+                                        "/",
+                                        stats.total,
+                                        " · ",
                                         percentage,
                                         "%"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                    lineNumber: 134,
-                                    columnNumber: 1202
+                                    lineNumber: 153,
+                                    columnNumber: 17
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                            lineNumber: 134,
-                            columnNumber: 1075
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "mt-2 h-1.5 overflow-hidden rounded-full bg-slate-200/70",
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: `h-full rounded-full ${completed ? "bg-slate-500" : "bg-gradient-to-r from-indigo-500 to-violet-500"}`,
-                                style: {
-                                    width: `${percentage}%`
-                                }
-                            }, void 0, false, {
-                                fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                lineNumber: 134,
-                                columnNumber: 1307
-                            }, this)
-                        }, void 0, false, {
-                            fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                            lineNumber: 134,
-                            columnNumber: 1234
+                            lineNumber: 151,
+                            columnNumber: 15
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                    lineNumber: 134,
-                    columnNumber: 33
+                    lineNumber: 143,
+                    columnNumber: 13
                 }, this)
             }, project.id, false, {
                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                lineNumber: 134,
-                columnNumber: 12
+                lineNumber: 142,
+                columnNumber: 11
             }, this);
         })
     }, void 0, false, {
         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-        lineNumber: 131,
-        columnNumber: 10
+        lineNumber: 137,
+        columnNumber: 5
     }, this);
 }
-_c3 = ProjectGrid;
+_c3 = ProjectList;
 var _c, _c1, _c2, _c3;
 __turbopack_context__.k.register(_c, "HomePage");
 __turbopack_context__.k.register(_c1, "LoadError");
 __turbopack_context__.k.register(_c2, "SectionTitle");
-__turbopack_context__.k.register(_c3, "ProjectGrid");
+__turbopack_context__.k.register(_c3, "ProjectList");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }
@@ -673,7 +603,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_
 ;
 function EmptyState({ title, description, action }) {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-indigo-200/70 bg-white/40 px-6 py-12 text-center backdrop-blur-xl",
+        className: "flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50/60 px-6 py-12 text-center",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                 className: "text-sm font-medium text-slate-700",
@@ -727,7 +657,7 @@ function Spinner({ label }) {
         className: "flex items-center gap-2 text-sm text-slate-500",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                className: "h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-indigo-500"
+                className: "h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-[#6541f3]"
             }, void 0, false, {
                 fileName: "[project]/team-assistant_1/components/Spinner.tsx",
                 lineNumber: 4,

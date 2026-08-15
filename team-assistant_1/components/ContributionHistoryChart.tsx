@@ -4,11 +4,11 @@ import type { ContributionHistorySnapshot } from "@/lib/apiClient";
 import Avatar from "@/components/Avatar";
 
 const COLORS = [
-  "#4f46e5",
+  "#6541f3",
   "#059669",
   "#d97706",
   "#e11d48",
-  "#7c3aed",
+  "#8b73ec",
   "#0891b2",
 ];
 
@@ -19,7 +19,7 @@ export default function ContributionHistoryChart({
 }) {
   if (snapshots.length === 0) {
     return (
-      <p className="rounded-xl bg-white/45 px-4 py-8 text-center text-sm text-slate-500">
+      <p className="rounded-xl bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
         아직 저장된 기여도 이력이 없습니다.
       </p>
     );

@@ -22,7 +22,7 @@ function Avatar({ emoji = __TURBOPACK__imported__module__$5b$project$5d2f$team$2
         role: "img",
         "aria-label": name ? `${name} 프로필 아바타` : "프로필 아바타",
         title: name ?? undefined,
-        className: `inline-flex shrink-0 items-center justify-center rounded-full border border-white/80 bg-gradient-to-br from-indigo-50 to-violet-100 shadow-sm ${SIZE_CLASSES[size]} ${className}`,
+        className: `inline-flex shrink-0 items-center justify-center rounded-full border border-violet-100 bg-violet-50 ${SIZE_CLASSES[size]} ${className}`,
         children: safeEmoji
     }, void 0, false, {
         fileName: "[project]/team-assistant_1/components/Avatar.tsx",
@@ -116,23 +116,19 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
 const NAV_ITEMS = [
     {
         segment: "",
-        label: "대시보드",
-        icon: "▦"
+        label: "대시보드"
     },
     {
         segment: "/records/new",
-        label: "기록 추가",
-        icon: "＋"
+        label: "기록 추가"
     },
     {
         segment: "/members",
-        label: "팀원 관리",
-        icon: "◎"
+        label: "팀원 관리"
     },
     {
         segment: "/contribution",
-        label: "기여도 리포트",
-        icon: "▥"
+        label: "기여도 리포트"
     }
 ];
 function ProtectedShell({ user, children }) {
@@ -206,8 +202,7 @@ function ProjectShell({ projectId, user, children }) {
     const visibleItems = projectStatus === "COMPLETED" ? [
         {
             segment: "/result",
-            label: "최종 결과",
-            icon: "✓"
+            label: "최종 결과"
         },
         NAV_ITEMS[2],
         NAV_ITEMS[3]
@@ -220,7 +215,7 @@ function ProjectShell({ projectId, user, children }) {
         className: "min-h-screen lg:flex",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("aside", {
-                className: "fixed inset-y-0 left-0 z-30 hidden w-56 flex-col border-r border-white/65 bg-white/48 px-3 py-5 shadow-[10px_0_40px_rgba(67,56,202,0.05)] backdrop-blur-3xl lg:flex",
+                className: "fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-slate-200 bg-white px-4 py-6 lg:flex",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "px-2",
@@ -235,18 +230,18 @@ function ProjectShell({ projectId, user, children }) {
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "mx-2 mt-7 rounded-xl border border-white/75 bg-white/52 px-3 py-3 shadow-sm",
+                        className: "mx-2 mt-9 border-b border-slate-200 pb-5",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                className: "text-[10px] font-semibold uppercase tracking-[0.16em] text-indigo-500",
-                                children: "Current project"
+                                className: "text-[10px] font-semibold uppercase tracking-[0.12em] text-slate-400",
+                                children: "현재 프로젝트"
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/components/layout/ProtectedShell.tsx",
                                 lineNumber: 47,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                className: "mt-1 truncate text-sm font-semibold text-slate-800",
+                                className: "mt-1.5 truncate text-sm font-semibold text-slate-900",
                                 children: projectName
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/components/layout/ProtectedShell.tsx",
@@ -268,26 +263,16 @@ function ProjectShell({ projectId, user, children }) {
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
-                        className: "mt-5 flex flex-col gap-1",
+                        className: "mt-5 flex flex-col gap-1.5",
                         "aria-label": "프로젝트 메뉴",
                         children: nav.map((item)=>{
                             const active = item.segment === "" ? pathname === item.href : pathname.startsWith(item.href);
                             return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                 href: item.href,
-                                className: `flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium ${active ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20" : "text-slate-600 hover:bg-white/60 hover:text-indigo-700"}`,
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        className: "w-5 text-center text-base",
-                                        "aria-hidden": "true",
-                                        children: item.icon
-                                    }, void 0, false, {
-                                        fileName: "[project]/team-assistant_1/components/layout/ProtectedShell.tsx",
-                                        lineNumber: 54,
-                                        columnNumber: 269
-                                    }, this),
-                                    item.label
-                                ]
-                            }, item.href, true, {
+                                "aria-current": active ? "page" : undefined,
+                                className: `rounded-lg px-3 py-2.5 text-sm font-medium ${active ? "bg-violet-50 text-[#6541f3]" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"}`,
+                                children: item.label
+                            }, item.href, false, {
                                 fileName: "[project]/team-assistant_1/components/layout/ProtectedShell.tsx",
                                 lineNumber: 54,
                                 columnNumber: 20
@@ -299,24 +284,13 @@ function ProjectShell({ projectId, user, children }) {
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "mt-auto",
+                        className: "mt-auto border-t border-slate-200 pt-4",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                 href: "/",
-                                className: "mb-3 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-white/60 hover:text-indigo-700",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        className: "w-5 text-center",
-                                        "aria-hidden": "true",
-                                        children: "←"
-                                    }, void 0, false, {
-                                        fileName: "[project]/team-assistant_1/components/layout/ProtectedShell.tsx",
-                                        lineNumber: 58,
-                                        columnNumber: 165
-                                    }, this),
-                                    "모든 프로젝트"
-                                ]
-                            }, void 0, true, {
+                                className: "mb-3 block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900",
+                                children: "← 모든 프로젝트"
+                            }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/components/layout/ProtectedShell.tsx",
                                 lineNumber: 58,
                                 columnNumber: 11
@@ -342,10 +316,10 @@ function ProjectShell({ projectId, user, children }) {
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "min-w-0 flex-1 lg:pl-56",
+                className: "min-w-0 flex-1 lg:pl-60",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
-                        className: "sticky top-0 z-20 border-b border-white/60 bg-white/50 px-4 py-3 backdrop-blur-2xl lg:hidden",
+                        className: "sticky top-0 z-20 border-b border-slate-200 bg-white px-4 py-3 lg:hidden",
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "flex items-center justify-between gap-3",
@@ -387,13 +361,14 @@ function ProjectShell({ projectId, user, children }) {
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
-                                className: "mt-3 flex gap-1 overflow-x-auto pb-1",
+                                className: "mt-3 flex gap-1.5 overflow-x-auto pb-1",
                                 "aria-label": "프로젝트 모바일 메뉴",
                                 children: nav.map((item)=>{
                                     const active = item.segment === "" ? pathname === item.href : pathname.startsWith(item.href);
                                     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                         href: item.href,
-                                        className: `shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold ${active ? "bg-indigo-600 text-white" : "bg-white/55 text-slate-600"}`,
+                                        "aria-current": active ? "page" : undefined,
+                                        className: `shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold ${active ? "bg-violet-50 text-[#6541f3]" : "text-slate-600 hover:bg-slate-50"}`,
                                         children: item.label
                                     }, item.href, false, {
                                         fileName: "[project]/team-assistant_1/components/layout/ProtectedShell.tsx",
@@ -441,27 +416,27 @@ _s1(ProjectShell, "0E/veHVDZB5bUStGyQAY4qFL32g=", false, function() {
 _c1 = ProjectShell;
 function HomeHeader({ user }) {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("header", {
-        className: "sticky top-0 z-20 border-b border-white/60 bg-white/48 backdrop-blur-2xl",
+        className: "sticky top-0 z-20 border-b border-slate-200 bg-white",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "mx-auto flex max-w-7xl items-center justify-between px-5 py-3.5 sm:px-8",
+            className: "mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 sm:px-8",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$components$2f$BrandMark$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                     fileName: "[project]/team-assistant_1/components/layout/ProtectedShell.tsx",
                     lineNumber: 79,
-                    columnNumber: 192
+                    columnNumber: 172
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(UserPanel, {
                     user: user
                 }, void 0, false, {
                     fileName: "[project]/team-assistant_1/components/layout/ProtectedShell.tsx",
                     lineNumber: 79,
-                    columnNumber: 205
+                    columnNumber: 185
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/team-assistant_1/components/layout/ProtectedShell.tsx",
             lineNumber: 79,
-            columnNumber: 103
+            columnNumber: 83
         }, this)
     }, void 0, false, {
         fileName: "[project]/team-assistant_1/components/layout/ProtectedShell.tsx",
@@ -486,7 +461,7 @@ function UserPanel({ user, compact = false }) {
         }
     }
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: `flex items-center ${compact ? "rounded-xl border border-white/70 bg-white/50 p-2" : "gap-3"}`,
+        className: `flex items-center ${compact ? "px-2 py-1" : "gap-3"}`,
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                 href: "/profile",
@@ -537,7 +512,7 @@ function UserPanel({ user, compact = false }) {
                 type: "button",
                 onClick: logout,
                 disabled: loggingOut,
-                className: `${compact ? "ml-auto px-2" : "btn-secondary rounded-lg px-3"} py-1.5 text-xs font-semibold text-slate-500 disabled:opacity-50`,
+                className: `${compact ? "ml-auto px-2 hover:text-slate-900" : "btn-secondary rounded-lg px-3"} py-1.5 text-xs font-semibold text-slate-500 disabled:opacity-50`,
                 children: loggingOut ? "처리 중" : "로그아웃"
             }, void 0, false, {
                 fileName: "[project]/team-assistant_1/components/layout/ProtectedShell.tsx",

@@ -76,8 +76,8 @@ export default function SignupForm() {
 
   return (
     <AuthCard
-      title="Effortly 시작하기"
-      description="계정을 만들고 팀의 노력을 더 선명하게 관리하세요."
+      title="회원가입"
+      description="팀 프로젝트를 함께 관리할 계정을 만드세요."
     >
       <form onSubmit={handleSubmit} className="grid gap-4">
         <Field label="이름(실명)" htmlFor="name">
@@ -199,7 +199,7 @@ export default function SignupForm() {
 
       <p className="mt-6 text-center text-sm text-slate-500">
         이미 계정이 있나요?{" "}
-        <Link href="/login" className="font-medium text-indigo-600 hover:text-indigo-700">
+        <Link href="/login" className="font-semibold text-[#6541f3] hover:text-[#5632d8]">
           로그인
         </Link>
       </p>

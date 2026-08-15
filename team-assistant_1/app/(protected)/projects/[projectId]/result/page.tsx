@@ -118,12 +118,12 @@ export default function ProjectResultPage({
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-500">Final Result</p>
+            <p className="page-eyebrow">최종 결과</p>
             <span className="rounded-full bg-slate-900 px-2.5 py-1 text-[10px] font-bold text-white">종료됨</span>
           </div>
           <h1 className="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{project!.name} 최종 결과</h1>
           <p className="mt-1 text-sm text-slate-500">
-            {startedAt.toLocaleDateString("ko-KR")} – {completedAt?.toLocaleDateString("ko-KR")}
+            {startedAt.toLocaleDateString("ko-KR")} - {completedAt?.toLocaleDateString("ko-KR")}
             {durationDays ? ` · ${durationDays}일` : ""}
           </p>
         </div>
@@ -136,7 +136,7 @@ export default function ProjectResultPage({
 
       {error && <p role="alert" className="mt-5 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-600">{error}</p>}
 
-      <section className="mt-7 grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <section className="mt-7 grid grid-cols-2 rounded-2xl border border-slate-200 bg-white lg:grid-cols-4">
         <SummaryCard label="팀원" value={members.length} />
         <SummaryCard label="분석 기록" value={records.length} />
         <SummaryCard label="전체 Task" value={tasks.length} />
@@ -149,14 +149,15 @@ export default function ProjectResultPage({
         {finalContribution.length === 0 ? (
           <div className="mt-5"><EmptyState title="저장된 최종 기여도가 없습니다." description="업무나 담당자가 없었던 프로젝트일 수 있습니다." /></div>
         ) : (
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="mt-5 divide-y divide-slate-200 border-y border-slate-200">
             {finalContribution.map((member, index) => (
-              <article key={member.memberId} className="rounded-2xl border border-white/70 bg-white/50 p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3"><Avatar emoji={member.avatarEmoji} name={member.name} size="md" /><span className="text-sm font-bold text-slate-800">{member.name}</span></div>
-                  <span className="text-xs font-semibold text-slate-400">#{index + 1}</span>
+              <article key={member.memberId} className="flex items-center gap-4 py-4">
+                <span className="w-5 text-center text-xs font-semibold text-slate-400">{index + 1}</span>
+                <Avatar emoji={member.avatarEmoji} name={member.name} size="md" />
+                <div className="flex min-w-0 flex-1 items-center justify-between gap-4">
+                  <span className="truncate text-sm font-bold text-slate-800">{member.name}</span>
+                  <p className="text-xl font-bold tracking-tight text-[#6541f3]">{member.percentage.toFixed(1)}%</p>
                 </div>
-                <p className="mt-4 text-3xl font-bold tracking-tight text-indigo-600">{member.percentage.toFixed(1)}%</p>
               </article>
             ))}
           </div>
@@ -175,12 +176,12 @@ export default function ProjectResultPage({
         {activities.length === 0 ? (
           <p className="mt-5 text-sm text-slate-500">아직 프로젝트 활동이 없습니다.</p>
         ) : (
-          <ul className="relative mt-5 grid gap-4 before:absolute before:bottom-3 before:left-[5px] before:top-3 before:w-px before:bg-indigo-100">
+          <ul className="relative mt-5 grid gap-4 before:absolute before:bottom-3 before:left-[5px] before:top-3 before:w-px before:bg-slate-200">
             {activities.map((activity) => (
-              <li key={activity.id} className="relative pl-5 before:absolute before:left-0 before:top-1.5 before:h-2.5 before:w-2.5 before:rounded-full before:border-2 before:border-white before:bg-indigo-500">
-                <div className="flex flex-wrap items-center gap-2"><p className="text-sm font-semibold text-slate-800">{activity.title}</p>{activity.source && <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${activity.source === "MANUAL" ? "bg-emerald-50 text-emerald-700" : "bg-indigo-50 text-indigo-600"}`}>{activity.source === "MANUAL" ? "직접 수정" : "AI"}</span>}</div>
+              <li key={activity.id} className="relative pl-5 before:absolute before:left-0 before:top-1.5 before:h-2.5 before:w-2.5 before:rounded-full before:border-2 before:border-white before:bg-[#6541f3]">
+                <div className="flex flex-wrap items-center gap-2"><p className="text-sm font-semibold text-slate-800">{activity.title}</p>{activity.source && <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${activity.source === "MANUAL" ? "bg-emerald-50 text-emerald-700" : "bg-violet-50 text-[#6541f3]"}`}>{activity.source === "MANUAL" ? "직접 수정" : "AI 분석"}</span>}</div>
                 <p className="mt-0.5 text-xs text-slate-500">{activity.description}</p>
-                <div className="mt-1 flex items-center gap-2 text-[10px] text-slate-400"><time>{new Date(activity.timestamp).toLocaleString("ko-KR")}</time>{activity.actor && <span>· {activity.actor}</span>}{activity.taskId && <button type="button" onClick={() => router.push(`/projects/${projectId}/tasks/${activity.taskId}`)} className="font-semibold text-indigo-500">Task 보기</button>}</div>
+                <div className="mt-1 flex items-center gap-2 text-[10px] text-slate-400"><time>{new Date(activity.timestamp).toLocaleString("ko-KR")}</time>{activity.actor && <span>· {activity.actor}</span>}{activity.taskId && <button type="button" onClick={() => router.push(`/projects/${projectId}/tasks/${activity.taskId}`)} className="font-semibold text-[#6541f3]">Task 보기</button>}</div>
               </li>
             ))}
           </ul>
@@ -195,7 +196,7 @@ export default function ProjectResultPage({
           <ul className="mt-4 grid gap-2 md:grid-cols-2">
             {tasks.map((task) => (
               <li key={task.id}>
-                <button type="button" onClick={() => router.push(`/projects/${projectId}/tasks/${task.id}`)} className="w-full rounded-xl border border-white/70 bg-white/50 p-4 text-left hover:border-indigo-200 hover:bg-white/75">
+                <button type="button" onClick={() => router.push(`/projects/${projectId}/tasks/${task.id}`)} className="w-full rounded-xl border border-slate-200 bg-white p-4 text-left hover:border-violet-300 hover:bg-slate-50">
                   <div className="flex items-start justify-between gap-3"><span className="min-w-0 truncate text-sm font-semibold text-slate-800">{task.title}</span><StatusBadge status={task.status} /></div>
                   <div className="mt-3"><TaskContributors contributors={task.contributors} compact /></div>
                 </button>
@@ -209,5 +210,5 @@ export default function ProjectResultPage({
 }
 
 function SummaryCard({ label, value }: { label: string; value: number | string }) {
-  return <div className="glass-card rounded-2xl p-4 sm:p-5"><p className="text-2xl font-bold tracking-tight text-slate-900">{value}</p><p className="mt-2 text-xs font-semibold text-slate-500">{label}</p></div>;
+  return <div className="border-b border-r border-slate-200 p-4 last:border-r-0 sm:p-5 lg:border-b-0"><p className="text-2xl font-bold tracking-tight text-slate-900">{value}</p><p className="mt-2 text-xs font-semibold text-slate-500">{label}</p></div>;
 }

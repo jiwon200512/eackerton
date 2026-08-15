@@ -28,7 +28,7 @@ export default function Avatar({
       role="img"
       aria-label={name ? `${name} 프로필 아바타` : "프로필 아바타"}
       title={name ?? undefined}
-      className={`inline-flex shrink-0 items-center justify-center rounded-full border border-white/80 bg-gradient-to-br from-indigo-50 to-violet-100 shadow-sm ${SIZE_CLASSES[size]} ${className}`}
+      className={`inline-flex shrink-0 items-center justify-center rounded-full border border-violet-100 bg-violet-50 ${SIZE_CLASSES[size]} ${className}`}
     >
       {safeEmoji}
     </span>

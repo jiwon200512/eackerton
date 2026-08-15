@@ -24,7 +24,7 @@ export default function TaskContributors({
           </span>
         ))}
         {contributors.length > visible.length && (
-          <span className="text-[11px] font-semibold text-indigo-500">+{contributors.length - visible.length}명</span>
+          <span className="text-[11px] font-semibold text-[#6541f3]">+{contributors.length - visible.length}명</span>
         )}
       </div>
     );
@@ -45,17 +45,17 @@ export default function TaskContributors({
                   className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
                     contributor.source === "MANUAL"
                       ? "bg-emerald-50 text-emerald-700"
-                      : "bg-indigo-50 text-indigo-600"
+                      : "bg-violet-50 text-[#6541f3]"
                   }`}
                 >
                   {contributor.source === "MANUAL" ? "직접 수정" : "AI 분석"}
                 </span>
               )}
-              <strong className="text-sm text-indigo-600">{contributor.share}%</strong>
+              <strong className="text-sm text-[#6541f3]">{contributor.share}%</strong>
             </span>
           </div>
           <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-200/70">
-            <div className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500" style={{ width: `${contributor.share}%` }} />
+            <div className="h-full rounded-full bg-[#6541f3]" style={{ width: `${contributor.share}%` }} />
           </div>
         </div>
       ))}

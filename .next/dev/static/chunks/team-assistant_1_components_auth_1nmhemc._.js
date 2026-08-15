@@ -62,8 +62,8 @@ function LoginForm() {
         }
     }
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(AuthCard, {
-        title: "다시 만나서 반가워요",
-        description: "Effortly에서 팀의 진행 상황을 이어서 확인하세요.",
+        title: "로그인",
+        description: "팀 프로젝트 현황을 이어서 확인하세요.",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
                 onSubmit: handleSubmit,
@@ -156,7 +156,7 @@ function LoginForm() {
                     " ",
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                         href: "/signup",
-                        className: "font-medium text-indigo-600 hover:text-indigo-700",
+                        className: "font-semibold text-[#6541f3] hover:text-[#5632d8]",
                         children: "회원가입"
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/components/auth/LoginForm.tsx",
@@ -200,22 +200,22 @@ function Field({ label, htmlFor, children }) {
 _c1 = Field;
 function AuthCard({ title, description, children }) {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
-        className: "flex min-h-screen w-full items-center justify-center px-5 py-10",
+        className: "flex min-h-screen w-full items-center justify-center bg-slate-50 px-5 py-10 sm:py-14",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
-            className: "glass-card-strong w-full max-w-[440px] rounded-3xl p-6 sm:p-8",
+            className: "glass-card-strong w-full max-w-[460px] rounded-2xl p-6 sm:p-9",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "mb-6 text-center",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "mx-auto mb-5 flex w-fit items-center gap-2.5",
+                            className: "mx-auto mb-6 flex w-fit items-center gap-2.5",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                     src: "/logo.png",
                                     alt: "",
-                                    width: 44,
-                                    height: 44,
-                                    className: "h-11 w-11 rounded-2xl",
+                                    width: 42,
+                                    height: 42,
+                                    className: "h-10 w-10 rounded-xl",
                                     priority: true
                                 }, void 0, false, {
                                     fileName: "[project]/team-assistant_1/components/auth/LoginForm.tsx",
@@ -228,7 +228,7 @@ function AuthCard({ title, description, children }) {
                                 }, void 0, false, {
                                     fileName: "[project]/team-assistant_1/components/auth/LoginForm.tsx",
                                     lineNumber: 138,
-                                    columnNumber: 171
+                                    columnNumber: 170
                                 }, this)
                             ]
                         }, void 0, true, {
@@ -363,8 +363,8 @@ function SignupForm() {
         }
     }
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$components$2f$auth$2f$LoginForm$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["AuthCard"], {
-        title: "Effortly 시작하기",
-        description: "계정을 만들고 팀의 노력을 더 선명하게 관리하세요.",
+        title: "회원가입",
+        description: "팀 프로젝트를 함께 관리할 계정을 만드세요.",
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
                 onSubmit: handleSubmit,
@@ -609,7 +609,7 @@ function SignupForm() {
                     " ",
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                         href: "/login",
-                        className: "font-medium text-indigo-600 hover:text-indigo-700",
+                        className: "font-semibold text-[#6541f3] hover:text-[#5632d8]",
                         children: "로그인"
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/components/auth/SignupForm.tsx",
@@ -649,31 +649,29 @@ __turbopack_context__.s([
     ()=>SocialLoginButtons
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/team-assistant_1/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/team-assistant_1/node_modules/next/image.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/team-assistant_1/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
 ;
+;
 const PROVIDERS = [
     {
-        name: "Google",
-        mark: "G",
-        color: "text-blue-600"
+        id: "google",
+        name: "Google"
     },
     {
-        name: "카카오",
-        mark: "K",
-        color: "text-amber-700"
+        id: "kakao",
+        name: "카카오"
     },
     {
-        name: "Apple",
-        mark: "A",
-        color: "text-slate-900"
+        id: "apple",
+        name: "Apple"
     },
     {
-        name: "네이버",
-        mark: "N",
-        color: "text-emerald-600"
+        id: "naver",
+        name: "네이버"
     }
 ];
 function SocialLoginButtons() {
@@ -689,7 +687,7 @@ function SocialLoginButtons() {
                         className: "h-px flex-1 bg-slate-200"
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/components/auth/SocialLoginButtons.tsx",
-                        lineNumber: 18,
+                        lineNumber: 21,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -697,52 +695,40 @@ function SocialLoginButtons() {
                         children: "또는"
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/components/auth/SocialLoginButtons.tsx",
-                        lineNumber: 19,
+                        lineNumber: 22,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "h-px flex-1 bg-slate-200"
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/components/auth/SocialLoginButtons.tsx",
-                        lineNumber: 20,
+                        lineNumber: 23,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/team-assistant_1/components/auth/SocialLoginButtons.tsx",
-                lineNumber: 17,
+                lineNumber: 20,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                className: "mt-4 grid gap-2",
-                children: PROVIDERS.map((provider)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                        type: "button",
-                        onClick: ()=>setMessage(`${provider.name} 로그인은 준비 중인 기능입니다.`),
-                        className: "btn-secondary relative w-full rounded-xl px-4 py-2.5 text-sm font-semibold",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                className: `absolute left-4 font-bold ${provider.color}`,
-                                children: provider.mark
-                            }, void 0, false, {
-                                fileName: "[project]/team-assistant_1/components/auth/SocialLoginButtons.tsx",
-                                lineNumber: 31,
-                                columnNumber: 13
-                            }, this),
-                            provider.name,
-                            "로 계속하기"
-                        ]
-                    }, provider.name, true, {
+                className: "mt-4 grid gap-2.5",
+                children: PROVIDERS.map((provider)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SocialAuthButton, {
+                        provider: provider.id,
+                        onClick: ()=>setMessage(`${provider.name} 로그인은 준비 중인 기능입니다.`)
+                    }, provider.id, false, {
                         fileName: "[project]/team-assistant_1/components/auth/SocialLoginButtons.tsx",
-                        lineNumber: 25,
+                        lineNumber: 28,
                         columnNumber: 11
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/team-assistant_1/components/auth/SocialLoginButtons.tsx",
-                lineNumber: 23,
+                lineNumber: 26,
                 columnNumber: 7
             }, this),
             message && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                 role: "status",
+                "aria-live": "polite",
                 className: "mt-3 text-center text-sm text-slate-500",
                 children: message
             }, void 0, false, {
@@ -753,14 +739,112 @@ function SocialLoginButtons() {
         ]
     }, void 0, true, {
         fileName: "[project]/team-assistant_1/components/auth/SocialLoginButtons.tsx",
-        lineNumber: 16,
+        lineNumber: 19,
         columnNumber: 5
     }, this);
 }
 _s(SocialLoginButtons, "oxT8SEz5FIjvFP5ix50Ku0sapH4=");
 _c = SocialLoginButtons;
-var _c;
+function SocialAuthButton({ provider, onClick }) {
+    if (provider === "kakao") {
+        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+            type: "button",
+            onClick: onClick,
+            "aria-label": "카카오로 계속하기",
+            className: "flex h-[50px] w-full items-center justify-center overflow-hidden rounded-xl bg-[#FEE500] hover:bg-[#f5dc00]",
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                src: "/brands/kakao-login.png",
+                alt: "",
+                width: 600,
+                height: 90,
+                className: "h-full w-full object-contain"
+            }, void 0, false, {
+                fileName: "[project]/team-assistant_1/components/auth/SocialLoginButtons.tsx",
+                lineNumber: 49,
+                columnNumber: 9
+            }, this)
+        }, void 0, false, {
+            fileName: "[project]/team-assistant_1/components/auth/SocialLoginButtons.tsx",
+            lineNumber: 48,
+            columnNumber: 7
+        }, this);
+    }
+    if (provider === "naver") {
+        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+            type: "button",
+            onClick: onClick,
+            "aria-label": "네이버로 계속하기",
+            className: "flex h-[50px] w-full items-center justify-center overflow-hidden rounded-xl bg-[#03C75A] hover:bg-[#02b651]",
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                src: "/brands/naver-login.png",
+                alt: "",
+                width: 1472,
+                height: 192,
+                className: "h-full w-full object-contain"
+            }, void 0, false, {
+                fileName: "[project]/team-assistant_1/components/auth/SocialLoginButtons.tsx",
+                lineNumber: 57,
+                columnNumber: 9
+            }, this)
+        }, void 0, false, {
+            fileName: "[project]/team-assistant_1/components/auth/SocialLoginButtons.tsx",
+            lineNumber: 56,
+            columnNumber: 7
+        }, this);
+    }
+    if (provider === "apple") {
+        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+            type: "button",
+            onClick: onClick,
+            className: "relative flex h-[50px] w-full items-center justify-center rounded-xl border border-black bg-white px-12 text-sm font-semibold text-black hover:bg-slate-50",
+            children: [
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                    src: "/brands/apple-logo-white.png",
+                    alt: "",
+                    width: 88,
+                    height: 88,
+                    className: "absolute left-4 h-5 w-5 object-contain"
+                }, void 0, false, {
+                    fileName: "[project]/team-assistant_1/components/auth/SocialLoginButtons.tsx",
+                    lineNumber: 65,
+                    columnNumber: 9
+                }, this),
+                "Apple로 계속하기"
+            ]
+        }, void 0, true, {
+            fileName: "[project]/team-assistant_1/components/auth/SocialLoginButtons.tsx",
+            lineNumber: 64,
+            columnNumber: 7
+        }, this);
+    }
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+        type: "button",
+        onClick: onClick,
+        className: "relative flex h-[50px] w-full items-center justify-center rounded-xl border border-[#747775] bg-white px-12 text-sm font-semibold text-[#1f1f1f] hover:bg-slate-50",
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                src: "/brands/google-g.png",
+                alt: "",
+                width: 200,
+                height: 204,
+                className: "absolute left-4 h-5 w-5 object-contain"
+            }, void 0, false, {
+                fileName: "[project]/team-assistant_1/components/auth/SocialLoginButtons.tsx",
+                lineNumber: 73,
+                columnNumber: 7
+            }, this),
+            "Google로 계속하기"
+        ]
+    }, void 0, true, {
+        fileName: "[project]/team-assistant_1/components/auth/SocialLoginButtons.tsx",
+        lineNumber: 72,
+        columnNumber: 5
+    }, this);
+}
+_c1 = SocialAuthButton;
+var _c, _c1;
 __turbopack_context__.k.register(_c, "SocialLoginButtons");
+__turbopack_context__.k.register(_c1, "SocialAuthButton");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }

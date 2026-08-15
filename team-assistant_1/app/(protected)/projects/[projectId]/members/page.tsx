@@ -133,13 +133,13 @@ export default function MembersPage({ params }: { params: Promise<{ projectId: s
   return (
     <div className="page-container max-w-4xl">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-500">Team Members</p>
+        <p className="page-eyebrow">팀원</p>
         <h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{project?.name} 팀원 관리</h1>
         <p className="mt-1 text-sm text-slate-500">팀장이 등록한 실명과 회원가입 실명이 일치하면 초대 참가 시 자동으로 연결됩니다.</p>
       </div>
 
       {isCompleted && <p className="mt-6 rounded-xl border border-slate-200 bg-slate-50/80 px-4 py-3 text-sm text-slate-600">종료된 프로젝트입니다. 팀원 정보는 읽기 전용으로 제공됩니다.</p>}
-      {!isOwner && !isCompleted && <p className="mt-6 rounded-xl border border-indigo-100 bg-white/55 px-4 py-3 text-sm text-slate-600">일반 팀원은 팀원 현황을 조회할 수 있습니다. 추가·삭제·초대 관리는 팀장만 가능합니다.</p>}
+      {!isOwner && !isCompleted && <p className="mt-6 rounded-xl border border-violet-100 bg-violet-50 px-4 py-3 text-sm text-slate-600">팀원 현황을 조회할 수 있습니다. 추가·삭제·초대 관리는 팀장만 가능합니다.</p>}
       {error && <p role="alert" className="mt-4 text-sm text-rose-600">{error}</p>}
 
       {isOwner && !isCompleted && <>
@@ -147,10 +147,10 @@ export default function MembersPage({ params }: { params: Promise<{ projectId: s
           <p className="text-sm font-bold text-slate-800">초대 코드</p>
           <p className="mt-1 text-xs text-slate-500">팀원이 회원가입 실명으로 자동 연결될 수 있도록 이 코드를 공유하세요.</p>
           <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
-            <span className="min-w-0 flex-1 rounded-xl border border-indigo-200/60 bg-white/70 px-4 py-3 text-center font-mono text-lg font-bold tracking-[0.3em] text-indigo-700">{inviteCode ?? "……"}</span>
+            <span className="min-w-0 flex-1 rounded-xl bg-violet-50 px-4 py-3 text-center font-mono text-lg font-bold tracking-[0.3em] text-[#6541f3]">{inviteCode ?? "……"}</span>
             <div className="flex gap-2">
-              <button type="button" onClick={copyCode} disabled={!inviteCode} className="rounded-xl border border-indigo-200 bg-white/70 px-4 py-2.5 text-sm font-semibold text-indigo-600 disabled:opacity-50">{copied ? "복사됨!" : "복사"}</button>
-              <button type="button" onClick={regenerateCode} disabled={inviteBusy} className="rounded-xl border border-slate-200 bg-white/70 px-4 py-2.5 text-sm font-semibold text-slate-600 disabled:opacity-50">{inviteBusy ? "재발급 중..." : "재발급"}</button>
+              <button type="button" onClick={copyCode} disabled={!inviteCode} className="btn-secondary rounded-xl px-4 py-2.5 text-sm font-semibold text-[#6541f3] disabled:opacity-50">{copied ? "복사됨" : "복사"}</button>
+              <button type="button" onClick={regenerateCode} disabled={inviteBusy} className="btn-secondary rounded-xl px-4 py-2.5 text-sm font-semibold disabled:opacity-50">{inviteBusy ? "재발급 중..." : "재발급"}</button>
             </div>
           </div>
         </section>
@@ -162,20 +162,20 @@ export default function MembersPage({ params }: { params: Promise<{ projectId: s
       </>}
 
       <section className="glass-card mt-6 overflow-hidden rounded-2xl">
-        <ul className="divide-y divide-white/70">
+        <ul className="divide-y divide-slate-200">
           {members.map((member) => <li key={member.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
-            <div className="flex items-center gap-3"><Avatar emoji={member.avatarEmoji} name={member.name} size="md" /><div><div className="flex flex-wrap items-center gap-2"><span className="text-sm font-semibold text-slate-800">{member.name}</span>{member.isLeader && <Badge tone="indigo">팀장</Badge>}<Badge tone={member.claimed ? "green" : "slate"}>{member.claimed ? "참여 완료" : "초대 대기"}</Badge></div>{member.claimedByMe && <p className="mt-1 text-[11px] text-indigo-500">내 계정</p>}</div></div>
-            {isOwner && !isCompleted && !member.isLeader && <div className="flex items-center gap-3">{member.claimed && <button type="button" onClick={() => handleTransfer(member)} disabled={busy} className="text-xs font-semibold text-indigo-600 disabled:opacity-50">팀장 양도</button>}<button type="button" onClick={() => handleDelete(member)} disabled={busy} className="text-xs font-medium text-rose-500 disabled:opacity-50">삭제</button></div>}
+            <div className="flex items-center gap-3"><Avatar emoji={member.avatarEmoji} name={member.name} size="md" /><div><div className="flex flex-wrap items-center gap-2"><span className="text-sm font-semibold text-slate-800">{member.name}</span>{member.isLeader && <Badge tone="indigo">팀장</Badge>}<Badge tone={member.claimed ? "green" : "slate"}>{member.claimed ? "참여 완료" : "초대 대기"}</Badge></div>{member.claimedByMe && <p className="mt-1 text-[11px] text-[#6541f3]">내 계정</p>}</div></div>
+            {isOwner && !isCompleted && !member.isLeader && <div className="flex items-center gap-3">{member.claimed && <button type="button" onClick={() => handleTransfer(member)} disabled={busy} className="text-xs font-semibold text-[#6541f3] disabled:opacity-50">팀장 양도</button>}<button type="button" onClick={() => handleDelete(member)} disabled={busy} className="text-xs font-medium text-rose-500 disabled:opacity-50">삭제</button></div>}
           </li>)}
         </ul>
       </section>
 
-      <button onClick={() => router.push(isCompleted ? `/projects/${projectId}/result` : `/projects/${projectId}`)} className="btn-primary mt-6 ml-auto block rounded-xl px-5 py-2.5 text-sm font-semibold">{isCompleted ? "최종 결과로 이동 →" : "Dashboard로 이동 →"}</button>
+      <button onClick={() => router.push(isCompleted ? `/projects/${projectId}/result` : `/projects/${projectId}`)} className="btn-primary mt-6 ml-auto block rounded-xl px-5 py-2.5 text-sm font-semibold">{isCompleted ? "최종 결과로 이동 →" : "대시보드로 이동 →"}</button>
     </div>
   );
 }
 
 function Badge({ children, tone }: { children: React.ReactNode; tone: "indigo" | "green" | "slate" }) {
-  const styles = { indigo: "bg-indigo-50 text-indigo-700", green: "bg-emerald-50 text-emerald-700", slate: "bg-slate-100 text-slate-500" };
+  const styles = { indigo: "bg-violet-50 text-[#6541f3]", green: "bg-emerald-50 text-emerald-700", slate: "bg-slate-100 text-slate-500" };
   return <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${styles[tone]}`}>{children}</span>;
 }

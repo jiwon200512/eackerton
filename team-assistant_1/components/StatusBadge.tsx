@@ -1,9 +1,9 @@
 import type { TaskStatus } from "@/lib/types";
 
 const CONFIG: Record<TaskStatus, { label: string; className: string }> = {
-  TODO: { label: "할 일", className: "bg-slate-100/80 text-slate-600 ring-slate-200" },
-  IN_PROGRESS: { label: "진행 중", className: "bg-amber-50/90 text-amber-700 ring-amber-200" },
-  DONE: { label: "완료", className: "bg-emerald-50/90 text-emerald-700 ring-emerald-200" },
+  TODO: { label: "할 일", className: "bg-slate-100 text-slate-600 ring-slate-200" },
+  IN_PROGRESS: { label: "진행 중", className: "bg-violet-50 text-[#6541f3] ring-violet-200" },
+  DONE: { label: "완료", className: "bg-emerald-50 text-emerald-700 ring-emerald-200" },
 };
 
 export default function StatusBadge({ status }: { status: TaskStatus }) {

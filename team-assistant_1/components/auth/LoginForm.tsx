@@ -44,8 +44,8 @@ export default function LoginForm() {
 
   return (
     <AuthCard
-      title="다시 만나서 반가워요"
-      description="Effortly에서 팀의 진행 상황을 이어서 확인하세요."
+      title="로그인"
+      description="팀 프로젝트 현황을 이어서 확인하세요."
     >
       <form onSubmit={handleSubmit} className="grid gap-4">
         <Field label="아이디" htmlFor="username">
@@ -94,7 +94,7 @@ export default function LoginForm() {
 
       <p className="mt-6 text-center text-sm text-slate-500">
         계정이 없나요?{" "}
-        <Link href="/signup" className="font-medium text-indigo-600 hover:text-indigo-700">
+        <Link href="/signup" className="font-semibold text-[#6541f3] hover:text-[#5632d8]">
           회원가입
         </Link>
       </p>
@@ -132,10 +132,10 @@ export function AuthCard({
   children: React.ReactNode;
 }) {
   return (
-    <main className="flex min-h-screen w-full items-center justify-center px-5 py-10">
-      <section className="glass-card-strong w-full max-w-[440px] rounded-3xl p-6 sm:p-8">
+    <main className="flex min-h-screen w-full items-center justify-center bg-slate-50 px-5 py-10 sm:py-14">
+      <section className="glass-card-strong w-full max-w-[460px] rounded-2xl p-6 sm:p-9">
         <div className="mb-6 text-center">
-          <div className="mx-auto mb-5 flex w-fit items-center gap-2.5"><Image src="/logo.png" alt="" width={44} height={44} className="h-11 w-11 rounded-2xl" priority /><span className="text-xl font-bold tracking-tight text-slate-900">Effortly</span></div>
+          <div className="mx-auto mb-6 flex w-fit items-center gap-2.5"><Image src="/logo.png" alt="" width={42} height={42} className="h-10 w-10 rounded-xl" priority /><span className="text-xl font-bold tracking-tight text-slate-900">Effortly</span></div>
           <h1 className="text-2xl font-bold tracking-tight text-slate-900">{title}</h1>
           <p className="mt-2 text-sm text-slate-500">{description}</p>
         </div>
