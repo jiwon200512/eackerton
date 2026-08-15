@@ -8,6 +8,7 @@ import { toTaskDTO } from "@/lib/taskDto";
 import { requireUser } from "@/lib/auth/session";
 import {
   getProjectOwnerUserId,
+  assertProjectIsActive,
   requireProjectAccess,
 } from "@/lib/projects/access";
 import { toMemberDTO } from "@/lib/memberDto";
@@ -68,7 +69,8 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   try {
     const user = await requireUser();
     const { projectId, taskId } = await params;
-    await requireProjectAccess(projectId, user.id);
+    const project = await requireProjectAccess(projectId, user.id);
+    assertProjectIsActive(project);
     const task = await loadTask(projectId, taskId);
     if (!task) throw Errors.notFound("Task");
 
@@ -151,7 +153,8 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
   try {
     const user = await requireUser();
     const { projectId, taskId } = await params;
-    await requireProjectAccess(projectId, user.id);
+    const project = await requireProjectAccess(projectId, user.id);
+    assertProjectIsActive(project);
     const task = await loadTask(projectId, taskId);
     if (!task) throw Errors.notFound("Task");
 

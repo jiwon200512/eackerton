@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   ApiError,
   deleteTask,
+  getProject,
   getTask,
   updateTask,
   type Member,
@@ -35,17 +36,22 @@ export default function TaskDetailPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
 
   const [titleDraft, setTitleDraft] = useState("");
   const [editingTitle, setEditingTitle] = useState(false);
 
   const load = useCallback(async () => {
     try {
-      const res = await getTask(projectId, taskId);
+      const [res, projectRes] = await Promise.all([
+        getTask(projectId, taskId),
+        getProject(projectId),
+      ]);
       setTask(res.task);
       setEvidence(res.evidence);
       setMembers(res.members);
       setTitleDraft(res.task.title);
+      setIsCompleted(projectRes.project.status === "COMPLETED");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Task를 불러오지 못했습니다.");
     } finally {
@@ -109,11 +115,12 @@ export default function TaskDetailPage({
       <div className="mb-7"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-500">Task Detail</p><h1 className="mt-1 text-2xl font-bold tracking-tight text-slate-900">업무 상세</h1><p className="mt-1 text-sm text-slate-500">Task 정보와 AI 평가, 분석 근거를 확인하고 수정하세요.</p></div>
 
       {error && <p className="text-sm text-rose-600">{error}</p>}
+      {isCompleted && <p className="mb-5 rounded-xl border border-slate-200 bg-slate-50/80 px-4 py-3 text-sm text-slate-600">종료된 프로젝트의 Task입니다. 업무 정보와 분석 근거는 읽기 전용입니다.</p>}
 
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(280px,.65fr)]">
       <div className="glass-card rounded-2xl p-5 sm:p-6">
         <div className="flex items-start justify-between gap-3">
-          {editingTitle ? (
+          {editingTitle && !isCompleted ? (
             <div className="flex flex-1 gap-2">
               <input
                 value={titleDraft}
@@ -140,9 +147,10 @@ export default function TaskDetailPage({
             </div>
           ) : (
             <button
-              onClick={() => setEditingTitle(true)}
-              className="text-left text-lg font-semibold text-slate-900 hover:underline"
-              title="클릭하여 이름 수정"
+              onClick={() => !isCompleted && setEditingTitle(true)}
+              disabled={isCompleted}
+              className="text-left text-lg font-semibold text-slate-900 enabled:hover:underline"
+              title={isCompleted ? undefined : "클릭하여 이름 수정"}
             >
               {task.title}
             </button>
@@ -160,7 +168,7 @@ export default function TaskDetailPage({
             <select
               value={task.assigneeId ?? ""}
               onChange={(e) => saveUpdate({ assigneeId: e.target.value || null })}
-              disabled={saving}
+              disabled={saving || isCompleted}
               className="glass-input mt-1 w-full rounded-xl px-3 py-2.5 text-sm"
             >
               <option value="">미배정</option>
@@ -176,7 +184,7 @@ export default function TaskDetailPage({
             <select
               value={task.status}
               onChange={(e) => saveUpdate({ status: e.target.value as TaskStatus })}
-              disabled={saving}
+              disabled={saving || isCompleted}
               className="glass-input mt-1 w-full rounded-xl px-3 py-2.5 text-sm"
             >
               {TASK_STATUSES.map((s) => (
@@ -200,13 +208,13 @@ export default function TaskDetailPage({
           </p>
         )}
 
-        <button
+        {!isCompleted && <button
           onClick={handleDelete}
           disabled={saving}
           className="mt-5 text-xs font-medium text-rose-500 hover:text-rose-700 disabled:opacity-50"
         >
           Task 삭제
-        </button>
+        </button>}
       </div>
 
       <div className="glass-card rounded-2xl p-5 sm:p-6">

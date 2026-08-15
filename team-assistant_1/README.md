@@ -1,5 +1,30 @@
 # Effortly
 
+## 프로젝트 종료와 최종 결과
+
+프로젝트 OWNER는 대시보드의 `프로젝트 종료` 버튼으로 현재 기여도를 확정할 수 있습니다. 종료 처리는 한 트랜잭션에서 프로젝트를 `COMPLETED`로 전환하고 최종 기여도 스냅샷을 저장합니다. 종료된 프로젝트는 홈의 아카이브 영역과 `/projects/[projectId]/result`에서 조회할 수 있습니다.
+
+- `POST /api/projects/[projectId]/complete`: OWNER 전용 종료 및 최종 스냅샷 저장
+- `POST /api/projects/[projectId]/reopen`: OWNER 전용 재시작. 기존 스냅샷은 보존
+- `GET /api/projects/[projectId]/contribution/history`: 접근 가능한 팀원의 기여도 이력 조회
+- 종료 후에도 프로젝트, Task, Evidence, 기록, 기여도는 조회 가능
+- 종료 후 기록 생성/분석, Task 수정/삭제, 팀원·초대·팀장 권한 변경, 초대 참가 요청은 서버에서 차단
+
+DB 반영은 기존 데이터와 테이블을 삭제하지 않는 `0005_rich_northstar.sql` 마이그레이션을 사용합니다. 배포 전 다음 명령을 실행하세요.
+
+```bash
+npm run db:migrate
+```
+
+주요 검증 명령은 다음과 같습니다.
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+npm run build
+```
+
 팀 대화 기록을 AI로 분석해 Task, Evidence, 기여도와 최근 변경사항을 관리하는 프로젝트 협업 서비스입니다.
 
 ## 기술 스택
@@ -9,7 +34,7 @@
 - OpenAI Responses API와 Structured Outputs
 - Vitest
 
-## 로컬 실행12
+## 로컬 실행126
 
 ```bash
 npm install

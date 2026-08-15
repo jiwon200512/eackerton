@@ -4,6 +4,7 @@ import { useEffect, useState, use, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   ApiError,
+  completeProject,
   getContribution,
   getProject,
   getRecentChanges,
@@ -42,6 +43,8 @@ export default function DashboardPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"ALL" | TaskStatus>("ALL");
+  const [role, setRole] = useState<"OWNER" | "MEMBER">("MEMBER");
+  const [completing, setCompleting] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -51,7 +54,12 @@ export default function DashboardPage({
         getContribution(projectId),
         getRecentChanges(projectId),
       ]);
+      if (projectRes.project.status === "COMPLETED") {
+        router.replace(`/projects/${projectId}/result`);
+        return;
+      }
       setProject(projectRes.project);
+      setRole(projectRes.currentUserRole);
       setMembers(projectRes.members);
       setTasks(taskRes.tasks);
       setContribution(contribRes.contribution);
@@ -61,7 +69,21 @@ export default function DashboardPage({
     } finally {
       setLoading(false);
     }
-  }, [projectId]);
+  }, [projectId, router]);
+
+  async function handleComplete() {
+    if (!window.confirm("프로젝트를 종료하면 모든 기록과 Task가 읽기 전용으로 전환되고 현재 기여도가 최종 결과로 저장됩니다. 종료할까요?")) return;
+    setCompleting(true);
+    setError(null);
+    try {
+      await completeProject(projectId);
+      router.push(`/projects/${projectId}/result`);
+      router.refresh();
+    } catch (caught) {
+      setError(caught instanceof ApiError ? caught.message : "프로젝트 종료에 실패했습니다.");
+      setCompleting(false);
+    }
+  }
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data fetch on mount
@@ -105,6 +127,16 @@ export default function DashboardPage({
           <p className="mt-1 text-sm text-slate-500">팀의 업무와 최신 변화를 한눈에 확인하세요.</p>
         </div>
         <div className="flex gap-2">
+          {role === "OWNER" && (
+            <button
+              type="button"
+              onClick={handleComplete}
+              disabled={completing}
+              className="rounded-xl border border-slate-300 bg-white/70 px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-white disabled:opacity-50"
+            >
+              {completing ? "종료 중..." : "프로젝트 종료"}
+            </button>
+          )}
           <button
             onClick={() => router.push(`/projects/${projectId}/members`)}
             className="btn-secondary rounded-xl px-4 py-2.5 text-sm font-semibold"

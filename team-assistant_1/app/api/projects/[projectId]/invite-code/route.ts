@@ -4,7 +4,10 @@ import { inviteCodes } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { toErrorResponse } from "@/lib/errors";
 import { requireUser } from "@/lib/auth/session";
-import { requireProjectOwner } from "@/lib/projects/access";
+import {
+  assertProjectIsActive,
+  requireProjectOwner,
+} from "@/lib/projects/access";
 import { generateInviteCode } from "@/lib/projects/inviteCode";
 
 type Params = { params: Promise<{ projectId: string }> };
@@ -13,7 +16,8 @@ export async function GET(_req: NextRequest, { params }: Params) {
   try {
     const user = await requireUser();
     const { projectId } = await params;
-    await requireProjectOwner(projectId, user.id);
+    const project = await requireProjectOwner(projectId, user.id);
+    assertProjectIsActive(project);
 
     const [existing] = await db
       .select()
@@ -40,7 +44,8 @@ export async function POST(_req: NextRequest, { params }: Params) {
   try {
     const user = await requireUser();
     const { projectId } = await params;
-    await requireProjectOwner(projectId, user.id);
+    const project = await requireProjectOwner(projectId, user.id);
+    assertProjectIsActive(project);
 
     const code = await createUniqueCode();
     const [existing] = await db

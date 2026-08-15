@@ -36,6 +36,13 @@
       "when": 1786731970918,
       "tag": "0004_conscious_morlocks",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1786733735977,
+      "tag": "0005_rich_northstar",
+      "breakpoints": true
     }
   ]
 }

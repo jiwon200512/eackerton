@@ -8,6 +8,7 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { randomUUID } from "crypto";
 import { DEFAULT_AVATAR_EMOJI } from "@/lib/avatar";
+import { PROJECT_STATUS } from "@/lib/projects/status";
 
 const id = () =>
   text("id")
@@ -46,6 +47,8 @@ export const sessions = sqliteTable("sessions", {
 export const projects = sqliteTable("projects", {
   id: id(),
   name: text("name").notNull(),
+  status: text("status").notNull().default(PROJECT_STATUS.ACTIVE),
+  completedAt: integer("completed_at", { mode: "timestamp_ms" }),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .default(sql`(strftime('%s','now') * 1000)`),

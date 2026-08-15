@@ -8,6 +8,7 @@ import {
 } from "@/lib/projects/access";
 import { toMemberDTO } from "@/lib/memberDto";
 import { loadProjectMembersWithAvatars } from "@/lib/members/query";
+import { toProjectDTO } from "@/lib/projectDto";
 
 type Params = { params: Promise<{ projectId: string }> };
 
@@ -22,7 +23,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
       getProjectOwnerUserId(projectId),
     ]);
     return NextResponse.json({
-      project,
+      project: toProjectDTO(project),
       currentUserRole,
       members: memberProfiles.map(({ member, avatarEmoji }) =>
         toMemberDTO(member, user.id, ownerUserId, avatarEmoji)

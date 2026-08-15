@@ -4,7 +4,10 @@ import { members, projectUsers } from "@/lib/db/schema";
 import { and, eq } from "drizzle-orm";
 import { Errors, toErrorResponse } from "@/lib/errors";
 import { requireUser } from "@/lib/auth/session";
-import { requireProjectOwner } from "@/lib/projects/access";
+import {
+  assertProjectIsActive,
+  requireProjectOwner,
+} from "@/lib/projects/access";
 
 type Params = { params: Promise<{ projectId: string; memberId: string }> };
 
@@ -12,7 +15,8 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
   try {
     const user = await requireUser();
     const { projectId, memberId } = await params;
-    await requireProjectOwner(projectId, user.id);
+    const project = await requireProjectOwner(projectId, user.id);
+    assertProjectIsActive(project);
     const [existing] = await db
       .select()
       .from(members)
