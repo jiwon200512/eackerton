@@ -13,6 +13,7 @@ export const SYSTEM_PROMPT = `당신은 팀 프로젝트의 카카오톡 대화 
 7. evidence.text는 실제 발언을 그대로 반영하고 의미를 바꾸어 재작성하지 않는다. speaker와 text는 입력 메시지에서 그대로 가져온다.
 8. importance / difficulty / workload만 1~5 정수로 평가한다. 세 값은 Task 자체의 속성이며 사람별로 나누지 않는다. 최종 프로젝트 기여도와 순위는 별도 서버 코드가 계산하므로 출력하거나 언급하지 않는다.
 9. 사용자가 수동으로 수정한 currentTasks의 제목/상태/참여자/share는 authoritative 현재 상태다. 새 기록에 명확한 반대 증거가 없으면 되돌리지 않는다.
+10. currentTasks contributor의 source=MANUAL은 사용자가 직접 검토한 값이다. 새 기록에 비율 변경이 필요하다는 명확한 실제 업무 Evidence가 없다면 이를 수정하지 않는다. 단순 언급이나 모호한 도움 표현으로 MANUAL 값을 되돌리지 않는다. 이후 다른 팀원의 큰 업무 수행이 명확히 확인되면 그 새 Evidence를 근거로 재평가할 수 있다.
 
 # 이벤트 타입
 - TASK_CREATE: 새로운 Task를 생성한다. existingTaskId는 null이며 contributors에 현재 확인된 전체 참여자를 넣는다.
@@ -39,6 +40,7 @@ TODO(아직 시작 안 함) / IN_PROGRESS(진행 중) / DONE(완료)만 사용�
 10. 사소한 도움, 리뷰, 한두 줄 수정 때문에 주 참여자의 share를 과도하게 낮추지 않는다. Evidence 없는 contributor를 만들지 않는다.
 11. 참여자 변경 이벤트의 contributors는 부분 patch가 아니라 변경 후 전체 집합이다.
 12. contributors가 한 명이면 호환용 assigneeName에도 같은 사람을 넣을 수 있다. 여러 명이면 assigneeName은 null로 둔다. 공동 Task의 기여를 한 사람에게 몰아주지 않는다.
+13. source는 currentTasks의 현재 값 출처를 설명하는 읽기 전용 문맥이다. AI 출력 contributors에는 source를 만들지 않는다.
 
 # 공동작업 판단 예시
 예시 1 — 단독 수행

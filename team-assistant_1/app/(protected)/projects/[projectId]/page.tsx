@@ -6,13 +6,21 @@ import {
   ApiError,
   completeProject,
   getContribution,
+  getProjectActivity,
   getProject,
   getRecentChanges,
   listTasks,
   type Member,
   type Project,
 } from "@/lib/apiClient";
-import type { MemberContribution, RecentChangeDTO, TaskDTO, TaskStatus } from "@/lib/types";
+import type {
+  LowConfidenceChangeDTO,
+  MemberContribution,
+  ProjectActivityDTO,
+  RecentChangeDTO,
+  TaskDTO,
+  TaskStatus,
+} from "@/lib/types";
 import StatusBadge from "@/components/StatusBadge";
 import ContributionBar from "@/components/ContributionBar";
 import EmptyState from "@/components/EmptyState";
@@ -41,6 +49,9 @@ export default function DashboardPage({
   const [tasks, setTasks] = useState<TaskDTO[]>([]);
   const [contribution, setContribution] = useState<MemberContribution[]>([]);
   const [changes, setChanges] = useState<RecentChangeDTO[]>([]);
+  const [activities, setActivities] = useState<ProjectActivityDTO[]>([]);
+  const [lowConfidenceChanges, setLowConfidenceChanges] = useState<LowConfidenceChangeDTO[]>([]);
+  const [activityVisibleCount, setActivityVisibleCount] = useState(8);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"ALL" | TaskStatus>("ALL");
@@ -48,12 +59,15 @@ export default function DashboardPage({
   const [completing, setCompleting] = useState(false);
 
   const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const [projectRes, taskRes, contribRes, changesRes] = await Promise.all([
+      const [projectRes, taskRes, contribRes, changesRes, activityRes] = await Promise.all([
         getProject(projectId),
         listTasks(projectId),
         getContribution(projectId),
         getRecentChanges(projectId),
+        getProjectActivity(projectId, 20),
       ]);
       if (projectRes.project.status === "COMPLETED") {
         router.replace(`/projects/${projectId}/result`);
@@ -65,6 +79,8 @@ export default function DashboardPage({
       setTasks(taskRes.tasks);
       setContribution(contribRes.contribution);
       setChanges(changesRes.changes);
+      setActivities(activityRes.activities);
+      setLowConfidenceChanges(activityRes.lowConfidenceChanges);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "대시보드를 불러오지 못했습니다.");
     } finally {
@@ -82,6 +98,7 @@ export default function DashboardPage({
       router.refresh();
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : "프로젝트 종료에 실패했습니다.");
+    } finally {
       setCompleting(false);
     }
   }
@@ -103,9 +120,10 @@ export default function DashboardPage({
     return (
       <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center gap-3 px-6 py-16">
         <p className="text-sm text-rose-600">{error}</p>
-        <button onClick={() => router.push("/")} className="text-sm text-slate-500 underline">
-          프로젝트 목록으로
-        </button>
+        <div className="flex gap-3">
+          <button onClick={load} className="btn-primary rounded-xl px-4 py-2 text-sm font-semibold">다시 시도</button>
+          <button onClick={() => router.push("/")} className="text-sm text-slate-500 underline">프로젝트 목록으로</button>
+        </div>
       </div>
     );
   }
@@ -160,6 +178,23 @@ export default function DashboardPage({
         <SummaryCard label="완료" value={counts.done} tone="emerald" icon="✓" />
       </section>
 
+      {lowConfidenceChanges.length > 0 && (
+        <section className="mt-6 rounded-2xl border border-amber-200/80 bg-amber-50/65 p-5 shadow-sm">
+          <div className="flex items-center justify-between gap-3">
+            <div><p className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-700">AI Review</p><h2 className="mt-1 text-sm font-bold text-slate-800">확인이 필요한 AI 판단 {lowConfidenceChanges.length}개</h2></div>
+            <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-700">확인 필요</span>
+          </div>
+          <ul className="mt-4 grid gap-2 lg:grid-cols-2">
+            {lowConfidenceChanges.slice(0, 4).map((change) => (
+              <li key={change.id} className="rounded-xl border border-amber-100 bg-white/60 p-3">
+                <div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="truncate text-sm font-semibold text-slate-800">{change.taskTitle}</p><p className="mt-1 text-xs leading-5 text-slate-500">{change.reason || "AI 판단 근거를 직접 확인해주세요."}</p></div><strong className="shrink-0 text-xs text-amber-700">신뢰도 {Math.round(change.confidence * 100)}%</strong></div>
+                {change.taskId && <button type="button" onClick={() => router.push(`/projects/${projectId}/tasks/${change.taskId}`)} className="mt-2 text-xs font-semibold text-indigo-600 hover:text-indigo-800">Task 확인 →</button>}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {members.length === 0 && (
         <EmptyState
           title="아직 팀원이 없습니다."
@@ -212,9 +247,36 @@ export default function DashboardPage({
           </ul>
         )}
       </section>
+
+      <section className="glass-card rounded-2xl p-5">
+        <div className="mb-4"><h2 className="text-sm font-bold text-slate-800">프로젝트 활동</h2><p className="mt-1 text-xs text-slate-500">기록과 Task가 누적 갱신된 흐름입니다.</p></div>
+        {activities.length === 0 ? (
+          <p className="text-sm text-slate-500">아직 프로젝트 활동이 없습니다.</p>
+        ) : (
+          <ul className="relative ml-1 flex flex-col gap-4 before:absolute before:bottom-3 before:left-[5px] before:top-3 before:w-px before:bg-indigo-100">
+            {activities.slice(0, activityVisibleCount).map((activity) => (
+              <li key={activity.id} className="relative pl-5 before:absolute before:left-0 before:top-1.5 before:h-2.5 before:w-2.5 before:rounded-full before:border-2 before:border-white before:bg-indigo-500">
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1"><p className="text-sm font-semibold text-slate-800">{activity.title}</p>{activity.source && <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${activity.source === "MANUAL" ? "bg-emerald-50 text-emerald-700" : "bg-indigo-50 text-indigo-600"}`}>{activity.source === "MANUAL" ? "직접 수정" : "AI"}</span>}</div>
+                <p className="mt-0.5 text-xs leading-5 text-slate-500">{activity.description}</p>
+                <div className="mt-1 flex items-center gap-2 text-[10px] text-slate-400"><time>{formatActivityTime(activity.timestamp)}</time>{activity.actor && <span>· {activity.actor}</span>}{activity.taskId && <button type="button" onClick={() => router.push(`/projects/${projectId}/tasks/${activity.taskId}`)} className="font-semibold text-indigo-500">Task 보기</button>}</div>
+              </li>
+            ))}
+          </ul>
+        )}
+        {activities.length > activityVisibleCount && <button type="button" onClick={() => setActivityVisibleCount((count) => Math.min(activities.length, count + 8))} className="mt-4 text-xs font-semibold text-indigo-600">더 보기</button>}
+      </section>
       </div></div>
     </div>
   );
+}
+
+function formatActivityTime(timestamp: number) {
+  return new Intl.DateTimeFormat("ko-KR", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(timestamp));
 }
 
 function SummaryCard({ label, value, tone, icon }: { label: string; value: number; tone: "indigo" | "slate" | "amber" | "emerald"; icon: string }) {

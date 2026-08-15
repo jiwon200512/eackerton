@@ -2,7 +2,10 @@
 
 import type {
   EvidenceDTO,
+  ContributionBreakdownMember,
+  LowConfidenceChangeDTO,
   MemberContribution,
+  ProjectActivityDTO,
   RecentChangeDTO,
   TaskDTO,
   TaskStatus,
@@ -223,6 +226,16 @@ export const getContributionHistory = (projectId: string) =>
   request<{ snapshots: ContributionHistorySnapshot[] }>(
     `/api/projects/${projectId}/contribution/history`
   );
+export const getContributionBreakdown = (projectId: string) =>
+  request<{ members: ContributionBreakdownMember[] }>(
+    `/api/projects/${projectId}/contribution/breakdown`
+  );
+export const getProjectActivity = (projectId: string, limit = 20) =>
+  request<{
+    activities: ProjectActivityDTO[];
+    lowConfidenceChanges: LowConfidenceChangeDTO[];
+    lowConfidenceThreshold: number;
+  }>(`/api/projects/${projectId}/activity?limit=${limit}`);
 export const getRecentChanges = (projectId: string) =>
   request<{ recordId: string | null; analyzedAt: number | null; changes: RecentChangeDTO[] }>(
     `/api/projects/${projectId}/recent-changes`

@@ -590,6 +590,8 @@ __turbopack_context__.s([
     ()=>deleteTask,
     "getContribution",
     ()=>getContribution,
+    "getContributionBreakdown",
+    ()=>getContributionBreakdown,
     "getContributionHistory",
     ()=>getContributionHistory,
     "getInviteCode",
@@ -598,6 +600,8 @@ __turbopack_context__.s([
     ()=>getProfile,
     "getProject",
     ()=>getProject,
+    "getProjectActivity",
+    ()=>getProjectActivity,
     "getRecentChanges",
     ()=>getRecentChanges,
     "getTask",
@@ -729,6 +733,8 @@ const deleteTask = (projectId, taskId)=>request(`/api/projects/${projectId}/task
     });
 const getContribution = (projectId)=>request(`/api/projects/${projectId}/contribution`);
 const getContributionHistory = (projectId)=>request(`/api/projects/${projectId}/contribution/history`);
+const getContributionBreakdown = (projectId)=>request(`/api/projects/${projectId}/contribution/breakdown`);
+const getProjectActivity = (projectId, limit = 20)=>request(`/api/projects/${projectId}/activity?limit=${limit}`);
 const getRecentChanges = (projectId)=>request(`/api/projects/${projectId}/recent-changes`);
 ;
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {

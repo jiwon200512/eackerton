@@ -8,7 +8,11 @@ export interface ContextTask {
   importance: number;
   difficulty: number;
   workload: number;
-  contributors: { memberName: string; share: number }[];
+  contributors: {
+    memberName: string;
+    share: number;
+    source: "AI" | "MANUAL" | null;
+  }[];
   recentEvidence: string[];
 }
 

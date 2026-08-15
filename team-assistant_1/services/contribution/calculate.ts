@@ -38,6 +38,26 @@ export interface ContributionResult {
   percentage: number;
 }
 
+export interface BreakdownScorableTask extends ScorableTask {
+  id: string;
+  title: string;
+}
+
+export interface ContributionBreakdownResult extends ContributionResult {
+  tasks: Array<{
+    taskId: string;
+    title: string;
+    status: TaskStatus;
+    importance: number;
+    difficulty: number;
+    workload: number;
+    taskScore: number;
+    statusMultiplier: number;
+    contributorShare: number;
+    memberTaskScore: number;
+  }>;
+}
+
 export function computeTaskScore(t: {
   importance: number;
   difficulty: number;
@@ -90,11 +110,78 @@ export function calculateContribution(
   members: ContributionMember[],
   tasks: ScorableTask[]
 ): ContributionResult[] {
+  const { rawScores } = calculateContributionState(members, tasks);
+  return buildContributionResults(members, rawScores);
+}
+
+/**
+ * Returns the same deterministic contribution result plus the exact Task
+ * allocations that produced each member's raw score. Both public calculators
+ * share calculateContributionState(), so the report and breakdown cannot
+ * drift onto different formulas.
+ */
+export function calculateContributionBreakdown(
+  members: ContributionMember[],
+  tasks: BreakdownScorableTask[]
+): ContributionBreakdownResult[] {
+  const { rawScores, allocations } = calculateContributionState(members, tasks);
+  const results = buildContributionResults(members, rawScores);
+
+  return results.map((result) => ({
+    ...result,
+    tasks: allocations
+      .filter((allocation) => allocation.memberId === result.memberId)
+      .map((allocation) => ({
+        taskId: allocation.taskId,
+        title: allocation.title,
+        status: allocation.status,
+        importance: allocation.importance,
+        difficulty: allocation.difficulty,
+        workload: allocation.workload,
+        taskScore: allocation.taskScore,
+        statusMultiplier: allocation.statusMultiplier,
+        contributorShare: allocation.contributorShare,
+        memberTaskScore: allocation.memberTaskScore,
+      }))
+      .sort(
+        (left, right) =>
+          right.memberTaskScore - left.memberTaskScore ||
+          left.title.localeCompare(right.title, "ko")
+      ),
+  }));
+}
+
+interface TaskAllocation {
+  memberId: string;
+  taskId: string;
+  title: string;
+  status: TaskStatus;
+  importance: number;
+  difficulty: number;
+  workload: number;
+  taskScore: number;
+  statusMultiplier: number;
+  contributorShare: number;
+  memberTaskScore: number;
+}
+
+function roundTo2(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function calculateContributionState(
+  members: ContributionMember[],
+  tasks: ScorableTask[]
+): { rawScores: Map<string, number>; allocations: TaskAllocation[] } {
   const rawScores = new Map<string, number>();
   for (const m of members) rawScores.set(m.id, 0);
+  const allocations: TaskAllocation[] = [];
 
   for (const t of tasks) {
-    const taskScore = computeCurrentTaskScore(t);
+    const baseTaskScore = computeTaskScore(t);
+    const statusMultiplier = STATUS_MULTIPLIER[t.status];
+    const currentTaskScore = baseTaskScore * statusMultiplier;
+    const breakdownTask = t as Partial<BreakdownScorableTask>;
     if (t.contributors && t.contributors.length > 0) {
       const validContributors = t.contributors.filter(
         (contributor) =>
@@ -108,11 +195,28 @@ export function calculateContribution(
       );
       if (shareTotal <= 0) continue;
       for (const contributor of validContributors) {
+        const normalizedShare = (contributor.share / shareTotal) * 100;
+        const memberTaskScore = currentTaskScore * (normalizedShare / 100);
         rawScores.set(
           contributor.memberId,
           (rawScores.get(contributor.memberId) ?? 0) +
-            taskScore * (contributor.share / shareTotal)
+            memberTaskScore
         );
+        if (breakdownTask.id && breakdownTask.title) {
+          allocations.push({
+            memberId: contributor.memberId,
+            taskId: breakdownTask.id,
+            title: breakdownTask.title,
+            status: t.status,
+            importance: t.importance,
+            difficulty: t.difficulty,
+            workload: t.workload,
+            taskScore: roundTo2(baseTaskScore),
+            statusMultiplier,
+            contributorShare: roundTo2(normalizedShare),
+            memberTaskScore: roundTo2(memberTaskScore),
+          });
+        }
       }
       continue;
     }
@@ -120,9 +224,34 @@ export function calculateContribution(
     // Backwards compatibility: production Tasks created before the
     // task_contributors migration still award 100% to their assignee.
     if (!t.assigneeId || !rawScores.has(t.assigneeId)) continue;
-    rawScores.set(t.assigneeId, (rawScores.get(t.assigneeId) ?? 0) + taskScore);
+    rawScores.set(
+      t.assigneeId,
+      (rawScores.get(t.assigneeId) ?? 0) + currentTaskScore
+    );
+    if (breakdownTask.id && breakdownTask.title) {
+      allocations.push({
+        memberId: t.assigneeId,
+        taskId: breakdownTask.id,
+        title: breakdownTask.title,
+        status: t.status,
+        importance: t.importance,
+        difficulty: t.difficulty,
+        workload: t.workload,
+        taskScore: roundTo2(baseTaskScore),
+        statusMultiplier,
+        contributorShare: 100,
+        memberTaskScore: roundTo2(currentTaskScore),
+      });
+    }
   }
 
+  return { rawScores, allocations };
+}
+
+function buildContributionResults(
+  members: ContributionMember[],
+  rawScores: Map<string, number>
+): ContributionResult[] {
   const total = [...rawScores.values()].reduce((a, b) => a + b, 0);
 
   const rawPercentages = members.map((m) =>

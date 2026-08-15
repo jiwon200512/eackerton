@@ -43,6 +43,9 @@ function DashboardPage({ params }) {
     const [tasks, setTasks] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
     const [contribution, setContribution] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
     const [changes, setChanges] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [activities, setActivities] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [lowConfidenceChanges, setLowConfidenceChanges] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [activityVisibleCount, setActivityVisibleCount] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(8);
     const [loading, setLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [filter, setFilter] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("ALL");
@@ -50,12 +53,15 @@ function DashboardPage({ params }) {
     const [completing, setCompleting] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const load = (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "DashboardPage.useCallback[load]": async ()=>{
+            setLoading(true);
+            setError(null);
             try {
-                const [projectRes, taskRes, contribRes, changesRes] = await Promise.all([
+                const [projectRes, taskRes, contribRes, changesRes, activityRes] = await Promise.all([
                     (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$lib$2f$apiClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getProject"])(projectId),
                     (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$lib$2f$apiClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["listTasks"])(projectId),
                     (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$lib$2f$apiClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getContribution"])(projectId),
-                    (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$lib$2f$apiClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getRecentChanges"])(projectId)
+                    (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$lib$2f$apiClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getRecentChanges"])(projectId),
+                    (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$lib$2f$apiClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getProjectActivity"])(projectId, 20)
                 ]);
                 if (projectRes.project.status === "COMPLETED") {
                     router.replace(`/projects/${projectId}/result`);
@@ -67,6 +73,8 @@ function DashboardPage({ params }) {
                 setTasks(taskRes.tasks);
                 setContribution(contribRes.contribution);
                 setChanges(changesRes.changes);
+                setActivities(activityRes.activities);
+                setLowConfidenceChanges(activityRes.lowConfidenceChanges);
             } catch (err) {
                 setError(err instanceof __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$lib$2f$apiClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ApiError"] ? err.message : "대시보드를 불러오지 못했습니다.");
             } finally{
@@ -87,6 +95,7 @@ function DashboardPage({ params }) {
             router.refresh();
         } catch (caught) {
             setError(caught instanceof __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$lib$2f$apiClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ApiError"] ? caught.message : "프로젝트 종료에 실패했습니다.");
+        } finally{
             setCompleting(false);
         }
     }
@@ -105,12 +114,12 @@ function DashboardPage({ params }) {
                 label: "불러오는 중..."
             }, void 0, false, {
                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                lineNumber: 97,
+                lineNumber: 114,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-            lineNumber: 96,
+            lineNumber: 113,
             columnNumber: 7
         }, this);
     }
@@ -123,22 +132,40 @@ function DashboardPage({ params }) {
                     children: error
                 }, void 0, false, {
                     fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                    lineNumber: 105,
+                    lineNumber: 122,
                     columnNumber: 9
                 }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                    onClick: ()=>router.push("/"),
-                    className: "text-sm text-slate-500 underline",
-                    children: "프로젝트 목록으로"
-                }, void 0, false, {
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "flex gap-3",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                            onClick: load,
+                            className: "btn-primary rounded-xl px-4 py-2 text-sm font-semibold",
+                            children: "다시 시도"
+                        }, void 0, false, {
+                            fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                            lineNumber: 124,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                            onClick: ()=>router.push("/"),
+                            className: "text-sm text-slate-500 underline",
+                            children: "프로젝트 목록으로"
+                        }, void 0, false, {
+                            fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                            lineNumber: 125,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
                     fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                    lineNumber: 106,
+                    lineNumber: 123,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-            lineNumber: 104,
+            lineNumber: 121,
             columnNumber: 7
         }, this);
     }
@@ -162,7 +189,7 @@ function DashboardPage({ params }) {
                                 children: "Dashboard"
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                lineNumber: 126,
+                                lineNumber: 144,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
@@ -170,7 +197,7 @@ function DashboardPage({ params }) {
                                 children: project?.name
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                lineNumber: 127,
+                                lineNumber: 145,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -178,13 +205,13 @@ function DashboardPage({ params }) {
                                 children: "팀의 업무와 최신 변화를 한눈에 확인하세요."
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                lineNumber: 128,
+                                lineNumber: 146,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                        lineNumber: 125,
+                        lineNumber: 143,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -198,7 +225,7 @@ function DashboardPage({ params }) {
                                 children: completing ? "종료 중..." : "프로젝트 종료"
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                lineNumber: 132,
+                                lineNumber: 150,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -207,7 +234,7 @@ function DashboardPage({ params }) {
                                 children: "팀원 관리"
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                lineNumber: 141,
+                                lineNumber: 159,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -216,19 +243,19 @@ function DashboardPage({ params }) {
                                 children: "+ 기록 추가"
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                lineNumber: 147,
+                                lineNumber: 165,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                        lineNumber: 130,
+                        lineNumber: 148,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                lineNumber: 124,
+                lineNumber: 142,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -241,7 +268,7 @@ function DashboardPage({ params }) {
                         icon: "▦"
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                        lineNumber: 157,
+                        lineNumber: 175,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SummaryCard, {
@@ -251,7 +278,7 @@ function DashboardPage({ params }) {
                         icon: "○"
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                        lineNumber: 158,
+                        lineNumber: 176,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SummaryCard, {
@@ -261,7 +288,7 @@ function DashboardPage({ params }) {
                         icon: "◐"
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                        lineNumber: 159,
+                        lineNumber: 177,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SummaryCard, {
@@ -271,14 +298,140 @@ function DashboardPage({ params }) {
                         icon: "✓"
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                        lineNumber: 160,
+                        lineNumber: 178,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                lineNumber: 156,
+                lineNumber: 174,
                 columnNumber: 7
+            }, this),
+            lowConfidenceChanges.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                className: "mt-6 rounded-2xl border border-amber-200/80 bg-amber-50/65 p-5 shadow-sm",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "flex items-center justify-between gap-3",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "text-xs font-semibold uppercase tracking-[0.12em] text-amber-700",
+                                        children: "AI Review"
+                                    }, void 0, false, {
+                                        fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                        lineNumber: 184,
+                                        columnNumber: 18
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                        className: "mt-1 text-sm font-bold text-slate-800",
+                                        children: [
+                                            "확인이 필요한 AI 판단 ",
+                                            lowConfidenceChanges.length,
+                                            "개"
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                        lineNumber: 184,
+                                        columnNumber: 111
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                lineNumber: 184,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-700",
+                                children: "확인 필요"
+                            }, void 0, false, {
+                                fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                lineNumber: 185,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                        lineNumber: 183,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                        className: "mt-4 grid gap-2 lg:grid-cols-2",
+                        children: lowConfidenceChanges.slice(0, 4).map((change)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                                className: "rounded-xl border border-amber-100 bg-white/60 p-3",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "flex items-start justify-between gap-3",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "min-w-0",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        className: "truncate text-sm font-semibold text-slate-800",
+                                                        children: change.taskTitle
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                                        lineNumber: 190,
+                                                        columnNumber: 98
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        className: "mt-1 text-xs leading-5 text-slate-500",
+                                                        children: change.reason || "AI 판단 근거를 직접 확인해주세요."
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                                        lineNumber: 190,
+                                                        columnNumber: 181
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                                lineNumber: 190,
+                                                columnNumber: 73
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                className: "shrink-0 text-xs text-amber-700",
+                                                children: [
+                                                    "신뢰도 ",
+                                                    Math.round(change.confidence * 100),
+                                                    "%"
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                                lineNumber: 190,
+                                                columnNumber: 285
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                        lineNumber: 190,
+                                        columnNumber: 17
+                                    }, this),
+                                    change.taskId && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        type: "button",
+                                        onClick: ()=>router.push(`/projects/${projectId}/tasks/${change.taskId}`),
+                                        className: "mt-2 text-xs font-semibold text-indigo-600 hover:text-indigo-800",
+                                        children: "Task 확인 →"
+                                    }, void 0, false, {
+                                        fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                        lineNumber: 191,
+                                        columnNumber: 35
+                                    }, this)
+                                ]
+                            }, change.id, true, {
+                                fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                lineNumber: 189,
+                                columnNumber: 15
+                            }, this))
+                    }, void 0, false, {
+                        fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                        lineNumber: 187,
+                        columnNumber: 11
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                lineNumber: 182,
+                columnNumber: 9
             }, this),
             members.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$components$2f$EmptyState$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                 title: "아직 팀원이 없습니다.",
@@ -289,12 +442,12 @@ function DashboardPage({ params }) {
                     children: "팀원 등록하러 가기"
                 }, void 0, false, {
                     fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                    lineNumber: 168,
+                    lineNumber: 203,
                     columnNumber: 13
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                lineNumber: 164,
+                lineNumber: 199,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -313,7 +466,7 @@ function DashboardPage({ params }) {
                                                 children: "Task"
                                             }, void 0, false, {
                                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                lineNumber: 181,
+                                                lineNumber: 216,
                                                 columnNumber: 128
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -325,13 +478,13 @@ function DashboardPage({ params }) {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                lineNumber: 181,
+                                                lineNumber: 216,
                                                 columnNumber: 188
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                        lineNumber: 181,
+                                        lineNumber: 216,
                                         columnNumber: 123
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -359,18 +512,18 @@ function DashboardPage({ params }) {
                                                 children: label
                                             }, value, false, {
                                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                lineNumber: 181,
+                                                lineNumber: 216,
                                                 columnNumber: 449
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                        lineNumber: 181,
+                                        lineNumber: 216,
                                         columnNumber: 269
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                lineNumber: 181,
+                                lineNumber: 216,
                                 columnNumber: 9
                             }, this),
                             visibleTasks.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -384,17 +537,17 @@ function DashboardPage({ params }) {
                                         children: "기록 추가하기"
                                     }, void 0, false, {
                                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                        lineNumber: 183,
+                                        lineNumber: 218,
                                         columnNumber: 207
                                     }, this) : undefined
                                 }, void 0, false, {
                                     fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                    lineNumber: 183,
+                                    lineNumber: 218,
                                     columnNumber: 34
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                lineNumber: 183,
+                                lineNumber: 218,
                                 columnNumber: 11
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
                                 className: "mt-3 flex flex-col gap-2",
@@ -414,7 +567,7 @@ function DashboardPage({ params }) {
                                                                     children: t.title
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                                    lineNumber: 186,
+                                                                    lineNumber: 221,
                                                                     columnNumber: 337
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -424,31 +577,31 @@ function DashboardPage({ params }) {
                                                                         compact: true
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                                        lineNumber: 186,
+                                                                        lineNumber: 221,
                                                                         columnNumber: 461
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                                    lineNumber: 186,
+                                                                    lineNumber: 221,
                                                                     columnNumber: 439
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                            lineNumber: 186,
+                                                            lineNumber: 221,
                                                             columnNumber: 312
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$components$2f$StatusBadge$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                                             status: t.status
                                                         }, void 0, false, {
                                                             fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                            lineNumber: 186,
+                                                            lineNumber: 221,
                                                             columnNumber: 531
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                    lineNumber: 186,
+                                                    lineNumber: 221,
                                                     columnNumber: 256
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -462,13 +615,13 @@ function DashboardPage({ params }) {
                                                                     children: t.importance
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                                    lineNumber: 186,
+                                                                    lineNumber: 221,
                                                                     columnNumber: 660
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                            lineNumber: 186,
+                                                            lineNumber: 221,
                                                             columnNumber: 650
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -479,13 +632,13 @@ function DashboardPage({ params }) {
                                                                     children: t.difficulty
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                                    lineNumber: 186,
+                                                                    lineNumber: 221,
                                                                     columnNumber: 725
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                            lineNumber: 186,
+                                                            lineNumber: 221,
                                                             columnNumber: 715
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -496,41 +649,41 @@ function DashboardPage({ params }) {
                                                                     children: t.workload
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                                    lineNumber: 186,
+                                                                    lineNumber: 221,
                                                                     columnNumber: 790
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                            lineNumber: 186,
+                                                            lineNumber: 221,
                                                             columnNumber: 780
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                    lineNumber: 186,
+                                                    lineNumber: 221,
                                                     columnNumber: 570
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                            lineNumber: 186,
+                                            lineNumber: 221,
                                             columnNumber: 53
                                         }, this)
                                     }, t.id, false, {
                                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                        lineNumber: 186,
+                                        lineNumber: 221,
                                         columnNumber: 38
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                lineNumber: 185,
+                                lineNumber: 220,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                        lineNumber: 180,
+                        lineNumber: 215,
                         columnNumber: 7
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -547,7 +700,7 @@ function DashboardPage({ params }) {
                                                 children: "팀원별 기여도"
                                             }, void 0, false, {
                                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                lineNumber: 192,
+                                                lineNumber: 227,
                                                 columnNumber: 134
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -556,13 +709,13 @@ function DashboardPage({ params }) {
                                                 children: "자세히 →"
                                             }, void 0, false, {
                                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                lineNumber: 192,
+                                                lineNumber: 227,
                                                 columnNumber: 195
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                        lineNumber: 192,
+                                        lineNumber: 227,
                                         columnNumber: 78
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -571,18 +724,18 @@ function DashboardPage({ params }) {
                                                 member: m
                                             }, m.memberId, false, {
                                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                lineNumber: 192,
+                                                lineNumber: 227,
                                                 columnNumber: 424
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                        lineNumber: 192,
+                                        lineNumber: 227,
                                         columnNumber: 362
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                lineNumber: 192,
+                                lineNumber: 227,
                                 columnNumber: 30
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -593,7 +746,7 @@ function DashboardPage({ params }) {
                                         children: "Recent Changes"
                                     }, void 0, false, {
                                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                        lineNumber: 196,
+                                        lineNumber: 231,
                                         columnNumber: 9
                                     }, this),
                                     changes.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -601,7 +754,7 @@ function DashboardPage({ params }) {
                                         children: "아직 AI 분석으로 발생한 변경사항이 없습니다."
                                     }, void 0, false, {
                                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                        lineNumber: 198,
+                                        lineNumber: 233,
                                         columnNumber: 11
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
                                         className: "flex flex-col gap-3",
@@ -612,7 +765,7 @@ function DashboardPage({ params }) {
                                                         className: "mt-1 h-2 w-2 shrink-0 rounded-full bg-indigo-500 shadow-[0_0_0_4px_rgba(99,102,241,.12)]"
                                                     }, void 0, false, {
                                                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                        lineNumber: 203,
+                                                        lineNumber: 238,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -622,7 +775,7 @@ function DashboardPage({ params }) {
                                                                 children: c.taskTitle
                                                             }, void 0, false, {
                                                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                                lineNumber: 205,
+                                                                lineNumber: 240,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -630,7 +783,7 @@ function DashboardPage({ params }) {
                                                                 children: c.summary
                                                             }, void 0, false, {
                                                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                                lineNumber: 206,
+                                                                lineNumber: 241,
                                                                 columnNumber: 19
                                                             }, this),
                                                             c.reason && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -638,7 +791,7 @@ function DashboardPage({ params }) {
                                                                 children: c.reason
                                                             }, void 0, false, {
                                                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                                lineNumber: 207,
+                                                                lineNumber: 242,
                                                                 columnNumber: 32
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -646,57 +799,201 @@ function DashboardPage({ params }) {
                                                                 children: CHANGE_TYPE_LABEL[c.changeType] ?? c.changeType
                                                             }, void 0, false, {
                                                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                                lineNumber: 208,
+                                                                lineNumber: 243,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                        lineNumber: 204,
+                                                        lineNumber: 239,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, c.id, true, {
                                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                                lineNumber: 202,
+                                                lineNumber: 237,
                                                 columnNumber: 15
                                             }, this))
                                     }, void 0, false, {
                                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                        lineNumber: 200,
+                                        lineNumber: 235,
                                         columnNumber: 11
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                                lineNumber: 195,
+                                lineNumber: 230,
+                                columnNumber: 7
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+                                className: "glass-card rounded-2xl p-5",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "mb-4",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                                className: "text-sm font-bold text-slate-800",
+                                                children: "프로젝트 활동"
+                                            }, void 0, false, {
+                                                fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                                lineNumber: 252,
+                                                columnNumber: 31
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                className: "mt-1 text-xs text-slate-500",
+                                                children: "기록과 Task가 누적 갱신된 흐름입니다."
+                                            }, void 0, false, {
+                                                fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                                lineNumber: 252,
+                                                columnNumber: 92
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                        lineNumber: 252,
+                                        columnNumber: 9
+                                    }, this),
+                                    activities.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "text-sm text-slate-500",
+                                        children: "아직 프로젝트 활동이 없습니다."
+                                    }, void 0, false, {
+                                        fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                        lineNumber: 254,
+                                        columnNumber: 11
+                                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
+                                        className: "relative ml-1 flex flex-col gap-4 before:absolute before:bottom-3 before:left-[5px] before:top-3 before:w-px before:bg-indigo-100",
+                                        children: activities.slice(0, activityVisibleCount).map((activity)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
+                                                className: "relative pl-5 before:absolute before:left-0 before:top-1.5 before:h-2.5 before:w-2.5 before:rounded-full before:border-2 before:border-white before:bg-indigo-500",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex flex-wrap items-center gap-x-2 gap-y-1",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                className: "text-sm font-semibold text-slate-800",
+                                                                children: activity.title
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                                                lineNumber: 259,
+                                                                columnNumber: 78
+                                                            }, this),
+                                                            activity.source && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: `rounded-full px-2 py-0.5 text-[10px] font-semibold ${activity.source === "MANUAL" ? "bg-emerald-50 text-emerald-700" : "bg-indigo-50 text-indigo-600"}`,
+                                                                children: activity.source === "MANUAL" ? "직접 수정" : "AI"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                                                lineNumber: 259,
+                                                                columnNumber: 170
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                                        lineNumber: 259,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        className: "mt-0.5 text-xs leading-5 text-slate-500",
+                                                        children: activity.description
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                                        lineNumber: 260,
+                                                        columnNumber: 17
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "mt-1 flex items-center gap-2 text-[10px] text-slate-400",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("time", {
+                                                                children: formatActivityTime(activity.timestamp)
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                                                lineNumber: 261,
+                                                                columnNumber: 90
+                                                            }, this),
+                                                            activity.actor && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                children: [
+                                                                    "· ",
+                                                                    activity.actor
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                                                lineNumber: 261,
+                                                                columnNumber: 162
+                                                            }, this),
+                                                            activity.taskId && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                type: "button",
+                                                                onClick: ()=>router.push(`/projects/${projectId}/tasks/${activity.taskId}`),
+                                                                className: "font-semibold text-indigo-500",
+                                                                children: "Task 보기"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                                                lineNumber: 261,
+                                                                columnNumber: 214
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                                        lineNumber: 261,
+                                                        columnNumber: 17
+                                                    }, this)
+                                                ]
+                                            }, activity.id, true, {
+                                                fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                                lineNumber: 258,
+                                                columnNumber: 15
+                                            }, this))
+                                    }, void 0, false, {
+                                        fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                        lineNumber: 256,
+                                        columnNumber: 11
+                                    }, this),
+                                    activities.length > activityVisibleCount && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        type: "button",
+                                        onClick: ()=>setActivityVisibleCount((count)=>Math.min(activities.length, count + 8)),
+                                        className: "mt-4 text-xs font-semibold text-indigo-600",
+                                        children: "더 보기"
+                                    }, void 0, false, {
+                                        fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                        lineNumber: 266,
+                                        columnNumber: 54
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
+                                lineNumber: 251,
                                 columnNumber: 7
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                        lineNumber: 191,
+                        lineNumber: 226,
                         columnNumber: 7
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                lineNumber: 178,
+                lineNumber: 213,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-        lineNumber: 122,
+        lineNumber: 140,
         columnNumber: 5
     }, this);
 }
-_s(DashboardPage, "cmyZrCcytua4FTNVF8Gxrb5xr6A=", false, function() {
+_s(DashboardPage, "22D5a4S5HwGNMmBJaWguc7eJ1Mc=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
     ];
 });
 _c = DashboardPage;
+function formatActivityTime(timestamp) {
+    return new Intl.DateTimeFormat("ko-KR", {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+    }).format(new Date(timestamp));
+}
 function SummaryCard({ label, value, tone, icon }) {
     const tones = {
         indigo: "bg-indigo-500/10 text-indigo-600",
@@ -715,7 +1012,7 @@ function SummaryCard({ label, value, tone, icon }) {
                         children: icon
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                        lineNumber: 222,
+                        lineNumber: 284,
                         columnNumber: 112
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -723,13 +1020,13 @@ function SummaryCard({ label, value, tone, icon }) {
                         children: value
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                        lineNumber: 222,
+                        lineNumber: 284,
                         columnNumber: 232
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                lineNumber: 222,
+                lineNumber: 284,
                 columnNumber: 61
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -737,13 +1034,13 @@ function SummaryCard({ label, value, tone, icon }) {
                 children: label
             }, void 0, false, {
                 fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-                lineNumber: 222,
+                lineNumber: 284,
                 columnNumber: 319
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/team-assistant_1/app/(protected)/projects/[projectId]/page.tsx",
-        lineNumber: 222,
+        lineNumber: 284,
         columnNumber: 10
     }, this);
 }
@@ -1107,11 +1404,28 @@ function TaskContributors({ contributors, compact = false }) {
                                 lineNumber: 38,
                                 columnNumber: 13
                             }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                className: "text-sm text-indigo-600",
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "flex shrink-0 items-center gap-2",
                                 children: [
-                                    contributor.share,
-                                    "%"
+                                    contributor.source && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: `rounded-full px-2 py-0.5 text-[10px] font-semibold ${contributor.source === "MANUAL" ? "bg-emerald-50 text-emerald-700" : "bg-indigo-50 text-indigo-600"}`,
+                                        children: contributor.source === "MANUAL" ? "직접 수정" : "AI 분석"
+                                    }, void 0, false, {
+                                        fileName: "[project]/team-assistant_1/components/TaskContributors.tsx",
+                                        lineNumber: 44,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                        className: "text-sm text-indigo-600",
+                                        children: [
+                                            contributor.share,
+                                            "%"
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/team-assistant_1/components/TaskContributors.tsx",
+                                        lineNumber: 54,
+                                        columnNumber: 15
+                                    }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/team-assistant_1/components/TaskContributors.tsx",
@@ -1133,12 +1447,12 @@ function TaskContributors({ contributors, compact = false }) {
                             }
                         }, void 0, false, {
                             fileName: "[project]/team-assistant_1/components/TaskContributors.tsx",
-                            lineNumber: 45,
+                            lineNumber: 58,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/components/TaskContributors.tsx",
-                        lineNumber: 44,
+                        lineNumber: 57,
                         columnNumber: 11
                     }, this)
                 ]

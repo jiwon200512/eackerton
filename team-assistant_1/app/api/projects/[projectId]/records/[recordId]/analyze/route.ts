@@ -118,7 +118,12 @@ export async function POST(req: NextRequest, { params }: Params) {
       const effectiveContributors = explicitContributors.length > 0
         ? explicitContributors
         : t.assigneeId && memberById.has(t.assigneeId)
-          ? [{ memberId: t.assigneeId, memberName: memberById.get(t.assigneeId)!, share: 100 }]
+          ? [{
+              memberId: t.assigneeId,
+              memberName: memberById.get(t.assigneeId)!,
+              share: 100,
+              source: null,
+            }]
           : [];
       existingTasksById.set(t.id, {
         id: t.id,
@@ -138,9 +143,10 @@ export async function POST(req: NextRequest, { params }: Params) {
         importance: t.importance,
         difficulty: t.difficulty,
         workload: t.workload,
-        contributors: effectiveContributors.map(({ memberName, share }) => ({
+        contributors: effectiveContributors.map(({ memberName, share, source }) => ({
           memberName,
           share,
+          source: source === "AI" || source === "MANUAL" ? source : null,
         })),
         recentEvidence: recentEvidenceByTask.get(t.id) ?? [],
       });

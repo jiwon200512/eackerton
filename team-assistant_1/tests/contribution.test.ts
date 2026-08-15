@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   calculateContribution,
+  calculateContributionBreakdown,
   computeTaskScore,
   computeCurrentTaskScore,
 } from "@/services/contribution/calculate";
@@ -166,5 +167,66 @@ describe("calculateContribution", () => {
       workload: 5,
     }]);
     expect(result.every((item) => item.rawScore === 0 && item.percentage === 0)).toBe(true);
+  });
+});
+
+describe("calculateContributionBreakdown", () => {
+  it("uses the same raw scores and percentages as the main calculator", () => {
+    const members = [
+      { id: "m1", name: "준영" },
+      { id: "m2", name: "민수" },
+    ];
+    const tasks = [
+      {
+        id: "task-a",
+        title: "Task A",
+        assigneeId: null,
+        contributors: [
+          { memberId: "m1", share: 60 },
+          { memberId: "m2", share: 40 },
+        ],
+        status: "DONE" as const,
+        importance: 5,
+        difficulty: 5,
+        workload: 5,
+      },
+      {
+        id: "task-b",
+        title: "Task B",
+        assigneeId: "m2",
+        contributors: [{ memberId: "m2", share: 100 }],
+        status: "DONE" as const,
+        importance: 3,
+        difficulty: 3,
+        workload: 3,
+      },
+    ];
+
+    const summary = calculateContribution(members, tasks);
+    const breakdown = calculateContributionBreakdown(members, tasks);
+    expect(
+      breakdown.map((member) => ({
+        memberId: member.memberId,
+        name: member.name,
+        rawScore: member.rawScore,
+        percentage: member.percentage,
+      }))
+    ).toEqual(summary);
+
+    const byId = Object.fromEntries(
+      breakdown.map((member) => [member.memberId, member])
+    );
+    expect(byId.m1).toMatchObject({ rawScore: 3, percentage: 37.5 });
+    expect(byId.m1.tasks).toEqual([
+      expect.objectContaining({
+        taskId: "task-a",
+        taskScore: 5,
+        statusMultiplier: 1,
+        contributorShare: 60,
+        memberTaskScore: 3,
+      }),
+    ]);
+    expect(byId.m2).toMatchObject({ rawScore: 5, percentage: 62.5 });
+    expect(byId.m2.tasks.map((task) => task.memberTaskScore)).toEqual([3, 2]);
   });
 });

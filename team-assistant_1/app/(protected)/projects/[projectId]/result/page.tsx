@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   ApiError,
   getContributionHistory,
+  getProjectActivity,
   getProject,
   listRecords,
   listTasks,
@@ -14,7 +15,7 @@ import {
   type Project,
   type RecordItem,
 } from "@/lib/apiClient";
-import type { TaskDTO } from "@/lib/types";
+import type { ProjectActivityDTO, TaskDTO } from "@/lib/types";
 import Avatar from "@/components/Avatar";
 import ContributionHistoryChart from "@/components/ContributionHistoryChart";
 import EmptyState from "@/components/EmptyState";
@@ -35,17 +36,21 @@ export default function ProjectResultPage({
   const [tasks, setTasks] = useState<TaskDTO[]>([]);
   const [records, setRecords] = useState<RecordItem[]>([]);
   const [snapshots, setSnapshots] = useState<ContributionHistorySnapshot[]>([]);
+  const [activities, setActivities] = useState<ProjectActivityDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const [projectRes, taskRes, recordRes, historyRes] = await Promise.all([
+      const [projectRes, taskRes, recordRes, historyRes, activityRes] = await Promise.all([
         getProject(projectId),
         listTasks(projectId),
         listRecords(projectId),
         getContributionHistory(projectId),
+        getProjectActivity(projectId, 20),
       ]);
       if (projectRes.project.status === "ACTIVE") {
         router.replace(`/projects/${projectId}`);
@@ -57,6 +62,7 @@ export default function ProjectResultPage({
       setTasks(taskRes.tasks);
       setRecords(recordRes.records);
       setSnapshots(historyRes.snapshots);
+      setActivities(activityRes.activities);
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : "최종 결과를 불러오지 못했습니다.");
     } finally {
@@ -88,6 +94,7 @@ export default function ProjectResultPage({
       router.refresh();
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : "프로젝트를 다시 시작하지 못했습니다.");
+    } finally {
       setBusy(false);
     }
   }
@@ -97,7 +104,7 @@ export default function ProjectResultPage({
   }
 
   if (error && !project) {
-    return <div className="page-container"><p className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-600">{error}</p></div>;
+    return <div className="page-container"><div className="rounded-xl bg-rose-50 px-4 py-4 text-center"><p className="text-sm text-rose-600">{error}</p><button type="button" onClick={load} className="btn-secondary mt-3 rounded-xl px-4 py-2 text-sm font-semibold">다시 시도</button></div></div>;
   }
 
   const startedAt = new Date(project!.createdAt);
@@ -160,6 +167,24 @@ export default function ProjectResultPage({
         <h2 className="text-base font-bold text-slate-800">기여도 변화</h2>
         <p className="mt-1 text-xs text-slate-500">각 AI 분석 결과와 최종 확정 시점의 변화입니다. 점에 마우스를 올리면 세부 값을 볼 수 있습니다.</p>
         <div className="mt-5"><ContributionHistoryChart snapshots={snapshots} /></div>
+      </section>
+
+      <section className="glass-card mt-6 rounded-2xl p-5 sm:p-6">
+        <h2 className="text-base font-bold text-slate-800">프로젝트 활동</h2>
+        <p className="mt-1 text-xs text-slate-500">종료된 프로젝트의 기록과 변경 과정입니다.</p>
+        {activities.length === 0 ? (
+          <p className="mt-5 text-sm text-slate-500">아직 프로젝트 활동이 없습니다.</p>
+        ) : (
+          <ul className="relative mt-5 grid gap-4 before:absolute before:bottom-3 before:left-[5px] before:top-3 before:w-px before:bg-indigo-100">
+            {activities.map((activity) => (
+              <li key={activity.id} className="relative pl-5 before:absolute before:left-0 before:top-1.5 before:h-2.5 before:w-2.5 before:rounded-full before:border-2 before:border-white before:bg-indigo-500">
+                <div className="flex flex-wrap items-center gap-2"><p className="text-sm font-semibold text-slate-800">{activity.title}</p>{activity.source && <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${activity.source === "MANUAL" ? "bg-emerald-50 text-emerald-700" : "bg-indigo-50 text-indigo-600"}`}>{activity.source === "MANUAL" ? "직접 수정" : "AI"}</span>}</div>
+                <p className="mt-0.5 text-xs text-slate-500">{activity.description}</p>
+                <div className="mt-1 flex items-center gap-2 text-[10px] text-slate-400"><time>{new Date(activity.timestamp).toLocaleString("ko-KR")}</time>{activity.actor && <span>· {activity.actor}</span>}{activity.taskId && <button type="button" onClick={() => router.push(`/projects/${projectId}/tasks/${activity.taskId}`)} className="font-semibold text-indigo-500">Task 보기</button>}</div>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
 
       <section className="glass-card mt-6 rounded-2xl p-5 sm:p-6">

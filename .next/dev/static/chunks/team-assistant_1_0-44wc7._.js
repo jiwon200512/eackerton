@@ -28,45 +28,56 @@ function HomePage() {
     const [name, setName] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     const [creating, setCreating] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [projectListError, setProjectListError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [inviteCode, setInviteCode] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     const [joining, setJoining] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [joinError, setJoinError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const loadProjects = (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "HomePage.useCallback[loadProjects]": async ()=>{
+            setProjects(null);
+            setProjectListError(null);
+            try {
+                const { projects: loadedProjects } = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$lib$2f$apiClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["listProjects"])();
+                setProjects(loadedProjects);
+                const entries = await Promise.all(loadedProjects.map({
+                    "HomePage.useCallback[loadProjects]": async (project)=>{
+                        try {
+                            const { tasks } = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$lib$2f$apiClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["listTasks"])(project.id);
+                            return [
+                                project.id,
+                                {
+                                    total: tasks.length,
+                                    done: tasks.filter({
+                                        "HomePage.useCallback[loadProjects]": (task)=>task.status === "DONE"
+                                    }["HomePage.useCallback[loadProjects]"]).length
+                                }
+                            ];
+                        } catch  {
+                            return [
+                                project.id,
+                                {
+                                    total: 0,
+                                    done: 0
+                                }
+                            ];
+                        }
+                    }
+                }["HomePage.useCallback[loadProjects]"]));
+                setTaskStats(Object.fromEntries(entries));
+            } catch (caught) {
+                setProjects([]);
+                setProjectListError(caught instanceof __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$lib$2f$apiClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ApiError"] ? caught.message : "프로젝트를 불러오지 못했습니다.");
+            }
+        }
+    }["HomePage.useCallback[loadProjects]"], []);
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "HomePage.useEffect": ()=>{
-            (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$lib$2f$apiClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["listProjects"])().then({
-                "HomePage.useEffect": async ({ projects: loadedProjects })=>{
-                    setProjects(loadedProjects);
-                    const entries = await Promise.all(loadedProjects.map({
-                        "HomePage.useEffect": async (project)=>{
-                            try {
-                                const { tasks } = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$lib$2f$apiClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["listTasks"])(project.id);
-                                return [
-                                    project.id,
-                                    {
-                                        total: tasks.length,
-                                        done: tasks.filter({
-                                            "HomePage.useEffect": (task)=>task.status === "DONE"
-                                        }["HomePage.useEffect"]).length
-                                    }
-                                ];
-                            } catch  {
-                                return [
-                                    project.id,
-                                    {
-                                        total: 0,
-                                        done: 0
-                                    }
-                                ];
-                            }
-                        }
-                    }["HomePage.useEffect"]));
-                    setTaskStats(Object.fromEntries(entries));
-                }
-            }["HomePage.useEffect"]).catch({
-                "HomePage.useEffect": (caught)=>setError(caught instanceof __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$lib$2f$apiClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ApiError"] ? caught.message : "프로젝트 목록을 불러오지 못했습니다.")
-            }["HomePage.useEffect"]);
+            // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data fetch on mount
+            loadProjects();
         }
-    }["HomePage.useEffect"], []);
+    }["HomePage.useEffect"], [
+        loadProjects
+    ]);
     async function handleCreate(event) {
         event.preventDefault();
         if (!name.trim()) return;
@@ -77,6 +88,7 @@ function HomePage() {
             router.push(`/projects/${project.id}/members`);
         } catch (caught) {
             setError(caught instanceof __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$lib$2f$apiClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ApiError"] ? caught.message : "프로젝트 생성에 실패했습니다.");
+        } finally{
             setCreating(false);
         }
     }
@@ -90,6 +102,7 @@ function HomePage() {
             router.push(`/projects/${projectId}`);
         } catch (caught) {
             setJoinError(caught instanceof __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$lib$2f$apiClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["ApiError"] ? caught.message : "참가에 실패했습니다.");
+        } finally{
             setJoining(false);
         }
     }
@@ -106,7 +119,7 @@ function HomePage() {
                         children: "Effortly · AI Project Assistant"
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 73,
+                        lineNumber: 85,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
@@ -118,13 +131,13 @@ function HomePage() {
                                 children: "명확한 성과로"
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                lineNumber: 74,
+                                lineNumber: 86,
                                 columnNumber: 103
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 74,
+                        lineNumber: 86,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -132,13 +145,13 @@ function HomePage() {
                         children: "대화와 회의 기록을 AI가 분석해 업무 현황과 팀원별 기여도를 한곳에서 정리합니다."
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 75,
+                        lineNumber: 87,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                lineNumber: 72,
+                lineNumber: 84,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -167,7 +180,7 @@ function HomePage() {
                                 children: icon
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                lineNumber: 80,
+                                lineNumber: 92,
                                 columnNumber: 77
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -175,7 +188,7 @@ function HomePage() {
                                 children: title
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                lineNumber: 80,
+                                lineNumber: 92,
                                 columnNumber: 211
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -183,18 +196,18 @@ function HomePage() {
                                 children: description
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                lineNumber: 80,
+                                lineNumber: 92,
                                 columnNumber: 277
                             }, this)
                         ]
                     }, title, true, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 80,
+                        lineNumber: 92,
                         columnNumber: 11
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                lineNumber: 78,
+                lineNumber: 90,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -207,7 +220,7 @@ function HomePage() {
                         children: "새 프로젝트 만들기"
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 85,
+                        lineNumber: 97,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -215,7 +228,7 @@ function HomePage() {
                         children: "프로젝트 이름을 입력하면 팀원 등록부터 시작합니다."
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 86,
+                        lineNumber: 98,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -229,7 +242,7 @@ function HomePage() {
                                 className: "glass-input min-w-0 flex-1 rounded-xl px-4 py-3 text-sm"
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                lineNumber: 87,
+                                lineNumber: 99,
                                 columnNumber: 63
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -239,13 +252,13 @@ function HomePage() {
                                 children: creating ? "생성 중..." : "만들기"
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                lineNumber: 87,
+                                lineNumber: 99,
                                 columnNumber: 251
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 87,
+                        lineNumber: 99,
                         columnNumber: 9
                     }, this),
                     error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -254,13 +267,13 @@ function HomePage() {
                         children: error
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 88,
+                        lineNumber: 100,
                         columnNumber: 19
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                lineNumber: 84,
+                lineNumber: 96,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -273,7 +286,7 @@ function HomePage() {
                         children: "초대 코드로 참가하기"
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 92,
+                        lineNumber: 104,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -281,7 +294,7 @@ function HomePage() {
                         children: "팀장이 공유한 초대 코드를 입력하세요."
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 93,
+                        lineNumber: 105,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -295,7 +308,7 @@ function HomePage() {
                                 className: "glass-input min-w-0 flex-1 rounded-xl px-4 py-3 text-sm uppercase"
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                lineNumber: 94,
+                                lineNumber: 106,
                                 columnNumber: 63
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -305,13 +318,13 @@ function HomePage() {
                                 children: joining ? "참가 중..." : "참가하기"
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                lineNumber: 94,
+                                lineNumber: 106,
                                 columnNumber: 268
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 94,
+                        lineNumber: 106,
                         columnNumber: 9
                     }, this),
                     joinError && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -320,13 +333,13 @@ function HomePage() {
                         children: joinError
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 95,
+                        lineNumber: 107,
                         columnNumber: 23
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                lineNumber: 91,
+                lineNumber: 103,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -338,45 +351,52 @@ function HomePage() {
                         count: projects ? activeProjects.length : null
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 99,
+                        lineNumber: 111,
                         columnNumber: 9
                     }, this),
                     projects === null ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$components$2f$Spinner$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
-                        label: "불러오는 중..."
+                        label: "진행 중인 프로젝트 불러오는 중..."
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 100,
+                        lineNumber: 112,
                         columnNumber: 30
+                    }, this) : projectListError ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(LoadError, {
+                        message: projectListError,
+                        onRetry: loadProjects
+                    }, void 0, false, {
+                        fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                        lineNumber: 112,
+                        columnNumber: 92
                     }, this) : projects.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$components$2f$EmptyState$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                         title: "첫 프로젝트를 만들어보세요.",
                         description: "위에서 프로젝트 이름을 입력하고 시작할 수 있습니다."
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 100,
-                        columnNumber: 86
+                        lineNumber: 112,
+                        columnNumber: 182
                     }, this) : activeProjects.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$components$2f$EmptyState$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                         title: "진행 중인 프로젝트가 없습니다.",
                         description: "새 프로젝트를 만들거나 종료된 프로젝트를 다시 시작할 수 있습니다."
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 100,
-                        columnNumber: 201
+                        lineNumber: 112,
+                        columnNumber: 297
                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(ProjectGrid, {
                         projects: activeProjects,
                         taskStats: taskStats,
                         onOpen: (project)=>router.push(`/projects/${project.id}`)
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 100,
-                        columnNumber: 296
+                        lineNumber: 112,
+                        columnNumber: 392
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                lineNumber: 98,
+                lineNumber: 110,
                 columnNumber: 7
             }, this),
-            projects !== null && completedProjects.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
+            projects !== null && !projectListError && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
                 className: "mx-auto mt-10 max-w-4xl",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(SectionTitle, {
@@ -386,38 +406,75 @@ function HomePage() {
                         muted: true
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 104,
+                        lineNumber: 116,
                         columnNumber: 54
                     }, this),
-                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(ProjectGrid, {
+                    completedProjects.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$components$2f$EmptyState$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
+                        title: "아직 종료된 프로젝트가 없습니다.",
+                        description: "프로젝트를 종료하면 최종 결과를 이곳에서 다시 확인할 수 있습니다."
+                    }, void 0, false, {
+                        fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                        lineNumber: 116,
+                        columnNumber: 178
+                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(ProjectGrid, {
                         projects: completedProjects,
                         taskStats: taskStats,
                         onOpen: (project)=>router.push(`/projects/${project.id}/result`),
                         completed: true
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 104,
-                        columnNumber: 144
+                        lineNumber: 116,
+                        columnNumber: 274
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                lineNumber: 104,
+                lineNumber: 116,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-        lineNumber: 71,
+        lineNumber: 83,
         columnNumber: 5
     }, this);
 }
-_s(HomePage, "oESqzY84odrALF7WnJkn4UnTR0k=", false, function() {
+_s(HomePage, "U53b1qrKccnQyogkf2zY5xJssNQ=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"]
     ];
 });
 _c = HomePage;
+function LoadError({ message, onRetry }) {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "glass-card rounded-2xl p-6 text-center",
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                className: "text-sm text-rose-600",
+                children: message
+            }, void 0, false, {
+                fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                lineNumber: 123,
+                columnNumber: 66
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                type: "button",
+                onClick: onRetry,
+                className: "btn-secondary mt-3 rounded-xl px-4 py-2 text-sm font-semibold",
+                children: "다시 시도"
+            }, void 0, false, {
+                fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+                lineNumber: 123,
+                columnNumber: 116
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
+        lineNumber: 123,
+        columnNumber: 10
+    }, this);
+}
+_c1 = LoadError;
 function SectionTitle({ eyebrow, title, count, muted = false }) {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "mb-4 flex items-end justify-between",
@@ -429,7 +486,7 @@ function SectionTitle({ eyebrow, title, count, muted = false }) {
                         children: eyebrow
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 111,
+                        lineNumber: 127,
                         columnNumber: 68
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
@@ -437,13 +494,13 @@ function SectionTitle({ eyebrow, title, count, muted = false }) {
                         children: title
                     }, void 0, false, {
                         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                        lineNumber: 111,
+                        lineNumber: 127,
                         columnNumber: 196
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                lineNumber: 111,
+                lineNumber: 127,
                 columnNumber: 63
             }, this),
             count !== null && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -455,17 +512,17 @@ function SectionTitle({ eyebrow, title, count, muted = false }) {
                 ]
             }, void 0, true, {
                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                lineNumber: 111,
+                lineNumber: 127,
                 columnNumber: 287
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-        lineNumber: 111,
+        lineNumber: 127,
         columnNumber: 10
     }, this);
 }
-_c1 = SectionTitle;
+_c2 = SectionTitle;
 function ProjectGrid({ projects, taskStats, onOpen, completed = false }) {
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
         className: "grid gap-4 sm:grid-cols-2",
@@ -489,7 +546,7 @@ function ProjectGrid({ projects, taskStats, onOpen, completed = false }) {
                                     children: project.name.charAt(0).toUpperCase()
                                 }, void 0, false, {
                                     fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                    lineNumber: 118,
+                                    lineNumber: 134,
                                     columnNumber: 324
                                 }, this),
                                 completed ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -497,20 +554,20 @@ function ProjectGrid({ projects, taskStats, onOpen, completed = false }) {
                                     children: "종료됨"
                                 }, void 0, false, {
                                     fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                    lineNumber: 118,
+                                    lineNumber: 134,
                                     columnNumber: 559
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                     className: "text-lg text-slate-300 group-hover:translate-x-1 group-hover:text-indigo-500",
                                     children: "→"
                                 }, void 0, false, {
                                     fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                    lineNumber: 118,
+                                    lineNumber: 134,
                                     columnNumber: 665
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                            lineNumber: 118,
+                            lineNumber: 134,
                             columnNumber: 268
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -518,7 +575,7 @@ function ProjectGrid({ projects, taskStats, onOpen, completed = false }) {
                             children: project.name
                         }, void 0, false, {
                             fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                            lineNumber: 118,
+                            lineNumber: 134,
                             columnNumber: 775
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -526,7 +583,7 @@ function ProjectGrid({ projects, taskStats, onOpen, completed = false }) {
                             children: completed && project.completedAt ? `종료 ${new Date(project.completedAt).toLocaleDateString("ko-KR")}` : `최근 업데이트 ${new Date(project.updatedAt).toLocaleDateString("ko-KR")}`
                         }, void 0, false, {
                             fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                            lineNumber: 118,
+                            lineNumber: 134,
                             columnNumber: 855
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -541,7 +598,7 @@ function ProjectGrid({ projects, taskStats, onOpen, completed = false }) {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                    lineNumber: 118,
+                                    lineNumber: 134,
                                     columnNumber: 1158
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -551,13 +608,13 @@ function ProjectGrid({ projects, taskStats, onOpen, completed = false }) {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                    lineNumber: 118,
+                                    lineNumber: 134,
                                     columnNumber: 1202
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                            lineNumber: 118,
+                            lineNumber: 134,
                             columnNumber: 1075
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$team$2d$assistant_1$2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -569,37 +626,38 @@ function ProjectGrid({ projects, taskStats, onOpen, completed = false }) {
                                 }
                             }, void 0, false, {
                                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                                lineNumber: 118,
+                                lineNumber: 134,
                                 columnNumber: 1307
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                            lineNumber: 118,
+                            lineNumber: 134,
                             columnNumber: 1234
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                    lineNumber: 118,
+                    lineNumber: 134,
                     columnNumber: 33
                 }, this)
             }, project.id, false, {
                 fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-                lineNumber: 118,
+                lineNumber: 134,
                 columnNumber: 12
             }, this);
         })
     }, void 0, false, {
         fileName: "[project]/team-assistant_1/app/(protected)/page.tsx",
-        lineNumber: 115,
+        lineNumber: 131,
         columnNumber: 10
     }, this);
 }
-_c2 = ProjectGrid;
-var _c, _c1, _c2;
+_c3 = ProjectGrid;
+var _c, _c1, _c2, _c3;
 __turbopack_context__.k.register(_c, "HomePage");
-__turbopack_context__.k.register(_c1, "SectionTitle");
-__turbopack_context__.k.register(_c2, "ProjectGrid");
+__turbopack_context__.k.register(_c1, "LoadError");
+__turbopack_context__.k.register(_c2, "SectionTitle");
+__turbopack_context__.k.register(_c3, "ProjectGrid");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }

@@ -23,6 +23,16 @@ AI는 Evidence를 바탕으로 Task 내부의 참여자와 상대 비율만 판�
 npm run db:migrate
 ```
 
+## 설명 가능한 기여도와 프로젝트 활동
+
+- `GET /api/projects/[projectId]/contribution/breakdown`은 기존 기여도 계산기와 동일한 내부 배분 결과를 사용해 팀원별 Task 점수, 상태 배율, 참여율과 MemberTaskScore를 반환합니다.
+- `task_contributors.source`는 새 AI 판단을 `AI`, 사용자가 직접 저장한 참여 비율을 `MANUAL`로 기록합니다. 출처 추적 이전 행은 `NULL`로 유지해 출처를 임의로 추정하지 않습니다.
+- `record_changes.confidence`가 `0.7` 미만인 AI 변경은 Dashboard의 확인 필요 목록에 표시하며, legacy `NULL` 값은 경고로 분류하지 않습니다.
+- `GET /api/projects/[projectId]/activity`는 기존 Record, AI `record_changes`, 최소 수동 변경 로그를 시간순으로 합쳐 반환합니다.
+- 수동 Task 변경은 Record와 연결되지 않으므로 `manual_task_changes`에 필요한 정보만 저장합니다. 별도의 범용 audit/notification 시스템은 추가하지 않습니다.
+
+위 source와 수동 변경 로그를 추가하는 비파괴 migration은 `0007_keen_phil_sheldon.sql`입니다. 기존 프로젝트와 Task 데이터는 삭제하거나 backfill하지 않습니다.
+
 ## 프로젝트 종료와 최종 결과
 
 프로젝트 OWNER는 대시보드의 `프로젝트 종료` 버튼으로 현재 기여도를 확정할 수 있습니다. 종료 처리는 한 트랜잭션에서 프로젝트를 `COMPLETED`로 전환하고 최종 기여도 스냅샷을 저장합니다. 종료된 프로젝트는 홈의 아카이브 영역과 `/projects/[projectId]/result`에서 조회할 수 있습니다.
@@ -57,7 +67,7 @@ npm run build
 - OpenAI Responses API와 Structured Outputs
 - Vitest
 
-## 로컬 실행126
+## 로컬 실행
 
 ```bash
 npm install

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
-import { evidence, members, tasks } from "@/lib/db/schema";
+import { evidence, manualTaskChanges, members, tasks } from "@/lib/db/schema";
 import { and, desc, eq } from "drizzle-orm";
 import { AppError, Errors, toErrorResponse } from "@/lib/errors";
 import { TASK_STATUSES } from "@/lib/types";
@@ -22,6 +22,26 @@ import {
 } from "@/services/tasks/contributors";
 
 type Params = { params: Promise<{ projectId: string; taskId: string }> };
+
+const STATUS_LABEL = {
+  TODO: "할 일",
+  IN_PROGRESS: "진행 중",
+  DONE: "완료",
+} as const;
+
+function contributorSummary(
+  contributors: ContributorShare[],
+  memberNameById: Map<string, string>
+) {
+  return contributors.length > 0
+    ? contributors
+        .map(
+          (contributor) =>
+            `${memberNameById.get(contributor.memberId) ?? "알 수 없는 팀원"} ${contributor.share}%`
+        )
+        .join(" / ")
+    : "참여자 없음";
+}
 
 async function loadTask(projectId: string, taskId: string) {
   const [task] = await db
@@ -115,11 +135,15 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     const body = await req.json().catch(() => ({}));
     const updates: Partial<typeof tasks.$inferInsert> = {};
     let contributorUpdate: ContributorShare[] | undefined;
+    const manualSummaryParts: string[] = [];
 
     if (body.title !== undefined) {
       const title = typeof body.title === "string" ? body.title.trim() : "";
       if (!title) throw new AppError("INVALID_TITLE", "Task 이름을 입력해주세요.", 400);
       updates.title = title;
+      if (title !== task.title) {
+        manualSummaryParts.push(`제목: "${task.title}" → "${title}"`);
+      }
     }
 
     if (body.status !== undefined) {
@@ -127,6 +151,11 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         throw new AppError("INVALID_STATUS", "잘못된 상태 값입니다.", 400);
       }
       updates.status = body.status;
+      if (body.status !== task.status) {
+        manualSummaryParts.push(
+          `상태: ${STATUS_LABEL[task.status as keyof typeof STATUS_LABEL]} → ${STATUS_LABEL[body.status as keyof typeof STATUS_LABEL]}`
+        );
+      }
     }
 
     if (body.assigneeId !== undefined && body.contributors !== undefined) {
@@ -172,7 +201,10 @@ export async function PATCH(req: NextRequest, { params }: Params) {
           );
         }
       }
-      contributorUpdate = parsedContributors;
+      contributorUpdate = parsedContributors.map((contributor) => ({
+        ...contributor,
+        source: "MANUAL" as const,
+      }));
       updates.assigneeId =
         parsedContributors.length === 1 ? parsedContributors[0].memberId : null;
     } else if (body.assigneeId !== undefined) {
@@ -192,8 +224,39 @@ export async function PATCH(req: NextRequest, { params }: Params) {
           );
         }
         updates.assigneeId = assignee.id;
-        contributorUpdate = [{ memberId: assignee.id, share: 100 }];
+        contributorUpdate = [
+          { memberId: assignee.id, share: 100, source: "MANUAL" },
+        ];
       }
+    }
+
+    if (contributorUpdate !== undefined) {
+      const [projectMemberRows, previousContributorRows] = await Promise.all([
+        db
+          .select({ id: members.id, name: members.name })
+          .from(members)
+          .where(eq(members.projectId, projectId)),
+        loadTaskContributorRows(db, [taskId]),
+      ]);
+      const memberNameById = new Map(
+        projectMemberRows.map((member) => [member.id, member.name])
+      );
+      const previousContributors: ContributorShare[] =
+        previousContributorRows.length > 0
+          ? previousContributorRows.map((contributor) => ({
+              memberId: contributor.memberId,
+              share: contributor.share,
+              source:
+                contributor.source === "AI" || contributor.source === "MANUAL"
+                  ? contributor.source
+                  : null,
+            }))
+          : task.assigneeId
+            ? [{ memberId: task.assigneeId, share: 100, source: null }]
+            : [];
+      manualSummaryParts.push(
+        `참여자: ${contributorSummary(previousContributors, memberNameById)} → ${contributorSummary(contributorUpdate, memberNameById)}`
+      );
     }
 
     if (Object.keys(updates).length === 0) {
@@ -211,6 +274,24 @@ export async function PATCH(req: NextRequest, { params }: Params) {
         .returning();
       if (contributorUpdate !== undefined) {
         await replaceTaskContributors(tx, taskId, contributorUpdate);
+      }
+      if (manualSummaryParts.length > 0) {
+        await tx
+          .insert(manualTaskChanges)
+          .values({
+            projectId,
+            taskId,
+            actorUserId: user.id,
+            taskTitle: updatedTask.title,
+            changeType:
+              contributorUpdate !== undefined
+                ? "TASK_CONTRIBUTORS_CHANGE"
+                : body.status !== undefined
+                  ? "TASK_STATUS_CHANGE"
+                  : "TASK_UPDATE",
+            summary: manualSummaryParts.join(" · "),
+          })
+          .run();
       }
       return updatedTask;
     });

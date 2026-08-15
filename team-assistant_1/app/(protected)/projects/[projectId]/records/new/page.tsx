@@ -2,7 +2,7 @@
 
 import { useEffect, useState, use, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { ApiError, analyzeRecord, createRecord, getProject } from "@/lib/apiClient";
+import { ApiError, analyzeRecord, createRecord, getProject, listRecords } from "@/lib/apiClient";
 import Spinner from "@/components/Spinner";
 import { MAX_RECORD_CHARS } from "@/lib/records/constants";
 
@@ -21,12 +21,18 @@ export default function NewRecordPage({
   const [text, setText] = useState("");
   const [fileName, setFileName] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
+  const [failedRecordId, setFailedRecordId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [projectStatus, setProjectStatus] = useState<"ACTIVE" | "COMPLETED" | null>(null);
 
   useEffect(() => {
-    getProject(projectId)
-      .then(({ project }) => setProjectStatus(project.status))
+    Promise.all([getProject(projectId), listRecords(projectId)])
+      .then(([{ project }, { records }]) => {
+        setProjectStatus(project.status);
+        setFailedRecordId(
+          records.find((record) => record.analysisStatus === "FAILED")?.id ?? null
+        );
+      })
       .catch((caught) => setError(caught instanceof ApiError ? caught.message : "프로젝트를 불러오지 못했습니다."));
   }, [projectId]);
 
@@ -36,13 +42,18 @@ export default function NewRecordPage({
       return;
     }
     setError(null);
-    const content = await file.text();
-    if (content.length > MAX_RECORD_CHARS) {
-      setError(`기록이 너무 깁니다. ${MAX_RECORD_CHARS.toLocaleString()}자 이하로 입력해주세요.`);
-      return;
+    try {
+      const content = await file.text();
+      if (content.length > MAX_RECORD_CHARS) {
+        setError(`기록이 너무 깁니다. ${MAX_RECORD_CHARS.toLocaleString()}자 이하로 입력해주세요.`);
+        return;
+      }
+      setText(content);
+      setFileName(file.name);
+      setFailedRecordId(null);
+    } catch {
+      setError("파일을 읽지 못했습니다. 다른 txt 파일을 선택해주세요.");
     }
-    setText(content);
-    setFileName(file.name);
   }
 
   async function handleSubmit() {
@@ -56,12 +67,32 @@ export default function NewRecordPage({
     }
     setAnalyzing(true);
     setError(null);
+    setFailedRecordId(null);
+    let createdRecordId: string | null = null;
     try {
       const { record } = await createRecord(projectId, mode, text);
+      createdRecordId = record.id;
       await analyzeRecord(projectId, record.id);
       router.push(`/projects/${projectId}`);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "분석에 실패했습니다.");
+      setFailedRecordId(createdRecordId);
+    } finally {
+      setAnalyzing(false);
+    }
+  }
+
+  async function retryAnalysis() {
+    if (!failedRecordId) return;
+    setAnalyzing(true);
+    setError(null);
+    try {
+      await analyzeRecord(projectId, failedRecordId, true);
+      setFailedRecordId(null);
+      router.push(`/projects/${projectId}`);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "AI 분석 중 문제가 발생했습니다.");
+    } finally {
       setAnalyzing(false);
     }
   }
@@ -122,7 +153,10 @@ export default function NewRecordPage({
         )}
         <textarea
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e) => {
+            setText(e.target.value);
+            setFailedRecordId(null);
+          }}
           placeholder={
             mode === "MANUAL_TEXT"
               ? "예)\n김지원: 로그인 페이지 내가 만들게.\n박민수: 그러면 나는 DB 연결할게.\n이철수: 발표자료는 내가 준비할게."
@@ -137,6 +171,14 @@ export default function NewRecordPage({
       <p className="mt-2 text-right text-xs text-slate-400">{text.length.toLocaleString()} / {MAX_RECORD_CHARS.toLocaleString()}자</p>
 
       {error && <p className="text-sm text-rose-600">{error}</p>}
+
+      {failedRecordId && !analyzing && (
+        <div className="mt-4 rounded-2xl border border-rose-100 bg-rose-50/70 p-4">
+          <p className="text-sm font-bold text-rose-700">분석 실패</p>
+          <p className="mt-1 text-xs leading-5 text-rose-600">기록은 안전하게 저장되었습니다. 같은 기록을 다시 분석할 수 있습니다.</p>
+          <button type="button" onClick={retryAnalysis} className="btn-secondary mt-3 rounded-xl px-4 py-2 text-sm font-semibold">다시 분석</button>
+        </div>
+      )}
 
       {analyzing ? (
         <div className="glass-card mt-5 flex items-center justify-center gap-2 rounded-2xl px-4 py-7">

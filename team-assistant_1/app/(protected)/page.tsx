@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ApiError, createProject, joinProjectByCode, listProjects, listTasks, type Project } from "@/lib/apiClient";
 import EmptyState from "@/components/EmptyState";
@@ -15,26 +15,36 @@ export default function HomePage() {
   const [name, setName] = useState("");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [projectListError, setProjectListError] = useState<string | null>(null);
   const [inviteCode, setInviteCode] = useState("");
   const [joining, setJoining] = useState(false);
   const [joinError, setJoinError] = useState<string | null>(null);
 
-  useEffect(() => {
-    listProjects()
-      .then(async ({ projects: loadedProjects }) => {
-        setProjects(loadedProjects);
-        const entries = await Promise.all(loadedProjects.map(async (project) => {
+  const loadProjects = useCallback(async () => {
+    setProjects(null);
+    setProjectListError(null);
+    try {
+      const { projects: loadedProjects } = await listProjects();
+      setProjects(loadedProjects);
+      const entries = await Promise.all(loadedProjects.map(async (project) => {
           try {
             const { tasks } = await listTasks(project.id);
             return [project.id, { total: tasks.length, done: tasks.filter((task) => task.status === "DONE").length }] as const;
           } catch {
             return [project.id, { total: 0, done: 0 }] as const;
           }
-        }));
-        setTaskStats(Object.fromEntries(entries));
-      })
-      .catch((caught) => setError(caught instanceof ApiError ? caught.message : "프로젝트 목록을 불러오지 못했습니다."));
+      }));
+      setTaskStats(Object.fromEntries(entries));
+    } catch (caught) {
+      setProjects([]);
+      setProjectListError(caught instanceof ApiError ? caught.message : "프로젝트를 불러오지 못했습니다.");
+    }
   }, []);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial data fetch on mount
+    loadProjects();
+  }, [loadProjects]);
 
   async function handleCreate(event: React.FormEvent) {
     event.preventDefault();
@@ -46,6 +56,7 @@ export default function HomePage() {
       router.push(`/projects/${project.id}/members`);
     } catch (caught) {
       setError(caught instanceof ApiError ? caught.message : "프로젝트 생성에 실패했습니다.");
+    } finally {
       setCreating(false);
     }
   }
@@ -60,6 +71,7 @@ export default function HomePage() {
       router.push(`/projects/${projectId}`);
     } catch (caught) {
       setJoinError(caught instanceof ApiError ? caught.message : "참가에 실패했습니다.");
+    } finally {
       setJoining(false);
     }
   }
@@ -97,14 +109,18 @@ export default function HomePage() {
 
       <section className="mx-auto mt-12 max-w-4xl">
         <SectionTitle eyebrow="Workspace" title="진행 중인 프로젝트" count={projects ? activeProjects.length : null} />
-        {projects === null ? <Spinner label="불러오는 중..." /> : projects.length === 0 ? <EmptyState title="첫 프로젝트를 만들어보세요." description="위에서 프로젝트 이름을 입력하고 시작할 수 있습니다." /> : activeProjects.length === 0 ? <EmptyState title="진행 중인 프로젝트가 없습니다." description="새 프로젝트를 만들거나 종료된 프로젝트를 다시 시작할 수 있습니다." /> : <ProjectGrid projects={activeProjects} taskStats={taskStats} onOpen={(project) => router.push(`/projects/${project.id}`)} />}
+        {projects === null ? <Spinner label="진행 중인 프로젝트 불러오는 중..." /> : projectListError ? <LoadError message={projectListError} onRetry={loadProjects} /> : projects.length === 0 ? <EmptyState title="첫 프로젝트를 만들어보세요." description="위에서 프로젝트 이름을 입력하고 시작할 수 있습니다." /> : activeProjects.length === 0 ? <EmptyState title="진행 중인 프로젝트가 없습니다." description="새 프로젝트를 만들거나 종료된 프로젝트를 다시 시작할 수 있습니다." /> : <ProjectGrid projects={activeProjects} taskStats={taskStats} onOpen={(project) => router.push(`/projects/${project.id}`)} />}
       </section>
 
-      {projects !== null && completedProjects.length > 0 && (
-        <section className="mx-auto mt-10 max-w-4xl"><SectionTitle eyebrow="Archive" title="종료된 프로젝트" count={completedProjects.length} muted /><ProjectGrid projects={completedProjects} taskStats={taskStats} onOpen={(project) => router.push(`/projects/${project.id}/result`)} completed /></section>
+      {projects !== null && !projectListError && (
+        <section className="mx-auto mt-10 max-w-4xl"><SectionTitle eyebrow="Archive" title="종료된 프로젝트" count={completedProjects.length} muted />{completedProjects.length === 0 ? <EmptyState title="아직 종료된 프로젝트가 없습니다." description="프로젝트를 종료하면 최종 결과를 이곳에서 다시 확인할 수 있습니다." /> : <ProjectGrid projects={completedProjects} taskStats={taskStats} onOpen={(project) => router.push(`/projects/${project.id}/result`)} completed />}</section>
       )}
     </div>
   );
+}
+
+function LoadError({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return <div className="glass-card rounded-2xl p-6 text-center"><p className="text-sm text-rose-600">{message}</p><button type="button" onClick={onRetry} className="btn-secondary mt-3 rounded-xl px-4 py-2 text-sm font-semibold">다시 시도</button></div>;
 }
 
 function SectionTitle({ eyebrow, title, count, muted = false }: { eyebrow: string; title: string; count: number | null; muted?: boolean }) {

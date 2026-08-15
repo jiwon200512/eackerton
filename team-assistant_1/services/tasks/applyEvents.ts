@@ -6,6 +6,7 @@ import type * as schema from "@/lib/db/schema";
 import type { EventType, TaskStatus } from "@/lib/types";
 import type { ValidatedEvent } from "@/services/ai/validate";
 import { replaceTaskContributors } from "@/services/tasks/contributors";
+import { LOW_CONFIDENCE_THRESHOLD } from "@/lib/ai/confidence";
 
 // Shared base type of both the plain db handle and a transaction (tx)
 // handle, so applyTaskEvents can be called with either. Turso/libSQL
@@ -21,7 +22,12 @@ export interface ExistingTaskRow {
   importance: number;
   difficulty: number;
   workload: number;
-  contributors: { memberId: string; memberName: string; share: number }[];
+  contributors: {
+    memberId: string;
+    memberName: string;
+    share: number;
+    source?: "AI" | "MANUAL" | null;
+  }[];
 }
 
 export interface AppliedChange {
@@ -124,7 +130,12 @@ export async function applyTaskEvents(
       .map((contributor) => {
         const memberId = memberByName.get(contributor.memberName);
         return memberId
-          ? { memberId, memberName: contributor.memberName, share: contributor.share }
+          ? {
+              memberId,
+              memberName: contributor.memberName,
+              share: contributor.share,
+              source: "AI" as const,
+            }
           : null;
       })
       .filter((contributor): contributor is NonNullable<typeof contributor> => contributor !== null);
@@ -293,7 +304,7 @@ export async function applyTaskEvents(
       // Only allow a title refinement when the AI is quite confident, so we
       // don't thrash task names on shaky signal.
       if (
-        event.confidence >= 0.7 &&
+        event.confidence >= LOW_CONFIDENCE_THRESHOLD &&
         event.taskTitle &&
         event.taskTitle !== existing.title
       ) {

@@ -10,6 +10,7 @@ type DB = BaseSQLiteDatabase<"async", ResultSet, typeof schema>;
 export interface ContributorShare {
   memberId: string;
   share: number;
+  source?: "AI" | "MANUAL" | null;
 }
 
 export function normalizeContributorShares<T extends ContributorShare>(
@@ -77,19 +78,33 @@ export async function loadTaskContributorRows(dbLike: DB, taskIds: string[]) {
 }
 
 export function groupContributorRowsByTask(
-  rows: Array<{ taskId: string; memberId: string; share: number }>
+  rows: Array<{
+    taskId: string;
+    memberId: string;
+    share: number;
+    source?: string | null;
+  }>
 ) {
   const grouped = new Map<string, ContributorShare[]>();
   for (const row of rows) {
     const list = grouped.get(row.taskId) ?? [];
-    list.push({ memberId: row.memberId, share: row.share });
+    list.push({
+      memberId: row.memberId,
+      share: row.share,
+      source: row.source === "AI" || row.source === "MANUAL" ? row.source : null,
+    });
     grouped.set(row.taskId, list);
   }
   return grouped;
 }
 
 export function buildContributorDTOsByTask(
-  rows: Array<{ taskId: string; memberId: string; share: number }>,
+  rows: Array<{
+    taskId: string;
+    memberId: string;
+    share: number;
+    source?: string | null;
+  }>,
   memberById: Map<string, { name: string; avatarEmoji: string }>
 ) {
   const grouped = new Map<string, TaskContributorDTO[]>();
@@ -102,6 +117,7 @@ export function buildContributorDTOsByTask(
       name: member.name,
       avatarEmoji: member.avatarEmoji,
       share: row.share,
+      source: row.source === "AI" || row.source === "MANUAL" ? row.source : null,
     });
     grouped.set(row.taskId, list);
   }
@@ -123,7 +139,14 @@ export async function replaceTaskContributors(
   if (contributors.length > 0) {
     await tx
       .insert(taskContributors)
-      .values(contributors.map((contributor) => ({ taskId, ...contributor })))
+      .values(
+        contributors.map((contributor) => ({
+          taskId,
+          memberId: contributor.memberId,
+          share: contributor.share,
+          source: contributor.source ?? null,
+        }))
+      )
       .run();
   }
 }

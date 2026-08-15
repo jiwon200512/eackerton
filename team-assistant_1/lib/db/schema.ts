@@ -182,6 +182,9 @@ export const taskContributors = sqliteTable(
       .notNull()
       .references(() => members.id, { onDelete: "cascade" }),
     share: integer("share").notNull(),
+    // AI | MANUAL. NULL means the row predates source tracking and is not
+    // guessed as either source in the UI.
+    source: text("source"),
     createdAt: integer("created_at", { mode: "timestamp_ms" })
       .notNull()
       .default(sql`(strftime('%s','now') * 1000)`),
@@ -249,6 +252,26 @@ export const recordChanges = sqliteTable("record_changes", {
   summary: text("summary").notNull(),
   reason: text("reason"),
   confidence: real("confidence"),
+  createdAt: integer("created_at", { mode: "timestamp_ms" })
+    .notNull()
+    .default(sql`(strftime('%s','now') * 1000)`),
+});
+
+// Minimal audit trail for human Task edits. AI changes continue to live in
+// record_changes because they belong to a Record; manual changes do not have
+// a recordId, so keeping them separate avoids a destructive table rebuild.
+export const manualTaskChanges = sqliteTable("manual_task_changes", {
+  id: id(),
+  projectId: text("project_id")
+    .notNull()
+    .references(() => projects.id, { onDelete: "cascade" }),
+  taskId: text("task_id").references(() => tasks.id, { onDelete: "set null" }),
+  actorUserId: text("actor_user_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  taskTitle: text("task_title").notNull(),
+  changeType: text("change_type").notNull(),
+  summary: text("summary").notNull(),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
     .notNull()
     .default(sql`(strftime('%s','now') * 1000)`),

@@ -69,6 +69,7 @@ export interface TaskContributorDTO {
   name: string;
   avatarEmoji: string;
   share: number;
+  source: "AI" | "MANUAL" | null;
 }
 
 export type ProjectRole = "OWNER" | "MEMBER";
@@ -101,4 +102,48 @@ export interface RecentChangeDTO {
   reason: string | null;
   confidence: number | null;
   createdAt: number;
+}
+
+export interface ContributionBreakdownTask {
+  taskId: string;
+  title: string;
+  status: TaskStatus;
+  importance: number;
+  difficulty: number;
+  workload: number;
+  taskScore: number;
+  statusMultiplier: number;
+  contributorShare: number;
+  memberTaskScore: number;
+}
+
+export interface ContributionBreakdownMember {
+  memberId: string;
+  name: string;
+  avatarEmoji: string;
+  percentage: number;
+  rawScore: number;
+  tasks: ContributionBreakdownTask[];
+}
+
+export interface LowConfidenceChangeDTO {
+  id: string;
+  taskId: string | null;
+  taskTitle: string;
+  changeType: EventType;
+  reason: string | null;
+  confidence: number;
+  createdAt: number;
+}
+
+export interface ProjectActivityDTO {
+  id: string;
+  type: "RECORD_CREATED" | "AI_ANALYZED" | "AI_CHANGE" | "MANUAL_CHANGE";
+  timestamp: number;
+  actor: string | null;
+  title: string;
+  description: string;
+  taskId: string | null;
+  recordId: string | null;
+  source: "AI" | "MANUAL" | null;
 }

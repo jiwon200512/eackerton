@@ -30,6 +30,7 @@ export function toTaskDTO(
           name: assignee.name,
           avatarEmoji: normalizeAvatarEmoji(assignee.avatarEmoji),
           share: 100,
+          source: null,
         }]
       : [];
   return {

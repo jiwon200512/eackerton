@@ -43,6 +43,8 @@ export default function TaskDetailPage({
   const [contributorDrafts, setContributorDrafts] = useState<Record<string, string>>({});
 
   const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
       const [res, projectRes] = await Promise.all([
         getTask(projectId, taskId),
@@ -102,6 +104,7 @@ export default function TaskDetailPage({
   }
 
   async function handleDelete() {
+    if (!window.confirm("이 Task를 삭제할까요?")) return;
     setSaving(true);
     setError(null);
     try {
@@ -156,6 +159,7 @@ export default function TaskDetailPage({
     return (
       <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col items-center justify-center gap-3 px-6 py-16">
         <p className="text-sm text-rose-600">{error ?? "Task를 찾을 수 없습니다."}</p>
+        <button type="button" onClick={load} className="btn-primary rounded-xl px-4 py-2 text-sm font-semibold">다시 시도</button>
         <button onClick={() => router.push(`/projects/${projectId}`)} className="text-sm text-slate-500 underline">
           Dashboard로
         </button>
@@ -186,7 +190,7 @@ export default function TaskDetailPage({
                 disabled={saving || !titleDraft.trim()}
                 className="btn-primary rounded-xl px-3 py-2 text-sm font-semibold disabled:opacity-50"
               >
-                저장
+                {saving ? "저장 중..." : "저장"}
               </button>
               <button
                 onClick={() => {
@@ -244,7 +248,7 @@ export default function TaskDetailPage({
                   return <label key={member.id} className={`flex items-center gap-2 rounded-lg border px-3 py-2 ${selected ? "border-indigo-200 bg-indigo-50/50" : "border-slate-200/70 bg-white/45"}`}><input type="checkbox" checked={selected} onChange={() => toggleContributor(member.id)} disabled={saving} className="accent-indigo-600" /><span className="min-w-0 flex-1 truncate text-sm text-slate-700">{member.avatarEmoji} {member.name}</span>{selected && <input type="number" min={1} max={100} step={1} value={contributorDrafts[member.id]} onChange={(event) => setContributorDrafts((current) => ({ ...current, [member.id]: event.target.value }))} onClick={(event) => event.stopPropagation()} disabled={saving} aria-label={`${member.name} 참여 비율`} className="glass-input w-16 rounded-lg px-2 py-1 text-right text-sm" />}{selected && <span className="text-xs text-slate-400">%</span>}</label>;
                 })}
               </div>
-              <div className="mt-3 flex flex-wrap justify-end gap-2"><button type="button" onClick={applyEqualDistribution} disabled={saving || Object.keys(contributorDrafts).length === 0} className="btn-secondary rounded-lg px-3 py-2 text-xs font-semibold disabled:opacity-50">균등 분배</button><button type="button" onClick={saveContributors} disabled={saving} className="btn-primary rounded-lg px-3 py-2 text-xs font-semibold disabled:opacity-50">참여자 저장</button></div>
+              <div className="mt-3 flex flex-wrap justify-end gap-2"><button type="button" onClick={applyEqualDistribution} disabled={saving || Object.keys(contributorDrafts).length === 0} className="btn-secondary rounded-lg px-3 py-2 text-xs font-semibold disabled:opacity-50">균등 분배</button><button type="button" onClick={saveContributors} disabled={saving} className="btn-primary rounded-lg px-3 py-2 text-xs font-semibold disabled:opacity-50">{saving ? "저장 중..." : "참여자 저장"}</button></div>
             </div>
           )}
         </section>
