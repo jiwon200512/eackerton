@@ -4,6 +4,7 @@ import { members, projects, projectUsers } from "@/lib/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { AppError, toErrorResponse } from "@/lib/errors";
 import { requireUser } from "@/lib/auth/session";
+import { toProjectDTO } from "@/lib/projectDto";
 
 export async function GET() {
   try {
@@ -14,7 +15,9 @@ export async function GET() {
       .innerJoin(projects, eq(projectUsers.projectId, projects.id))
       .where(eq(projectUsers.userId, user.id))
       .orderBy(desc(projects.createdAt));
-    return NextResponse.json({ projects: rows.map((r) => r.project) });
+    return NextResponse.json({
+      projects: rows.map((row) => toProjectDTO(row.project)),
+    });
   } catch (err) {
     const { status, body } = toErrorResponse(err);
     return NextResponse.json(body, { status });
@@ -45,7 +48,10 @@ export async function POST(req: NextRequest) {
       });
       return project;
     });
-    return NextResponse.json({ project: created }, { status: 201 });
+    return NextResponse.json(
+      { project: toProjectDTO(created) },
+      { status: 201 }
+    );
   } catch (err) {
     const { status, body } = toErrorResponse(err);
     return NextResponse.json(body, { status });

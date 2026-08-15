@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { projects, projectUsers } from "@/lib/db/schema";
 import { Errors } from "@/lib/errors";
+import { PROJECT_STATUS } from "@/lib/projects/status";
 
 export type ProjectRole = "OWNER" | "MEMBER";
 
@@ -40,6 +41,12 @@ export async function requireProjectOwner(projectId: string, userId: string) {
   const role = await getProjectRole(projectId, userId);
   if (role !== "OWNER") throw Errors.ownerRequired();
   return project;
+}
+
+export function assertProjectIsActive(project: { status: string }): void {
+  if (project.status !== PROJECT_STATUS.ACTIVE) {
+    throw Errors.projectCompleted();
+  }
 }
 
 export async function getProjectOwnerUserId(

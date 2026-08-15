@@ -19,7 +19,10 @@ import { applyTaskEvents, type ExistingTaskRow } from "@/services/tasks/applyEve
 import { calculateContribution } from "@/services/contribution/calculate";
 import type { ParsedMessage, TaskStatus } from "@/lib/types";
 import { requireUser } from "@/lib/auth/session";
-import { requireProjectAccess } from "@/lib/projects/access";
+import {
+  assertProjectIsActive,
+  requireProjectAccess,
+} from "@/lib/projects/access";
 import { selectRecordMessages } from "@/services/ai/selectRecordMessages";
 
 type Params = { params: Promise<{ projectId: string; recordId: string }> };
@@ -29,7 +32,8 @@ export async function POST(req: NextRequest, { params }: Params) {
   try {
     const user = await requireUser();
     const { projectId, recordId } = await params;
-    await requireProjectAccess(projectId, user.id);
+    const project = await requireProjectAccess(projectId, user.id);
+    assertProjectIsActive(project);
     const body = await req.json().catch(() => ({}));
     const force = body?.force === true;
 

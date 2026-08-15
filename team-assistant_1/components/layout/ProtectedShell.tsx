@@ -25,12 +25,20 @@ export default function ProtectedShell({ user, children }: { user: UserInfo; chi
 function ProjectShell({ projectId, user, children }: { projectId: string; user: UserInfo; children: React.ReactNode }) {
   const pathname = usePathname();
   const [projectName, setProjectName] = useState("프로젝트");
+  const [projectStatus, setProjectStatus] = useState<"ACTIVE" | "COMPLETED">("ACTIVE");
   useEffect(() => {
     let active = true;
-    getProject(projectId).then(({ project }) => { if (active) setProjectName(project.name); }).catch(() => undefined);
+    getProject(projectId).then(({ project }) => { if (active) { setProjectName(project.name); setProjectStatus(project.status); } }).catch(() => undefined);
     return () => { active = false; };
   }, [projectId]);
-  const nav = NAV_ITEMS.map((item) => ({ ...item, href: `/projects/${projectId}${item.segment}` }));
+  const visibleItems = projectStatus === "COMPLETED"
+    ? [
+        { segment: "/result", label: "최종 결과", icon: "✓" },
+        NAV_ITEMS[2],
+        NAV_ITEMS[3],
+      ]
+    : NAV_ITEMS;
+  const nav = visibleItems.map((item) => ({ ...item, href: `/projects/${projectId}${item.segment}` }));
   return (
     <div className="min-h-screen lg:flex">
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-56 flex-col border-r border-white/65 bg-white/48 px-3 py-5 shadow-[10px_0_40px_rgba(67,56,202,0.05)] backdrop-blur-3xl lg:flex">
@@ -38,6 +46,7 @@ function ProjectShell({ projectId, user, children }: { projectId: string; user: 
         <div className="mx-2 mt-7 rounded-xl border border-white/75 bg-white/52 px-3 py-3 shadow-sm">
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-indigo-500">Current project</p>
           <p className="mt-1 truncate text-sm font-semibold text-slate-800">{projectName}</p>
+          {projectStatus === "COMPLETED" && <span className="mt-2 inline-flex rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">종료됨</span>}
         </div>
         <nav className="mt-5 flex flex-col gap-1" aria-label="프로젝트 메뉴">
           {nav.map((item) => {

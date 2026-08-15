@@ -117,6 +117,24 @@ export const Errors = {
       "현재 비밀번호가 올바르지 않습니다.",
       400
     ),
+  projectCompleted: () =>
+    new AppError(
+      "PROJECT_COMPLETED",
+      "종료된 프로젝트에서는 내용을 변경할 수 없습니다.",
+      409
+    ),
+  projectAlreadyCompleted: () =>
+    new AppError(
+      "PROJECT_ALREADY_COMPLETED",
+      "이미 종료된 프로젝트입니다.",
+      409
+    ),
+  projectNotCompleted: () =>
+    new AppError(
+      "PROJECT_NOT_COMPLETED",
+      "진행 중인 프로젝트입니다.",
+      409
+    ),
 };
 
 export function toErrorResponse(err: unknown): { status: number; body: { error: string; code: string } } {

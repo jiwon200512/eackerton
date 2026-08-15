@@ -11,6 +11,8 @@ import type {
 export interface Project {
   id: string;
   name: string;
+  status: "ACTIVE" | "COMPLETED";
+  completedAt: number | null;
   createdAt: number | string;
   updatedAt: number | string;
 }
@@ -44,6 +46,20 @@ export interface ProfileUser {
   username: string;
   email: string;
   avatarEmoji: string;
+}
+
+export interface ContributionHistoryMember {
+  memberId: string;
+  name: string;
+  avatarEmoji: string;
+  percentage: number;
+}
+
+export interface ContributionHistorySnapshot {
+  id: string;
+  createdAt: number;
+  sequence: number;
+  members: ContributionHistoryMember[];
 }
 
 class ApiError extends Error {
@@ -118,6 +134,15 @@ export const transferProjectOwner = (projectId: string, memberId: string) =>
     method: "POST",
     body: JSON.stringify({ memberId }),
   });
+export const completeProject = (projectId: string) =>
+  request<{ project: Project; snapshotId: string }>(
+    `/api/projects/${projectId}/complete`,
+    { method: "POST" }
+  );
+export const reopenProject = (projectId: string) =>
+  request<{ project: Project }>(`/api/projects/${projectId}/reopen`, {
+    method: "POST",
+  });
 
 // Profile
 export const getProfile = () =>
@@ -188,6 +213,10 @@ export const deleteTask = (projectId: string, taskId: string) =>
 export const getContribution = (projectId: string) =>
   request<{ contribution: MemberContribution[]; lastSnapshotAt: number | null }>(
     `/api/projects/${projectId}/contribution`
+  );
+export const getContributionHistory = (projectId: string) =>
+  request<{ snapshots: ContributionHistorySnapshot[] }>(
+    `/api/projects/${projectId}/contribution/history`
   );
 export const getRecentChanges = (projectId: string) =>
   request<{ recordId: string | null; analyzedAt: number | null; changes: RecentChangeDTO[] }>(

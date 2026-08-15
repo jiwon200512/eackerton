@@ -4,7 +4,10 @@ import { requireUser } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
 import { members, projectUsers } from "@/lib/db/schema";
 import { Errors, toErrorResponse } from "@/lib/errors";
-import { requireProjectOwner } from "@/lib/projects/access";
+import {
+  assertProjectIsActive,
+  requireProjectOwner,
+} from "@/lib/projects/access";
 
 type Params = { params: Promise<{ projectId: string }> };
 
@@ -12,7 +15,8 @@ export async function POST(req: NextRequest, { params }: Params) {
   try {
     const user = await requireUser();
     const { projectId } = await params;
-    await requireProjectOwner(projectId, user.id);
+    const project = await requireProjectOwner(projectId, user.id);
+    assertProjectIsActive(project);
 
     const body = await req.json().catch(() => ({}));
     const memberId = typeof body.memberId === "string" ? body.memberId : "";

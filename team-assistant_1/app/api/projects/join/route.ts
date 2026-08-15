@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
-import { inviteCodes, members, projectUsers } from "@/lib/db/schema";
+import { inviteCodes, members, projects, projectUsers } from "@/lib/db/schema";
 import { and, eq } from "drizzle-orm";
 import { AppError, Errors, toErrorResponse } from "@/lib/errors";
 import { requireUser } from "@/lib/auth/session";
 import { normalizeInviteCode } from "@/lib/projects/inviteCode";
 import { normalizePersonName } from "@/lib/personName";
+import { assertProjectIsActive } from "@/lib/projects/access";
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,6 +23,13 @@ export async function POST(req: NextRequest) {
       .from(inviteCodes)
       .where(eq(inviteCodes.code, code));
     if (!invite) throw Errors.invalidInviteCode();
+
+    const [project] = await db
+      .select({ status: projects.status })
+      .from(projects)
+      .where(eq(projects.id, invite.projectId));
+    if (!project) throw Errors.notFound("프로젝트");
+    assertProjectIsActive(project);
 
     const [existingMembership, projectMembers] = await Promise.all([
       db

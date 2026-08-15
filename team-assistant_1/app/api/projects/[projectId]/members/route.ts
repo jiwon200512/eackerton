@@ -6,6 +6,7 @@ import { AppError, toErrorResponse } from "@/lib/errors";
 import { requireUser } from "@/lib/auth/session";
 import {
   getProjectOwnerUserId,
+  assertProjectIsActive,
   requireProjectAccess,
   requireProjectOwner,
 } from "@/lib/projects/access";
@@ -39,7 +40,8 @@ export async function POST(req: NextRequest, { params }: Params) {
   try {
     const user = await requireUser();
     const { projectId } = await params;
-    await requireProjectOwner(projectId, user.id);
+    const project = await requireProjectOwner(projectId, user.id);
+    assertProjectIsActive(project);
 
     const body = await req.json().catch(() => ({}));
     const name = typeof body.name === "string" ? body.name.trim() : "";

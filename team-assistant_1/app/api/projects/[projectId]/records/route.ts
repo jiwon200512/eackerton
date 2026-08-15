@@ -5,7 +5,10 @@ import { desc, eq } from "drizzle-orm";
 import { AppError, Errors, toErrorResponse } from "@/lib/errors";
 import { RECORD_TYPES } from "@/lib/types";
 import { requireUser } from "@/lib/auth/session";
-import { requireProjectAccess } from "@/lib/projects/access";
+import {
+  assertProjectIsActive,
+  requireProjectAccess,
+} from "@/lib/projects/access";
 import { MAX_RECORD_CHARS } from "@/lib/records/constants";
 
 type Params = { params: Promise<{ projectId: string }> };
@@ -31,7 +34,8 @@ export async function POST(req: NextRequest, { params }: Params) {
   try {
     const user = await requireUser();
     const { projectId } = await params;
-    await requireProjectAccess(projectId, user.id);
+    const project = await requireProjectAccess(projectId, user.id);
+    assertProjectIsActive(project);
 
     const body = await req.json().catch(() => ({}));
     const type = body.type;

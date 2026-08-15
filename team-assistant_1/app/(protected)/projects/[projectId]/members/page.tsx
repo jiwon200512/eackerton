@@ -36,7 +36,7 @@ export default function MembersPage({ params }: { params: Promise<{ projectId: s
       setProject(res.project);
       setMembers(res.members);
       setRole(res.currentUserRole);
-      if (res.currentUserRole === "OWNER") {
+      if (res.currentUserRole === "OWNER" && res.project.status === "ACTIVE") {
         const { code } = await getInviteCode(projectId);
         setInviteCode(code);
       } else {
@@ -128,6 +128,7 @@ export default function MembersPage({ params }: { params: Promise<{ projectId: s
 
   if (loading) return <div className="flex min-h-[60vh] items-center justify-center"><Spinner label="불러오는 중..." /></div>;
   const isOwner = role === "OWNER";
+  const isCompleted = project?.status === "COMPLETED";
 
   return (
     <div className="page-container max-w-4xl">
@@ -137,10 +138,11 @@ export default function MembersPage({ params }: { params: Promise<{ projectId: s
         <p className="mt-1 text-sm text-slate-500">팀장이 등록한 실명과 회원가입 실명이 일치하면 초대 참가 시 자동으로 연결됩니다.</p>
       </div>
 
-      {!isOwner && <p className="mt-6 rounded-xl border border-indigo-100 bg-white/55 px-4 py-3 text-sm text-slate-600">일반 팀원은 팀원 현황을 조회할 수 있습니다. 추가·삭제·초대 관리는 팀장만 가능합니다.</p>}
+      {isCompleted && <p className="mt-6 rounded-xl border border-slate-200 bg-slate-50/80 px-4 py-3 text-sm text-slate-600">종료된 프로젝트입니다. 팀원 정보는 읽기 전용으로 제공됩니다.</p>}
+      {!isOwner && !isCompleted && <p className="mt-6 rounded-xl border border-indigo-100 bg-white/55 px-4 py-3 text-sm text-slate-600">일반 팀원은 팀원 현황을 조회할 수 있습니다. 추가·삭제·초대 관리는 팀장만 가능합니다.</p>}
       {error && <p role="alert" className="mt-4 text-sm text-rose-600">{error}</p>}
 
-      {isOwner && <>
+      {isOwner && !isCompleted && <>
         <section className="glass-card mt-7 rounded-2xl p-5 sm:p-6">
           <p className="text-sm font-bold text-slate-800">초대 코드</p>
           <p className="mt-1 text-xs text-slate-500">팀원이 회원가입 실명으로 자동 연결될 수 있도록 이 코드를 공유하세요.</p>
@@ -163,12 +165,12 @@ export default function MembersPage({ params }: { params: Promise<{ projectId: s
         <ul className="divide-y divide-white/70">
           {members.map((member) => <li key={member.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
             <div className="flex items-center gap-3"><Avatar emoji={member.avatarEmoji} name={member.name} size="md" /><div><div className="flex flex-wrap items-center gap-2"><span className="text-sm font-semibold text-slate-800">{member.name}</span>{member.isLeader && <Badge tone="indigo">팀장</Badge>}<Badge tone={member.claimed ? "green" : "slate"}>{member.claimed ? "참여 완료" : "초대 대기"}</Badge></div>{member.claimedByMe && <p className="mt-1 text-[11px] text-indigo-500">내 계정</p>}</div></div>
-            {isOwner && !member.isLeader && <div className="flex items-center gap-3">{member.claimed && <button type="button" onClick={() => handleTransfer(member)} disabled={busy} className="text-xs font-semibold text-indigo-600 disabled:opacity-50">팀장 양도</button>}<button type="button" onClick={() => handleDelete(member)} disabled={busy} className="text-xs font-medium text-rose-500 disabled:opacity-50">삭제</button></div>}
+            {isOwner && !isCompleted && !member.isLeader && <div className="flex items-center gap-3">{member.claimed && <button type="button" onClick={() => handleTransfer(member)} disabled={busy} className="text-xs font-semibold text-indigo-600 disabled:opacity-50">팀장 양도</button>}<button type="button" onClick={() => handleDelete(member)} disabled={busy} className="text-xs font-medium text-rose-500 disabled:opacity-50">삭제</button></div>}
           </li>)}
         </ul>
       </section>
 
-      <button onClick={() => router.push(`/projects/${projectId}`)} className="btn-primary mt-6 ml-auto block rounded-xl px-5 py-2.5 text-sm font-semibold">Dashboard로 이동 →</button>
+      <button onClick={() => router.push(isCompleted ? `/projects/${projectId}/result` : `/projects/${projectId}`)} className="btn-primary mt-6 ml-auto block rounded-xl px-5 py-2.5 text-sm font-semibold">{isCompleted ? "최종 결과로 이동 →" : "Dashboard로 이동 →"}</button>
     </div>
   );
 }

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, use, useRef } from "react";
+import { useEffect, useState, use, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { ApiError, analyzeRecord, createRecord } from "@/lib/apiClient";
+import { ApiError, analyzeRecord, createRecord, getProject } from "@/lib/apiClient";
 import Spinner from "@/components/Spinner";
 import { MAX_RECORD_CHARS } from "@/lib/records/constants";
 
@@ -22,6 +22,13 @@ export default function NewRecordPage({
   const [fileName, setFileName] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [projectStatus, setProjectStatus] = useState<"ACTIVE" | "COMPLETED" | null>(null);
+
+  useEffect(() => {
+    getProject(projectId)
+      .then(({ project }) => setProjectStatus(project.status))
+      .catch((caught) => setError(caught instanceof ApiError ? caught.message : "프로젝트를 불러오지 못했습니다."));
+  }, [projectId]);
 
   async function handleFile(file: File) {
     if (!file.name.toLowerCase().endsWith(".txt")) {
@@ -57,6 +64,22 @@ export default function NewRecordPage({
       setError(err instanceof ApiError ? err.message : "분석에 실패했습니다.");
       setAnalyzing(false);
     }
+  }
+
+  if (projectStatus === null && !error) {
+    return <div className="page-container flex min-h-[60vh] items-center justify-center"><Spinner label="프로젝트를 확인하는 중..." /></div>;
+  }
+
+  if (projectStatus === "COMPLETED") {
+    return (
+      <div className="page-container max-w-4xl">
+        <div className="glass-card rounded-2xl p-6 text-center">
+          <h1 className="text-xl font-bold text-slate-900">종료된 프로젝트입니다.</h1>
+          <p className="mt-2 text-sm text-slate-500">종료된 프로젝트에는 새 기록을 추가하거나 AI 분석을 실행할 수 없습니다.</p>
+          <button type="button" onClick={() => router.push(`/projects/${projectId}/result`)} className="btn-primary mt-5 rounded-xl px-5 py-2.5 text-sm font-semibold">최종 결과 보기</button>
+        </div>
+      </div>
+    );
   }
 
   return (
