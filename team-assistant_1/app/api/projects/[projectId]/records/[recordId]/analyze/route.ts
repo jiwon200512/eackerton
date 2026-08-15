@@ -24,6 +24,10 @@ import {
   requireProjectAccess,
 } from "@/lib/projects/access";
 import { selectRecordMessages } from "@/services/ai/selectRecordMessages";
+import {
+  groupContributorRowsByTask,
+  loadTaskContributorRows,
+} from "@/services/tasks/contributors";
 
 type Params = { params: Promise<{ projectId: string; recordId: string }> };
 
@@ -99,7 +103,23 @@ export async function POST(req: NextRequest, { params }: Params) {
 
     const contextTasks: ContextTask[] = [];
     const existingTasksById = new Map<string, ExistingTaskRow>();
+    const contributorRows = await loadTaskContributorRows(
+      db,
+      activeTasks.map((task) => task.id)
+    );
+    const contributorsByTask = groupContributorRowsByTask(contributorRows);
     for (const t of activeTasks) {
+      const explicitContributors = (contributorsByTask.get(t.id) ?? [])
+        .map((contributor) => {
+          const memberName = memberById.get(contributor.memberId);
+          return memberName ? { ...contributor, memberName } : null;
+        })
+        .filter((contributor): contributor is NonNullable<typeof contributor> => contributor !== null);
+      const effectiveContributors = explicitContributors.length > 0
+        ? explicitContributors
+        : t.assigneeId && memberById.has(t.assigneeId)
+          ? [{ memberId: t.assigneeId, memberName: memberById.get(t.assigneeId)!, share: 100 }]
+          : [];
       existingTasksById.set(t.id, {
         id: t.id,
         title: t.title,
@@ -108,12 +128,20 @@ export async function POST(req: NextRequest, { params }: Params) {
         importance: t.importance,
         difficulty: t.difficulty,
         workload: t.workload,
+        contributors: effectiveContributors,
       });
       contextTasks.push({
         id: t.id,
         title: t.title,
         assignee: t.assigneeId ? memberById.get(t.assigneeId) ?? null : null,
         status: t.status as TaskStatus,
+        importance: t.importance,
+        difficulty: t.difficulty,
+        workload: t.workload,
+        contributors: effectiveContributors.map(({ memberName, share }) => ({
+          memberName,
+          share,
+        })),
         recentEvidence: recentEvidenceByTask.get(t.id) ?? [],
       });
     }
@@ -215,11 +243,19 @@ export async function POST(req: NextRequest, { params }: Params) {
         .from(tasks)
         .where(and(eq(tasks.projectId, projectId), eq(tasks.isDeleted, false)))
         .all();
+      const freshContributorRows = await loadTaskContributorRows(
+        tx,
+        freshTasks.map((task) => task.id)
+      );
+      const freshContributorsByTask = groupContributorRowsByTask(
+        freshContributorRows
+      );
 
       const contribution = calculateContribution(
         projectMembers.map((m) => ({ id: m.id, name: m.name })),
         freshTasks.map((t) => ({
           assigneeId: t.assigneeId,
+          contributors: freshContributorsByTask.get(t.id),
           status: t.status as TaskStatus,
           importance: t.importance,
           difficulty: t.difficulty,

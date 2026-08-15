@@ -43,6 +43,13 @@
       "when": 1786733735977,
       "tag": "0005_rich_northstar",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1786772955036,
+      "tag": "0006_petite_vance_astro",
+      "breakpoints": true
     }
   ]
 }

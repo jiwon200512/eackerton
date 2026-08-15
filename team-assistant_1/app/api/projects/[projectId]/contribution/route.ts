@@ -9,6 +9,10 @@ import { requireUser } from "@/lib/auth/session";
 import { requireProjectAccess } from "@/lib/projects/access";
 import { loadProjectMembersWithAvatars } from "@/lib/members/query";
 import { DEFAULT_AVATAR_EMOJI } from "@/lib/avatar";
+import {
+  groupContributorRowsByTask,
+  loadTaskContributorRows,
+} from "@/services/tasks/contributors";
 
 type Params = { params: Promise<{ projectId: string }> };
 
@@ -31,11 +35,17 @@ export async function GET(_req: NextRequest, { params }: Params) {
         .orderBy(desc(contributionSnapshots.createdAt))
         .limit(2),
     ]);
+    const contributorRows = await loadTaskContributorRows(
+      db,
+      taskRows.map((task) => task.id)
+    );
+    const contributorsByTask = groupContributorRowsByTask(contributorRows);
 
     const current = calculateContribution(
       memberRows.map(({ member }) => ({ id: member.id, name: member.name })),
       taskRows.map((t) => ({
         assigneeId: t.assigneeId,
+        contributors: contributorsByTask.get(t.id),
         status: t.status as TaskStatus,
         importance: t.importance,
         difficulty: t.difficulty,

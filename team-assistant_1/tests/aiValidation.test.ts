@@ -46,6 +46,48 @@ describe("AI result validation", () => {
     );
     expect(events).toEqual([]);
   });
+
+  it("drops unknown members and deterministically normalizes valid shares", () => {
+    const events = validateAIResult(
+      {
+        events: [{
+          ...baseEvent,
+          type: "TASK_CONTRIBUTORS_CHANGE",
+          contributors: [
+            { memberName: "김지원", share: 60 },
+            { memberName: "김민수", share: 30 },
+            { memberName: "프로젝트외부인", share: 10 },
+          ],
+        }],
+      },
+      {
+        ...context,
+        memberNames: ["김지원", "김민수"],
+      }
+    );
+    expect(events).toHaveLength(1);
+    expect(events[0].contributors).toEqual([
+      { memberName: "김지원", share: 67 },
+      { memberName: "김민수", share: 33 },
+    ]);
+  });
+
+  it("rejects a contributor change containing a duplicate member", () => {
+    const events = validateAIResult(
+      {
+        events: [{
+          ...baseEvent,
+          type: "TASK_CONTRIBUTORS_CHANGE",
+          contributors: [
+            { memberName: "김지원", share: 60 },
+            { memberName: "김지원", share: 40 },
+          ],
+        }],
+      },
+      context
+    );
+    expect(events).toEqual([]);
+  });
 });
 
 describe("record parser fallback selection", () => {

@@ -4,6 +4,7 @@ import {
   text,
   integer,
   real,
+  check,
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import { randomUUID } from "crypto";
@@ -169,6 +170,36 @@ export const tasks = sqliteTable("tasks", {
     .notNull()
     .default(sql`(strftime('%s','now') * 1000)`),
 });
+
+export const taskContributors = sqliteTable(
+  "task_contributors",
+  {
+    id: id(),
+    taskId: text("task_id")
+      .notNull()
+      .references(() => tasks.id, { onDelete: "cascade" }),
+    memberId: text("member_id")
+      .notNull()
+      .references(() => members.id, { onDelete: "cascade" }),
+    share: integer("share").notNull(),
+    createdAt: integer("created_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(strftime('%s','now') * 1000)`),
+    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
+      .notNull()
+      .default(sql`(strftime('%s','now') * 1000)`),
+  },
+  (table) => [
+    check(
+      "task_contributors_share_check",
+      sql`${table.share} >= 1 AND ${table.share} <= 100`
+    ),
+    uniqueIndex("task_contributors_task_id_member_id_idx").on(
+      table.taskId,
+      table.memberId
+    ),
+  ]
+);
 
 export const evidence = sqliteTable("evidence", {
   id: id(),

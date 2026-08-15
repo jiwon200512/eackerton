@@ -19,6 +19,7 @@ export const STATUS_MULTIPLIER: Record<TaskStatus, number> = {
 
 export interface ScorableTask {
   assigneeId: string | null;
+  contributors?: { memberId: string; share: number }[];
   status: TaskStatus;
   importance: number;
   difficulty: number;
@@ -93,12 +94,33 @@ export function calculateContribution(
   for (const m of members) rawScores.set(m.id, 0);
 
   for (const t of tasks) {
-    if (!t.assigneeId) continue;
-    if (!rawScores.has(t.assigneeId)) continue; // assignee no longer a member
-    rawScores.set(
-      t.assigneeId,
-      (rawScores.get(t.assigneeId) ?? 0) + computeCurrentTaskScore(t)
-    );
+    const taskScore = computeCurrentTaskScore(t);
+    if (t.contributors && t.contributors.length > 0) {
+      const validContributors = t.contributors.filter(
+        (contributor) =>
+          rawScores.has(contributor.memberId) &&
+          Number.isFinite(contributor.share) &&
+          contributor.share > 0
+      );
+      const shareTotal = validContributors.reduce(
+        (sum, contributor) => sum + contributor.share,
+        0
+      );
+      if (shareTotal <= 0) continue;
+      for (const contributor of validContributors) {
+        rawScores.set(
+          contributor.memberId,
+          (rawScores.get(contributor.memberId) ?? 0) +
+            taskScore * (contributor.share / shareTotal)
+        );
+      }
+      continue;
+    }
+
+    // Backwards compatibility: production Tasks created before the
+    // task_contributors migration still award 100% to their assignee.
+    if (!t.assigneeId || !rawScores.has(t.assigneeId)) continue;
+    rawScores.set(t.assigneeId, (rawScores.get(t.assigneeId) ?? 0) + taskScore);
   }
 
   const total = [...rawScores.values()].reduce((a, b) => a + b, 0);

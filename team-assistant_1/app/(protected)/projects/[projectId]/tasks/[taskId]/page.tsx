@@ -14,7 +14,7 @@ import type { EvidenceDTO, TaskDTO, TaskStatus } from "@/lib/types";
 import { TASK_STATUSES } from "@/lib/types";
 import StatusBadge from "@/components/StatusBadge";
 import Spinner from "@/components/Spinner";
-import Avatar from "@/components/Avatar";
+import TaskContributors from "@/components/TaskContributors";
 
 const STATUS_LABEL: Record<TaskStatus, string> = {
   TODO: "할 일",
@@ -40,6 +40,7 @@ export default function TaskDetailPage({
 
   const [titleDraft, setTitleDraft] = useState("");
   const [editingTitle, setEditingTitle] = useState(false);
+  const [contributorDrafts, setContributorDrafts] = useState<Record<string, string>>({});
 
   const load = useCallback(async () => {
     try {
@@ -51,6 +52,14 @@ export default function TaskDetailPage({
       setEvidence(res.evidence);
       setMembers(res.members);
       setTitleDraft(res.task.title);
+      setContributorDrafts(
+        Object.fromEntries(
+          res.task.contributors.map((contributor) => [
+            contributor.memberId,
+            String(contributor.share),
+          ])
+        )
+      );
       setIsCompleted(projectRes.project.status === "COMPLETED");
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Task를 불러오지 못했습니다.");
@@ -64,13 +73,26 @@ export default function TaskDetailPage({
     load();
   }, [load]);
 
-  async function saveUpdate(updates: Partial<{ title: string; status: TaskStatus; assigneeId: string | null }>) {
+  async function saveUpdate(updates: Partial<{
+    title: string;
+    status: TaskStatus;
+    assigneeId: string | null;
+    contributors: { memberId: string; share: number }[];
+  }>) {
     setSaving(true);
     setError(null);
     try {
       const res = await updateTask(projectId, taskId, updates);
       setTask(res.task);
       setTitleDraft(res.task.title);
+      setContributorDrafts(
+        Object.fromEntries(
+          res.task.contributors.map((contributor) => [
+            contributor.memberId,
+            String(contributor.share),
+          ])
+        )
+      );
       setEditingTitle(false);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "저장에 실패했습니다.");
@@ -89,6 +111,37 @@ export default function TaskDetailPage({
       setError(err instanceof ApiError ? err.message : "삭제에 실패했습니다.");
       setSaving(false);
     }
+  }
+
+  function toggleContributor(memberId: string) {
+    setContributorDrafts((current) => {
+      const selected = Object.keys(current).filter((id) => id !== memberId);
+      if (!(memberId in current)) selected.push(memberId);
+      return distributeEqually(selected);
+    });
+  }
+
+  function applyEqualDistribution() {
+    setContributorDrafts((current) => distributeEqually(Object.keys(current)));
+  }
+
+  async function saveContributors() {
+    const contributors = Object.entries(contributorDrafts).map(([memberId, share]) => ({
+      memberId,
+      share: Number(share),
+    }));
+    const valid = contributors.every(
+      (contributor) =>
+        Number.isInteger(contributor.share) &&
+        contributor.share >= 1 &&
+        contributor.share <= 100
+    );
+    const total = contributors.reduce((sum, contributor) => sum + contributor.share, 0);
+    if (!valid || (contributors.length > 0 && total !== 100)) {
+      setError("참여자 비율은 1~100 정수이며 합계가 100이어야 합니다.");
+      return;
+    }
+    await saveUpdate({ contributors });
   }
 
   if (loading) {
@@ -158,27 +211,7 @@ export default function TaskDetailPage({
           <StatusBadge status={task.status} />
         </div>
 
-        <div className="mt-5 grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs font-medium text-slate-500">담당자</label>
-            <div className="mt-1.5 flex items-center gap-2 text-sm font-medium text-slate-700">
-              <Avatar emoji={task.assigneeAvatarEmoji} name={task.assigneeName} size="sm" />
-              <span>{task.assigneeName ?? "미배정"}</span>
-            </div>
-            <select
-              value={task.assigneeId ?? ""}
-              onChange={(e) => saveUpdate({ assigneeId: e.target.value || null })}
-              disabled={saving || isCompleted}
-              className="glass-input mt-1 w-full rounded-xl px-3 py-2.5 text-sm"
-            >
-              <option value="">미배정</option>
-              {members.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.name}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="mt-5 max-w-xs">
           <div>
             <label className="text-xs font-medium text-slate-500">상태</label>
             <select
@@ -195,6 +228,26 @@ export default function TaskDetailPage({
             </select>
           </div>
         </div>
+
+        <section className="mt-6 border-t border-white/70 pt-5">
+          <div className="flex items-center justify-between gap-3">
+            <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-slate-400">참여자</p><p className="mt-1 text-xs text-slate-500">Task 내부 업무 비율이며 전체 프로젝트 기여도가 아닙니다.</p></div>
+            <span className={`text-xs font-bold ${Object.values(contributorDrafts).reduce((sum, share) => sum + Number(share || 0), 0) === 100 || Object.keys(contributorDrafts).length === 0 ? "text-emerald-600" : "text-rose-600"}`}>합계 {Object.values(contributorDrafts).reduce((sum, share) => sum + Number(share || 0), 0)}%</span>
+          </div>
+          <div className="mt-4"><TaskContributors contributors={task.contributors} /></div>
+
+          {!isCompleted && (
+            <div className="mt-5 rounded-xl border border-white/70 bg-white/45 p-4">
+              <div className="grid gap-2 sm:grid-cols-2">
+                {members.map((member) => {
+                  const selected = member.id in contributorDrafts;
+                  return <label key={member.id} className={`flex items-center gap-2 rounded-lg border px-3 py-2 ${selected ? "border-indigo-200 bg-indigo-50/50" : "border-slate-200/70 bg-white/45"}`}><input type="checkbox" checked={selected} onChange={() => toggleContributor(member.id)} disabled={saving} className="accent-indigo-600" /><span className="min-w-0 flex-1 truncate text-sm text-slate-700">{member.avatarEmoji} {member.name}</span>{selected && <input type="number" min={1} max={100} step={1} value={contributorDrafts[member.id]} onChange={(event) => setContributorDrafts((current) => ({ ...current, [member.id]: event.target.value }))} onClick={(event) => event.stopPropagation()} disabled={saving} aria-label={`${member.name} 참여 비율`} className="glass-input w-16 rounded-lg px-2 py-1 text-right text-sm" />}{selected && <span className="text-xs text-slate-400">%</span>}</label>;
+                })}
+              </div>
+              <div className="mt-3 flex flex-wrap justify-end gap-2"><button type="button" onClick={applyEqualDistribution} disabled={saving || Object.keys(contributorDrafts).length === 0} className="btn-secondary rounded-lg px-3 py-2 text-xs font-semibold disabled:opacity-50">균등 분배</button><button type="button" onClick={saveContributors} disabled={saving} className="btn-primary rounded-lg px-3 py-2 text-xs font-semibold disabled:opacity-50">참여자 저장</button></div>
+            </div>
+          )}
+        </section>
 
         <div className="mt-6"><p className="mb-3 text-xs font-bold uppercase tracking-[0.12em] text-slate-400">AI 업무 평가</p><div className="grid grid-cols-3 gap-3 text-center">
           <ScoreBox label="중요도" value={task.importance} />
@@ -234,6 +287,18 @@ export default function TaskDetailPage({
         )}
       </div></div>
     </div>
+  );
+}
+
+function distributeEqually(memberIds: string[]) {
+  if (memberIds.length === 0) return {};
+  const base = Math.floor(100 / memberIds.length);
+  const remainder = 100 - base * memberIds.length;
+  return Object.fromEntries(
+    memberIds.map((memberId, index) => [
+      memberId,
+      String(base + (index < remainder ? 1 : 0)),
+    ])
   );
 }
 

@@ -198,7 +198,12 @@ export const getTask = (projectId: string, taskId: string) =>
 export const updateTask = (
   projectId: string,
   taskId: string,
-  updates: Partial<{ title: string; status: TaskStatus; assigneeId: string | null }>
+  updates: Partial<{
+    title: string;
+    status: TaskStatus;
+    assigneeId: string | null;
+    contributors: { memberId: string; share: number }[];
+  }>
 ) =>
   request<{ task: TaskDTO }>(`/api/projects/${projectId}/tasks/${taskId}`, {
     method: "PATCH",

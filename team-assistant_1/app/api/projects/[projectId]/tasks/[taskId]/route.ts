@@ -13,6 +13,13 @@ import {
 } from "@/lib/projects/access";
 import { toMemberDTO } from "@/lib/memberDto";
 import { loadProjectMembersWithAvatars } from "@/lib/members/query";
+import {
+  buildContributorDTOsByTask,
+  loadTaskContributorRows,
+  replaceTaskContributors,
+  validateExactContributorShares,
+  type ContributorShare,
+} from "@/services/tasks/contributors";
 
 type Params = { params: Promise<{ projectId: string; taskId: string }> };
 
@@ -24,6 +31,28 @@ async function loadTask(projectId: string, taskId: string) {
   return task;
 }
 
+async function serializeTask(projectId: string, task: NonNullable<Awaited<ReturnType<typeof loadTask>>>) {
+  const [memberProfiles, contributorRows] = await Promise.all([
+    loadProjectMembersWithAvatars(projectId),
+    loadTaskContributorRows(db, [task.id]),
+  ]);
+  const memberById = new Map(
+    memberProfiles.map(({ member, avatarEmoji }) => [
+      member.id,
+      { name: member.name, avatarEmoji },
+    ])
+  );
+  const contributorsByTask = buildContributorDTOsByTask(
+    contributorRows,
+    memberById
+  );
+  return toTaskDTO(
+    task,
+    task.assigneeId ? memberById.get(task.assigneeId) ?? null : null,
+    contributorsByTask.get(task.id) ?? []
+  );
+}
+
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
     const user = await requireUser();
@@ -32,7 +61,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
     const task = await loadTask(projectId, taskId);
     if (!task) throw Errors.notFound("Task");
 
-    const [evidenceRows, memberProfiles, ownerUserId] = await Promise.all([
+    const [evidenceRows, memberProfiles, ownerUserId, contributorRows] = await Promise.all([
       db
         .select()
         .from(evidence)
@@ -40,6 +69,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
         .orderBy(desc(evidence.createdAt)),
       loadProjectMembersWithAvatars(projectId),
       getProjectOwnerUserId(projectId),
+      loadTaskContributorRows(db, [taskId]),
     ]);
     const memberById = new Map(
       memberProfiles.map(({ member, avatarEmoji }) => [
@@ -47,9 +77,17 @@ export async function GET(_req: NextRequest, { params }: Params) {
         { name: member.name, avatarEmoji },
       ])
     );
+    const contributorsByTask = buildContributorDTOsByTask(
+      contributorRows,
+      memberById
+    );
 
     return NextResponse.json({
-      task: toTaskDTO(task, task.assigneeId ? memberById.get(task.assigneeId) ?? null : null),
+      task: toTaskDTO(
+        task,
+        task.assigneeId ? memberById.get(task.assigneeId) ?? null : null,
+        contributorsByTask.get(task.id) ?? []
+      ),
       evidence: evidenceRows,
       members: memberProfiles.map(({ member, avatarEmoji }) =>
         toMemberDTO(member, user.id, ownerUserId, avatarEmoji)
@@ -76,6 +114,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
     const body = await req.json().catch(() => ({}));
     const updates: Partial<typeof tasks.$inferInsert> = {};
+    let contributorUpdate: ContributorShare[] | undefined;
 
     if (body.title !== undefined) {
       const title = typeof body.title === "string" ? body.title.trim() : "";
@@ -90,9 +129,56 @@ export async function PATCH(req: NextRequest, { params }: Params) {
       updates.status = body.status;
     }
 
-    if (body.assigneeId !== undefined) {
+    if (body.assigneeId !== undefined && body.contributors !== undefined) {
+      throw new AppError(
+        "AMBIGUOUS_CONTRIBUTORS",
+        "담당자와 참여자 목록을 동시에 수정할 수 없습니다.",
+        400
+      );
+    }
+
+    if (body.contributors !== undefined) {
+      if (!Array.isArray(body.contributors)) {
+        throw new AppError("INVALID_CONTRIBUTORS", "참여자 목록 형식이 올바르지 않습니다.", 400);
+      }
+      const parsedContributors: ContributorShare[] = body.contributors.map((item: unknown) => {
+        if (!item || typeof item !== "object") {
+          throw new AppError("INVALID_CONTRIBUTORS", "참여자 목록 형식이 올바르지 않습니다.", 400);
+        }
+        const candidate = item as { memberId?: unknown; share?: unknown };
+        if (typeof candidate.memberId !== "string" || typeof candidate.share !== "number") {
+          throw new AppError("INVALID_CONTRIBUTORS", "참여자와 비율을 확인해주세요.", 400);
+        }
+        return { memberId: candidate.memberId, share: candidate.share };
+      });
+      if (!validateExactContributorShares(parsedContributors)) {
+        throw new AppError(
+          "INVALID_CONTRIBUTOR_SHARES",
+          "참여자 비율은 1~100 정수이며 중복 없이 합계가 100이어야 합니다.",
+          400
+        );
+      }
+      if (parsedContributors.length > 0) {
+        const projectMembers = await db
+          .select({ id: members.id })
+          .from(members)
+          .where(eq(members.projectId, projectId));
+        const validMemberIds = new Set(projectMembers.map((member) => member.id));
+        if (parsedContributors.some((contributor) => !validMemberIds.has(contributor.memberId))) {
+          throw new AppError(
+            "INVALID_CONTRIBUTOR",
+            "프로젝트에 속한 팀원만 참여자로 지정할 수 있습니다.",
+            400
+          );
+        }
+      }
+      contributorUpdate = parsedContributors;
+      updates.assigneeId =
+        parsedContributors.length === 1 ? parsedContributors[0].memberId : null;
+    } else if (body.assigneeId !== undefined) {
       if (body.assigneeId === null) {
         updates.assigneeId = null;
+        contributorUpdate = [];
       } else {
         const [assignee] = await db
           .select()
@@ -106,42 +192,31 @@ export async function PATCH(req: NextRequest, { params }: Params) {
           );
         }
         updates.assigneeId = assignee.id;
+        contributorUpdate = [{ memberId: assignee.id, share: 100 }];
       }
     }
 
     if (Object.keys(updates).length === 0) {
-      const memberProfiles = await loadProjectMembersWithAvatars(projectId);
-      const memberById = new Map(
-        memberProfiles.map(({ member, avatarEmoji }) => [
-          member.id,
-          { name: member.name, avatarEmoji },
-        ])
-      );
       return NextResponse.json({
-        task: toTaskDTO(task, task.assigneeId ? memberById.get(task.assigneeId) ?? null : null),
+        task: await serializeTask(projectId, task),
       });
     }
 
     updates.updatedAt = new Date();
-    const [updated] = await db
-      .update(tasks)
-      .set(updates)
-      .where(eq(tasks.id, taskId))
-      .returning();
-
-    const memberProfiles = await loadProjectMembersWithAvatars(projectId);
-    const memberById = new Map(
-      memberProfiles.map(({ member, avatarEmoji }) => [
-        member.id,
-        { name: member.name, avatarEmoji },
-      ])
-    );
+    const updated = await db.transaction(async (tx) => {
+      const [updatedTask] = await tx
+        .update(tasks)
+        .set(updates)
+        .where(eq(tasks.id, taskId))
+        .returning();
+      if (contributorUpdate !== undefined) {
+        await replaceTaskContributors(tx, taskId, contributorUpdate);
+      }
+      return updatedTask;
+    });
 
     return NextResponse.json({
-      task: toTaskDTO(
-        updated,
-        updated.assigneeId ? memberById.get(updated.assigneeId) ?? null : null
-      ),
+      task: await serializeTask(projectId, updated),
     });
   } catch (err) {
     const { status, body } = toErrorResponse(err);
@@ -158,10 +233,14 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
     const task = await loadTask(projectId, taskId);
     if (!task) throw Errors.notFound("Task");
 
-    await db
-      .update(tasks)
-      .set({ isDeleted: true, updatedAt: new Date() })
-      .where(eq(tasks.id, taskId));
+    await db.transaction(async (tx) => {
+      await replaceTaskContributors(tx, taskId, []);
+      await tx
+        .update(tasks)
+        .set({ isDeleted: true, updatedAt: new Date() })
+        .where(eq(tasks.id, taskId))
+        .run();
+    });
 
     return NextResponse.json({ ok: true });
   } catch (err) {

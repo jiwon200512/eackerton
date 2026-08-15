@@ -1,6 +1,12 @@
 import { EVENT_TYPES, TASK_STATUSES, type EventType, type TaskStatus } from "@/lib/types";
 import { Errors } from "@/lib/errors";
 import type { AIEvaluation, AIEventRaw, AIEvidenceItem } from "./schema";
+import { normalizeContributorShares } from "@/services/tasks/contributors";
+
+export interface ValidatedContributor {
+  memberName: string;
+  share: number;
+}
 
 export interface ValidatedEvent {
   type: EventType;
@@ -8,6 +14,7 @@ export interface ValidatedEvent {
   taskTitle: string;
   assigneeName: string | null;
   previousAssigneeName: string | null;
+  contributors: ValidatedContributor[];
   status: TaskStatus | null;
   previousStatus: TaskStatus | null;
   confidence: number;
@@ -32,6 +39,42 @@ function clampInt(n: unknown, min: number, max: number, fallback: number): numbe
 function clampConfidence(n: unknown): number {
   const num = typeof n === "number" && Number.isFinite(n) ? n : 0;
   return Math.min(1, Math.max(0, num));
+}
+
+export function normalizeAIContributors(
+  raw: unknown,
+  memberNames: Set<string>
+): ValidatedContributor[] | null {
+  if (raw === undefined || (Array.isArray(raw) && raw.length === 0)) return [];
+  if (!Array.isArray(raw)) return null;
+
+  const valid: Array<ValidatedContributor & { memberId: string }> = [];
+  const seen = new Set<string>();
+  for (const item of raw) {
+    if (!item || typeof item !== "object") continue;
+    const candidate = item as { memberName?: unknown; share?: unknown };
+    const memberName =
+      typeof candidate.memberName === "string" ? candidate.memberName.trim() : "";
+    if (!memberName || !memberNames.has(memberName)) continue;
+    if (seen.has(memberName)) return null;
+    if (
+      typeof candidate.share !== "number" ||
+      !Number.isInteger(candidate.share) ||
+      candidate.share < 1 ||
+      candidate.share > 100
+    ) {
+      continue;
+    }
+    seen.add(memberName);
+    valid.push({ memberId: memberName, memberName, share: candidate.share });
+  }
+  if (raw.length > 0 && valid.length === 0) return null;
+  const normalized = normalizeContributorShares(valid);
+  if (valid.length > 0 && normalized.length === 0) return null;
+  return normalized.map(({ memberName, share }) => ({
+    memberName,
+    share,
+  }));
 }
 
 /**
@@ -97,6 +140,16 @@ export function validateAIResult(
         ? previousAssigneeNameRaw
         : null;
 
+    let contributors = normalizeAIContributors(e.contributors, memberSet);
+    if (contributors === null) continue;
+    if (
+      contributors.length === 0 &&
+      assigneeName &&
+      (type === "TASK_CREATE" || type === "TASK_ASSIGNEE_CHANGE")
+    ) {
+      contributors = [{ memberName: assigneeName, share: 100 }];
+    }
+
     const status =
       typeof e.status === "string" && TASK_STATUSES.includes(e.status as TaskStatus)
         ? (e.status as TaskStatus)
@@ -137,7 +190,8 @@ export function validateAIResult(
     const majorChange =
       type === "TASK_CREATE" ||
       type === "TASK_STATUS_CHANGE" ||
-      type === "TASK_ASSIGNEE_CHANGE";
+      type === "TASK_ASSIGNEE_CHANGE" ||
+      type === "TASK_CONTRIBUTORS_CHANGE";
     if (majorChange && evidence.length === 0) continue;
 
     // Rule #5: low-confidence changes are not applied; the safer choice
@@ -145,7 +199,7 @@ export function validateAIResult(
     // existing task is lower-risk, so we allow a lower bar there, but still
     // filter out near-zero-confidence noise entirely.
     const requiredConfidence = majorChange
-      ? type === "TASK_ASSIGNEE_CHANGE"
+      ? type === "TASK_ASSIGNEE_CHANGE" || type === "TASK_CONTRIBUTORS_CHANGE"
         ? 0.6
         : MIN_CONFIDENCE_TO_APPLY
       : 0.3;
@@ -173,6 +227,7 @@ export function validateAIResult(
       taskTitle,
       assigneeName,
       previousAssigneeName,
+      contributors,
       status,
       previousStatus,
       confidence,

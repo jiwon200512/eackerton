@@ -5,6 +5,10 @@ export interface ContextTask {
   title: string;
   assignee: string | null;
   status: TaskStatus;
+  importance: number;
+  difficulty: number;
+  workload: number;
+  contributors: { memberName: string; share: number }[];
   recentEvidence: string[];
 }
 

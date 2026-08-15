@@ -20,6 +20,7 @@ import ContributionHistoryChart from "@/components/ContributionHistoryChart";
 import EmptyState from "@/components/EmptyState";
 import Spinner from "@/components/Spinner";
 import StatusBadge from "@/components/StatusBadge";
+import TaskContributors from "@/components/TaskContributors";
 
 export default function ProjectResultPage({
   params,
@@ -171,7 +172,7 @@ export default function ProjectResultPage({
               <li key={task.id}>
                 <button type="button" onClick={() => router.push(`/projects/${projectId}/tasks/${task.id}`)} className="w-full rounded-xl border border-white/70 bg-white/50 p-4 text-left hover:border-indigo-200 hover:bg-white/75">
                   <div className="flex items-start justify-between gap-3"><span className="min-w-0 truncate text-sm font-semibold text-slate-800">{task.title}</span><StatusBadge status={task.status} /></div>
-                  <div className="mt-3 flex items-center gap-2 text-xs text-slate-500"><Avatar emoji={task.assigneeAvatarEmoji} name={task.assigneeName} size="sm" />{task.assigneeName ?? "미배정"}</div>
+                  <div className="mt-3"><TaskContributors contributors={task.contributors} compact /></div>
                 </button>
               </li>
             ))}

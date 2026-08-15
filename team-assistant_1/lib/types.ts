@@ -18,6 +18,7 @@ export const EVENT_TYPES = [
   "TASK_CREATE",
   "TASK_STATUS_CHANGE",
   "TASK_ASSIGNEE_CHANGE",
+  "TASK_CONTRIBUTORS_CHANGE",
   "TASK_UPDATE",
   "EVIDENCE_ADD",
 ] as const;
@@ -36,6 +37,7 @@ export interface TaskDTO {
   assigneeId: string | null;
   assigneeName: string | null;
   assigneeAvatarEmoji: string;
+  contributors: TaskContributorDTO[];
   status: TaskStatus;
   importance: number;
   difficulty: number;
@@ -60,6 +62,13 @@ export interface MemberDTO {
   role: ProjectRole | null;
   avatarEmoji: string;
   createdAt: number | string;
+}
+
+export interface TaskContributorDTO {
+  memberId: string;
+  name: string;
+  avatarEmoji: string;
+  share: number;
 }
 
 export type ProjectRole = "OWNER" | "MEMBER";

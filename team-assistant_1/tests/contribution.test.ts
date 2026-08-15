@@ -95,4 +95,76 @@ describe("calculateContribution", () => {
     // the highest contributor despite login+API split across two tasks for m1.
     expect(byId.m2.percentage).toBeGreaterThan(byId.m3.percentage);
   });
+
+  it("splits one completed Task score by contributor share", () => {
+    const result = calculateContribution(members, [{
+      assigneeId: null,
+      contributors: [
+        { memberId: "m1", share: 60 },
+        { memberId: "m2", share: 40 },
+      ],
+      status: "DONE",
+      importance: 5,
+      difficulty: 5,
+      workload: 5,
+    }]);
+    const byId = Object.fromEntries(result.map((item) => [item.memberId, item]));
+    expect(byId.m1.rawScore).toBe(3);
+    expect(byId.m2.rawScore).toBe(2);
+    expect(byId.m1.percentage).toBe(60);
+    expect(byId.m2.percentage).toBe(40);
+  });
+
+  it("combines shared and solo Tasks before calculating final percentages", () => {
+    const result = calculateContribution(members, [
+      {
+        assigneeId: null,
+        contributors: [
+          { memberId: "m1", share: 60 },
+          { memberId: "m2", share: 40 },
+        ],
+        status: "DONE",
+        importance: 5,
+        difficulty: 5,
+        workload: 5,
+      },
+      {
+        assigneeId: "m2",
+        contributors: [{ memberId: "m2", share: 100 }],
+        status: "DONE",
+        importance: 3,
+        difficulty: 3,
+        workload: 3,
+      },
+    ]);
+    const byId = Object.fromEntries(result.map((item) => [item.memberId, item]));
+    expect(byId.m1.rawScore).toBe(3);
+    expect(byId.m2.rawScore).toBe(5);
+    expect(byId.m1.percentage).toBe(37.5);
+    expect(byId.m2.percentage).toBe(62.5);
+  });
+
+  it("keeps legacy assignee-only Tasks as a 100% assignment", () => {
+    const result = calculateContribution(members, [{
+      assigneeId: "m1",
+      status: "DONE",
+      importance: 5,
+      difficulty: 5,
+      workload: 5,
+    }]);
+    expect(result.find((item) => item.memberId === "m1")?.rawScore).toBe(5);
+    expect(result.find((item) => item.memberId === "m1")?.percentage).toBe(100);
+  });
+
+  it("excludes Tasks that have neither contributors nor a legacy assignee", () => {
+    const result = calculateContribution(members, [{
+      assigneeId: null,
+      contributors: [],
+      status: "DONE",
+      importance: 5,
+      difficulty: 5,
+      workload: 5,
+    }]);
+    expect(result.every((item) => item.rawScore === 0 && item.percentage === 0)).toBe(true);
+  });
 });

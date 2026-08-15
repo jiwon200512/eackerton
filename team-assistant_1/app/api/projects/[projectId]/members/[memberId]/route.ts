@@ -1,13 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db/client";
-import { members, projectUsers } from "@/lib/db/schema";
-import { and, eq } from "drizzle-orm";
+import { members, projectUsers, taskContributors, tasks } from "@/lib/db/schema";
+import { and, eq, inArray } from "drizzle-orm";
 import { Errors, toErrorResponse } from "@/lib/errors";
 import { requireUser } from "@/lib/auth/session";
 import {
   assertProjectIsActive,
   requireProjectOwner,
 } from "@/lib/projects/access";
+import {
+  groupContributorRowsByTask,
+  normalizeContributorShares,
+  replaceTaskContributors,
+} from "@/services/tasks/contributors";
 
 type Params = { params: Promise<{ projectId: string; memberId: string }> };
 
@@ -37,9 +42,37 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
     }
     if (linkedMembership?.role === "OWNER") throw Errors.cannotDeleteOwner();
 
+    const affectedContributorRows = await db
+      .select({ taskId: taskContributors.taskId })
+      .from(taskContributors)
+      .where(eq(taskContributors.memberId, memberId));
+    const affectedTaskIds = [...new Set(affectedContributorRows.map((row) => row.taskId))];
+
     await db.transaction(async (tx) => {
       // tasks.assigneeId becomes NULL through the existing FK rule.
-      await tx.delete(members).where(eq(members.id, memberId));
+      await tx.delete(members).where(eq(members.id, memberId)).run();
+      if (affectedTaskIds.length > 0) {
+        const remainingRows = await tx
+          .select()
+          .from(taskContributors)
+          .where(inArray(taskContributors.taskId, affectedTaskIds))
+          .all();
+        const remainingByTask = groupContributorRowsByTask(remainingRows);
+        for (const taskId of affectedTaskIds) {
+          const normalized = normalizeContributorShares(
+            remainingByTask.get(taskId) ?? []
+          );
+          await replaceTaskContributors(tx, taskId, normalized);
+          await tx
+            .update(tasks)
+            .set({
+              assigneeId: normalized.length === 1 ? normalized[0].memberId : null,
+              updatedAt: new Date(),
+            })
+            .where(eq(tasks.id, taskId))
+            .run();
+        }
+      }
       if (existing.userId && linkedMembership?.role === "MEMBER") {
         await tx
           .delete(projectUsers)
@@ -49,7 +82,8 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
               eq(projectUsers.userId, existing.userId),
               eq(projectUsers.role, "MEMBER")
             )
-          );
+          )
+          .run();
       }
     });
     return NextResponse.json({ ok: true });

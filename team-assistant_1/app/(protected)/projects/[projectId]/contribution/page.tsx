@@ -27,7 +27,13 @@ export default function ContributionReportPage({ params }: { params: Promise<{ p
       setTasks(taskRes.tasks);
       const details = await Promise.all(taskRes.tasks.map((task) => getTask(projectId, task.id).catch(() => null)));
       const counts: Record<string, number> = {};
-      for (const detail of details) if (detail?.task.assigneeId) counts[detail.task.assigneeId] = (counts[detail.task.assigneeId] ?? 0) + detail.evidence.length;
+      for (const detail of details) {
+        if (!detail) continue;
+        for (const contributor of detail.task.contributors) {
+          counts[contributor.memberId] =
+            (counts[contributor.memberId] ?? 0) + detail.evidence.length;
+        }
+      }
       setEvidenceByMember(counts);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "기여도 리포트를 불러오지 못했습니다.");
@@ -41,7 +47,7 @@ export default function ContributionReportPage({ params }: { params: Promise<{ p
     load();
   }, [load]);
 
-  const taskCounts = useMemo(() => Object.fromEntries(members.map((member) => [member.id, tasks.filter((task) => task.assigneeId === member.id).length])), [members, tasks]);
+  const taskCounts = useMemo(() => Object.fromEntries(members.map((member) => [member.id, tasks.filter((task) => task.contributors.some((contributor) => contributor.memberId === member.id)).length])), [members, tasks]);
   const rankedContribution = useMemo(() => [...contribution].sort((a, b) => b.percentage - a.percentage), [contribution]);
 
   if (loading) return <div className="page-container flex min-h-[60vh] items-center justify-center"><Spinner label="기여도 데이터를 불러오는 중..." /></div>;

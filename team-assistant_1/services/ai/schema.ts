@@ -18,12 +18,18 @@ export const AIEvaluationSchema = z.object({
   workload: z.number(),
 });
 
+export const AIContributorSchema = z.object({
+  memberName: z.string(),
+  share: z.number(),
+});
+
 export const AIEventSchema = z.object({
   type: z.enum(EVENT_TYPES),
   existingTaskId: z.string().nullable(),
   taskTitle: z.string(),
   assigneeName: z.string().nullable(),
   previousAssigneeName: z.string().nullable(),
+  contributors: z.array(AIContributorSchema).default([]),
   status: z.enum(TASK_STATUSES).nullable(),
   previousStatus: z.enum(TASK_STATUSES).nullable(),
   confidence: z.number(),
@@ -61,6 +67,18 @@ export const AI_JSON_SCHEMA = {
             taskTitle: { type: "string" },
             assigneeName: { type: ["string", "null"] },
             previousAssigneeName: { type: ["string", "null"] },
+            contributors: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  memberName: { type: "string" },
+                  share: { type: "integer", minimum: 1, maximum: 100 },
+                },
+                required: ["memberName", "share"],
+                additionalProperties: false,
+              },
+            },
             status: { type: ["string", "null"], enum: [...TASK_STATUSES, null] },
             previousStatus: {
               type: ["string", "null"],
@@ -97,6 +115,7 @@ export const AI_JSON_SCHEMA = {
             "taskTitle",
             "assigneeName",
             "previousAssigneeName",
+            "contributors",
             "status",
             "previousStatus",
             "confidence",

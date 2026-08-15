@@ -1,5 +1,28 @@
 # Effortly
 
+## 공동 Task 참여자와 기여도
+
+Task는 한 명 또는 여러 명의 참여자를 지원합니다. `task_contributors`는 Task와 팀원을 연결하고 각 Task 내부의 정수 비율 `share`를 저장합니다. 동일한 Task/팀원 조합은 한 번만 저장되며, share는 1~100이고 한 Task의 전체 share 합은 애플리케이션에서 항상 100으로 검증합니다.
+
+기존 `tasks.assignee_id`는 호환성을 위해 유지합니다. 연결된 contributor가 없는 기존 Task는 assignee를 100% 참여자로 계산합니다. 공동 Task는 `assignee_id`를 `NULL`로 두고 `task_contributors`를 authoritative 데이터로 사용합니다.
+
+```text
+TaskScore = importance*0.3 + difficulty*0.3 + workload*0.4
+TaskWeightedScore = TaskScore * StatusMultiplier
+MemberTaskScore = TaskWeightedScore * (share / 100)
+Contribution(member) = MemberRawScore / AllMemberRawScore * 100
+
+StatusMultiplier: TODO=0.2, IN_PROGRESS=0.6, DONE=1.0
+```
+
+AI는 Evidence를 바탕으로 Task 내부의 참여자와 상대 비율만 판단합니다. 메시지 수나 발언량은 계산 기준으로 사용하지 않으며, 최종 프로젝트 기여도는 서버의 결정적 계산 코드가 산출합니다. 잘못된 멤버와 share는 제거하고, 유효한 share의 합계만 어긋난 경우 largest-remainder 방식으로 합계 100이 되도록 정규화합니다.
+
+공동작업 스키마를 적용하려면 배포 대상 환경에서 다음 명령을 실행하세요.
+
+```bash
+npm run db:migrate
+```
+
 ## 프로젝트 종료와 최종 결과
 
 프로젝트 OWNER는 대시보드의 `프로젝트 종료` 버튼으로 현재 기여도를 확정할 수 있습니다. 종료 처리는 한 트랜잭션에서 프로젝트를 `COMPLETED`로 전환하고 최종 기여도 스냅샷을 저장합니다. 종료된 프로젝트는 홈의 아카이브 영역과 `/projects/[projectId]/result`에서 조회할 수 있습니다.

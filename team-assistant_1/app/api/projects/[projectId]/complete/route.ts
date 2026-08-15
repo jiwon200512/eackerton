@@ -14,6 +14,10 @@ import { requireProjectOwner } from "@/lib/projects/access";
 import { PROJECT_STATUS } from "@/lib/projects/status";
 import { calculateContribution } from "@/services/contribution/calculate";
 import type { TaskStatus } from "@/lib/types";
+import {
+  groupContributorRowsByTask,
+  loadTaskContributorRows,
+} from "@/services/tasks/contributors";
 
 type Params = { params: Promise<{ projectId: string }> };
 
@@ -79,10 +83,16 @@ export async function POST(_request: NextRequest, { params }: Params) {
         .where(
           and(eq(tasks.projectId, projectId), eq(tasks.isDeleted, false))
         );
+      const contributorRows = await loadTaskContributorRows(
+        tx,
+        taskRows.map((task) => task.id)
+      );
+      const contributorsByTask = groupContributorRowsByTask(contributorRows);
       const contribution = calculateContribution(
         memberRows.map((member) => ({ id: member.id, name: member.name })),
         taskRows.map((task) => ({
           assigneeId: task.assigneeId,
+          contributors: contributorsByTask.get(task.id),
           status: task.status as TaskStatus,
           importance: task.importance,
           difficulty: task.difficulty,

@@ -8,6 +8,10 @@ import type { TaskDTO, TaskStatus } from "@/lib/types";
 import { requireUser } from "@/lib/auth/session";
 import { requireProjectAccess } from "@/lib/projects/access";
 import { loadProjectMembersWithAvatars } from "@/lib/members/query";
+import {
+  buildContributorDTOsByTask,
+  loadTaskContributorRows,
+} from "@/services/tasks/contributors";
 
 type Params = { params: Promise<{ projectId: string }> };
 
@@ -29,9 +33,21 @@ export async function GET(_req: NextRequest, { params }: Params) {
         { name: member.name, avatarEmoji },
       ])
     );
+    const contributorRows = await loadTaskContributorRows(
+      db,
+      taskRows.map((task) => task.id)
+    );
+    const contributorsByTask = buildContributorDTOsByTask(
+      contributorRows,
+      memberById
+    );
 
     const dtos: TaskDTO[] = taskRows.map((t) =>
-      toTaskDTO(t, t.assigneeId ? memberById.get(t.assigneeId) ?? null : null)
+      toTaskDTO(
+        t,
+        t.assigneeId ? memberById.get(t.assigneeId) ?? null : null,
+        contributorsByTask.get(t.id) ?? []
+      )
     );
 
     // Stable, readable ordering for the dashboard: in-progress first, then

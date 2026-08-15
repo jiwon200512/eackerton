@@ -5,6 +5,7 @@ import { evidence, tasks } from "@/lib/db/schema";
 import type * as schema from "@/lib/db/schema";
 import type { EventType, TaskStatus } from "@/lib/types";
 import type { ValidatedEvent } from "@/services/ai/validate";
+import { replaceTaskContributors } from "@/services/tasks/contributors";
 
 // Shared base type of both the plain db handle and a transaction (tx)
 // handle, so applyTaskEvents can be called with either. Turso/libSQL
@@ -20,6 +21,7 @@ export interface ExistingTaskRow {
   importance: number;
   difficulty: number;
   workload: number;
+  contributors: { memberId: string; memberName: string; share: number }[];
 }
 
 export interface AppliedChange {
@@ -36,6 +38,26 @@ const STATUS_LABEL: Record<TaskStatus, string> = {
   IN_PROGRESS: "진행 중",
   DONE: "완료",
 };
+
+function sameContributors(
+  left: { memberId: string; share: number }[],
+  right: { memberId: string; share: number }[]
+) {
+  const canonical = (items: { memberId: string; share: number }[]) =>
+    [...items]
+      .sort((a, b) => a.memberId.localeCompare(b.memberId))
+      .map((item) => `${item.memberId}:${item.share}`)
+      .join("|");
+  return canonical(left) === canonical(right);
+}
+
+function contributorSummary(
+  contributors: { memberName: string; share: number }[]
+) {
+  return contributors.length > 0
+    ? contributors.map((item) => `${item.memberName} ${item.share}%`).join(" / ")
+    : "참여자 없음";
+}
 
 async function insertEvidence(
   tx: DB,
@@ -98,6 +120,14 @@ export async function applyTaskEvents(
     const assigneeId = event.assigneeName
       ? memberByName.get(event.assigneeName) ?? null
       : null;
+    const eventContributors = event.contributors
+      .map((contributor) => {
+        const memberId = memberByName.get(contributor.memberName);
+        return memberId
+          ? { memberId, memberName: contributor.memberName, share: contributor.share }
+          : null;
+      })
+      .filter((contributor): contributor is NonNullable<typeof contributor> => contributor !== null);
 
     if (event.type === "TASK_CREATE") {
       const status = event.status ?? "TODO";
@@ -111,7 +141,12 @@ export async function applyTaskEvents(
         .values({
           projectId,
           title: event.taskTitle,
-          assigneeId,
+          assigneeId:
+            eventContributors.length === 1
+              ? eventContributors[0].memberId
+              : eventContributors.length > 1
+                ? null
+                : assigneeId,
           status,
           importance: evalScore.importance,
           difficulty: evalScore.difficulty,
@@ -120,6 +155,10 @@ export async function applyTaskEvents(
         })
         .returning()
         .get();
+
+      if (eventContributors.length > 0) {
+        await replaceTaskContributors(tx, created.id, eventContributors);
+      }
 
       await insertEvidence(tx, created.id, recordId, event.evidence, seenEvidence);
 
@@ -134,13 +173,14 @@ export async function applyTaskEvents(
         importance: created.importance,
         difficulty: created.difficulty,
         workload: created.workload,
+        contributors: eventContributors,
       });
 
       changes.push({
         taskId: created.id,
         taskTitle: created.title,
         changeType: "TASK_CREATE",
-        summary: `신규 Task 생성 (${STATUS_LABEL[status]})`,
+        summary: `신규 Task 생성 (${STATUS_LABEL[status]}) · ${contributorSummary(eventContributors)}`,
         reason: event.reason || null,
         confidence: event.confidence,
       });
@@ -176,18 +216,56 @@ export async function applyTaskEvents(
 
     if (event.type === "TASK_ASSIGNEE_CHANGE") {
       const prevAssigneeId = existing.assigneeId;
-      if (assigneeId && assigneeId !== prevAssigneeId) {
+      const nextContributors = assigneeId && event.assigneeName
+        ? [{ memberId: assigneeId, memberName: event.assigneeName, share: 100 }]
+        : [];
+      if (
+        assigneeId &&
+        (assigneeId !== prevAssigneeId || !sameContributors(existing.contributors, nextContributors))
+      ) {
+        await replaceTaskContributors(tx, existing.id, nextContributors);
         await tx
           .update(tasks)
           .set({ assigneeId, lastReason: event.reason || null, updatedAt: new Date() })
           .where(eq(tasks.id, existing.id))
           .run();
         existing.assigneeId = assigneeId;
+        existing.contributors = nextContributors;
         changes.push({
           taskId: existing.id,
           taskTitle: existing.title,
           changeType: "TASK_ASSIGNEE_CHANGE",
           summary: `담당자 변경: ${event.previousAssigneeName ?? "미배정"} → ${event.assigneeName ?? "미배정"}`,
+          reason: event.reason || null,
+          confidence: event.confidence,
+        });
+      }
+      await insertEvidence(tx, existing.id, recordId, event.evidence, seenEvidence);
+      continue;
+    }
+
+    if (event.type === "TASK_CONTRIBUTORS_CHANGE") {
+      if (!sameContributors(existing.contributors, eventContributors)) {
+        const previous = contributorSummary(existing.contributors);
+        await replaceTaskContributors(tx, existing.id, eventContributors);
+        const nextAssigneeId =
+          eventContributors.length === 1 ? eventContributors[0].memberId : null;
+        await tx
+          .update(tasks)
+          .set({
+            assigneeId: nextAssigneeId,
+            lastReason: event.reason || null,
+            updatedAt: new Date(),
+          })
+          .where(eq(tasks.id, existing.id))
+          .run();
+        existing.assigneeId = nextAssigneeId;
+        existing.contributors = eventContributors;
+        changes.push({
+          taskId: existing.id,
+          taskTitle: existing.title,
+          changeType: "TASK_CONTRIBUTORS_CHANGE",
+          summary: `참여자 변경: ${previous} → ${contributorSummary(eventContributors)}`,
           reason: event.reason || null,
           confidence: event.confidence,
         });
