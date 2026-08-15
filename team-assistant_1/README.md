@@ -1,4 +1,4 @@
-# Effortly4456
+# Effortly
 
 ## 공동 Task 참여자와 기여도
 
